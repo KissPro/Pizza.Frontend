@@ -1,0 +1,28 @@
+<nb-card accent="success">
+  <nb-card-header>
+    Upload File {{type}}<button class="float-right" nbButton ghost tabIndex="-1"  (click)="downloadTemplate()" status="info"><nb-icon icon="download-outline"></nb-icon></button>
+  </nb-card-header>
+  <nb-card-body>
+    <div class="row">
+      <div class="col-md-2">
+        <input type="file" #file placeholder="Choose file" (change)="uploadFile(file.files)" style="display:none;">
+        <button nbButton outline (click)="file.click()" tabIndex="-1" status="success">Upload<nb-icon icon="upload-outline"></nb-icon></button>
+      </div>
+      <div class="offset-md-2 col-md-8">
+        <span class="upload" *ngIf="progress > 0">
+          {{progress}}%
+          <nb-progress-bar [value]="progress" status="{{statusProcess}}"></nb-progress-bar>
+        </span>
+        <span class="upload" *ngIf="message">
+          {{message}}
+        </span>
+      </div>
+    </div>
+  </nb-card-body>
+  <nb-card-footer>
+    <div class="text-right">
+      <button class="cancel" nbButton status="danger" (click)="cancel()">Cancel</button>
+      <button nbButton status="success" (click)="submit()">Submit</button>
+    </div> 
+  </nb-card-footer>
+</nb-card>

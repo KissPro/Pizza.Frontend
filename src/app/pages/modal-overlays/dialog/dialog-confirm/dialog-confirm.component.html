@@ -1,0 +1,14 @@
+<nb-card>
+  <nb-card-body>
+    <div class="ml-3 mr-3">
+      <div class="text-center mb-2">
+        <nb-icon icon="alert-circle-outline" status="warning" style="font-size:'7rem'"></nb-icon>
+      </div>
+      <h4 class="text-center text-secondary mb-4">Are you sure?</h4>
+      <div class="text-center">
+        <button class="cancel" nbButton status="danger" (click)="cancel()">NO, cancel!</button>
+        <button nbButton status="success" (click)="submit()">Yes, do it</button>
+      </div>
+    </div>
+  </nb-card-body>
+</nb-card>

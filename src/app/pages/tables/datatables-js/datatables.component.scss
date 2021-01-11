@@ -1,0 +1,10 @@
+/*
+   server-side-angular-way.component.css
+*/
+.no-data-available {
+   text-align: center;
+ }
+ 
+ ::ng-deep table.dataTable td.dataTables_empty {
+  display: none;
+}
