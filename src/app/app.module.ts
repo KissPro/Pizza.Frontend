@@ -17,6 +17,7 @@ import {
   NbDatepickerModule,
   NbDialogModule,
   NbMenuModule,
+  NbProgressBarModule,
   NbSidebarModule,
   NbToastrModule,
   NbWindowModule,

@@ -7,14 +7,14 @@ export const MENU_ITEMS: NbMenuItem[] = [
   //   link: '/pages/dashboard',
   // },
   {
-    title: 'ANNEX 5 BOM of circular 05/2018/TT-BCT',
+    title: 'Issue Table',
     icon: 'layers-outline',
-    link: '/pages/tables/boom-ecus',
+    link: '/pages/tables/issue',
   },
   {
-    title: 'Delivery and Sales',
+    title: 'Create Issue',
     icon: 'car-outline',
-    link: '/pages/tables/dn',
+    link: '/pages/tables/create-issue',
   },
   {
     title: 'SETTINGS',

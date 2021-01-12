@@ -12,6 +12,7 @@ import { BoomEcusService } from 'app/@core/service/boom-ecus.service';
 import { DNService } from 'app/@core/service/dn.service';
 import { CountryShipService } from 'app/@core/service/country-ship.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { IssueService } from 'app/@core/service/issue.service';
 
 @NgModule({
   imports: [
@@ -28,7 +29,7 @@ import { FormsModule, ReactiveFormsModule } from '@angular/forms';
   declarations: [
     PagesComponent,
   ],
-  providers: [COOService, BoomEcusService, DNService, CountryShipService],
+  providers: [COOService, BoomEcusService, DNService, CountryShipService, IssueService],
 })
 export class PagesModule {
 }

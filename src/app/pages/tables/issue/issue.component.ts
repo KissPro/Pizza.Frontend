@@ -7,23 +7,26 @@ import { BoomEcusService } from 'app/@core/service/boom-ecus.service';
 import { Subject } from 'rxjs';
 import { DataTableDirective } from 'angular-datatables';
 import { UploadService } from 'app/@core/service/upload-file.service';
-
+import { IssueModel } from 'app/@core/models/issue';
+import { IssueService } from 'app/@core/service/issue.service';
 
 @Component({
-  selector: 'ngx-boom-ecus',
-  templateUrl: 'boom-ecus.component.html',
-  styleUrls: ['boom-ecus.component.scss'],
+  selector: 'ngx-issue',
+  templateUrl: './issue.component.html',
+  styleUrls: ['./issue.component.scss']
 })
-export class BoomEcusComponent implements OnInit, AfterViewInit, OnDestroy {
+export class IssueComponent implements OnInit {
+
   dtOptions: DataTables.Settings = {};
-  boomEcus: BoomEcusModel[];
+  issueModel: IssueModel[];
+
   dtTrigger: Subject<any> = new Subject();
   indexTable: number;
   @ViewChild(DataTableDirective, { static: false })
   dtElement: DataTableDirective;
 
   constructor(private http: HttpClient,
-    private boomEcusService: BoomEcusService,
+    private issueService: IssueService,
     private uploadService: UploadService,
     private sidebarService: NbSidebarService,
     private layoutService: LayoutService) { }
@@ -39,13 +42,13 @@ export class BoomEcusComponent implements OnInit, AfterViewInit, OnDestroy {
       serverSide: true,
       processing: true,
       scrollX: true, // header scroll
-      scrollY: '65vh', // hight data
+      scrollY: '56vh', // hight data
       order: [1, 'asc'],
 
       ajax: (dataTablesParameters: any, callback) => {
-        that.boomEcusService.getBoomEcus(dataTablesParameters)
+        that.issueService.getIssue(dataTablesParameters)
           .subscribe(resp => {
-            that.boomEcus = resp.data;
+            that.issueModel = resp.data;
             that.indexTable = resp.start;
             callback({
               recordsTotal: resp.recordsTotal,
@@ -57,10 +60,8 @@ export class BoomEcusComponent implements OnInit, AfterViewInit, OnDestroy {
       },
       columns: [
         // tslint:disable-next-line: max-line-length
-        { data: 'index' }, { data: 'plant' }, { data: 'parentMaterial' },
-        { data: 'level' }, { data: 'item' }, { data: 'tenHang' },
-        { data: 'maHS' }, { data: 'quantity' }, { data: 'donGiaHd' }, { data: 'country' },
-        { data: 'soTk' }, { data: 'ngayDk' }, { data: 'altGroup' }, { data: 'sortString' },
+        { data: 'index' }, { data: 'issueNo' }, { data: 'title' },
+        { data: 'failureDesc' }, { data: 'issueStatus' }, { data: 'processType' },
       ],
     };
   }
@@ -92,19 +93,37 @@ export class BoomEcusComponent implements OnInit, AfterViewInit, OnDestroy {
       this.currentRow = null;
   }
 
-  downloadBoomEcus() {
-    console.log(1);
-    this.boomEcusService.downloadBoomEcus()
-    .subscribe(
-      result => this.uploadService.ShowFile(result, 'Download_BoomEcus_' + new Date().toLocaleString()),
-    );
+  downloadIssue() {
+    this.issueService.download()
+      .subscribe(
+        result => this.uploadService.ShowFile(result, 'Download_BoomEcus_' + new Date().toLocaleString()),
+      );
   }
 
-  // hideColumn() {
-  //   this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
-  //     const column = dtInstance.column(1);
-  //     column.visible( ! column.visible() );
-  //   });
-  //   // this.rerender();
-  // }
+
+  // Show progress bar
+  showIssueStatus(status: string) {
+    if (status.toLocaleUpperCase() === 'OPEN')
+      return 25;
+    else if (status.toLocaleUpperCase() === 'ON-GOING')
+      return 50;
+    else if (status.toLocaleUpperCase() === 'MONITORING')
+      return 75;
+    else if (status.toLocaleUpperCase() === 'CLOSED')
+      return 100;
+    else
+      return 0; // re-open
+  }
+  progressStatus(value: number) {
+    if (value <= 25) {
+      return 'danger';
+    } else if (value <= 50) {
+      return 'warning';
+    } else if (value <= 75) {
+      return 'info';
+    } else {
+      return 'success';
+    }
+  }
+  
 }

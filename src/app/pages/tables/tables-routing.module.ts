@@ -11,6 +11,8 @@ import { CountryShipComponent } from './country-ship/country-ship.component';
 import { ConfigComponent } from './config/config.component';
 import { PlantComponent } from './plant/plant.component';
 import { DNMComponent } from './dn/dnm.component';
+import { IssueComponent } from './issue/issue.component';
+import { CreateIssueComponent } from './create-issue/create-issue.component';
 
 const routes: Routes = [{
   path: '',
@@ -52,6 +54,14 @@ const routes: Routes = [{
       path: 'plant',
       component: PlantComponent,
     },
+    {
+      path: 'issue',
+      component: IssueComponent,
+    },
+    {
+      path: 'create-issue',
+      component: CreateIssueComponent,
+    },
   ],
 }];
 
@@ -72,4 +82,6 @@ export const routedComponents = [
   CountryShipComponent,
   ConfigComponent,
   PlantComponent,
+  IssueComponent,
+  CreateIssueComponent,
 ];

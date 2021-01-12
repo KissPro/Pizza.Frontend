@@ -1,0 +1,136 @@
+<nb-card accent="info">
+    <nb-card-header>
+        Problem Description
+    </nb-card-header>
+    <nb-card-body>
+        <div class="row">
+            <div class="col-sm-4">
+                <nb-select placeholder="Info" status="info" placeholder="Select Showcase"
+                    [(selected)]="commonSelectedItem">
+                    <nb-option value="1">OBA</nb-option>
+                    <nb-option value="2">IT</nb-option>
+                    <nb-option value="4">Scrap</nb-option>
+                </nb-select>
+                <!-- <nb-select [selected]="currentTheme" (selectedChange)="changeTheme($event)" status="primary">
+                    <nb-option *ngFor="let theme of themes" [value]="theme.value"> {{ theme.name }}</nb-option>
+                  </nb-select> -->
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <input type="text" nbInput fullWidth id="inputFirstName" placeholder="Issue No">
+                </div>
+            </div>
+            <div class="col-sm-4">
+                <div class="form-group">
+                    <input type="text" nbInput fullWidth id="inputFirstName" placeholder="Issue Title">
+                </div>
+            </div>
+        </div>
+        <hr>
+        <div class="row">
+            <div class="col-sm-6">
+                <ngx-tiny-mce [rickText]="inputRick"
+                    (editorKeyup)="getRickText($event)"
+                ></ngx-tiny-mce>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="inputLastName" class="label">RPN</label>
+                    <input type="text" nbInput fullWidth id="inputLastName" placeholder="Last Name">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="inputEmail" class="label">Description</label>
+                    <input type="email" nbInput fullWidth id="inputEmail" placeholder="Email">
+                </div>
+            </div>
+            <div class="col-sm-6">
+                <div class="form-group">
+                    <label for="inputWebsite" class="label">Repeated Symptom</label>
+                    <input type="text" nbInput fullWidth id="inputWebsite" placeholder="Website">
+                </div>
+            </div>
+        </div>
+    </nb-card-body>
+</nb-card>
+
+
+<div class="row">
+    <div class="col-md-4">
+        <nb-card>
+            <nb-card-header>
+                OBA Information
+            </nb-card-header>
+            <nb-card-body>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="inputFirstName" class="label">First Name</label>
+                            <input type="text" nbInput fullWidth id="inputFirstName" placeholder="First Name">
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="inputLastName" class="label">Last Name</label>
+                            <input type="text" nbInput fullWidth id="inputLastName" placeholder="Last Name">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="inputEmail" class="label">Email</label>
+                            <input type="email" nbInput fullWidth id="inputEmail" placeholder="Email">
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="inputWebsite" class="label">Website</label>
+                            <input type="text" nbInput fullWidth id="inputWebsite" placeholder="Website">
+                        </div>
+                    </div>
+                </div>
+            </nb-card-body>
+        </nb-card>
+    </div>
+    <div class="col-md-4">
+        <nb-card>
+            <nb-card-header>
+                Product Information
+            </nb-card-header>
+            <nb-card-body>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="inputFirstName" class="label">First Name</label>
+                            <input type="text" nbInput fullWidth id="inputFirstName" placeholder="First Name">
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="inputLastName" class="label">Last Name</label>
+                            <input type="text" nbInput fullWidth id="inputLastName" placeholder="Last Name">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="inputEmail" class="label">Email</label>
+                            <input type="email" nbInput fullWidth id="inputEmail" placeholder="Email">
+                        </div>
+                    </div>
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="inputWebsite" class="label">Website</label>
+                            <input type="text" nbInput fullWidth id="inputWebsite" placeholder="Website">
+                        </div>
+                    </div>
+                </div>
+            </nb-card-body>
+        </nb-card>
+    </div>
+</div>

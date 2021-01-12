@@ -1,6 +1,8 @@
 import { NgModule } from '@angular/core';
 import { NbActionsModule, NbButtonModule, NbCardModule,
   NbDatepickerModule, NbIconModule, NbInputModule,
+  NbProgressBarModule,
+  NbSelectModule,
 NbTabsetModule, NbTreeGridModule, NbWindowModule } from '@nebular/theme';
 import { Ng2SmartTableModule } from 'ng2-smart-table';
 
@@ -18,7 +20,7 @@ import { PlantService } from 'app/@core/service/plant.service';
 import { ConfigService } from 'app/@core/service/config.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DNMComponent } from './dn/dnm.component';
-
+import { IssueService } from 'app/@core/service/issue.service';
 
 @NgModule({
   imports: [
@@ -26,8 +28,10 @@ import { DNMComponent } from './dn/dnm.component';
     NbTreeGridModule,
     NbTabsetModule,
     NbWindowModule,
+    NbProgressBarModule,
     NbIconModule,
     NbInputModule,
+    NbSelectModule,
     ThemeModule,
     TablesRoutingModule,
     Ng2SmartTableModule,
@@ -43,6 +47,8 @@ import { DNMComponent } from './dn/dnm.component';
     ...routedComponents,
     FsIconComponent,
   ],
-  providers: [COOService, BoomEcusService, DNService, CountryShipService, GuidService, PlantService, ConfigService],
+  providers: [COOService, BoomEcusService, DNService, 
+              CountryShipService, GuidService, PlantService, 
+              ConfigService, IssueService],
 })
 export class TablesModule { }

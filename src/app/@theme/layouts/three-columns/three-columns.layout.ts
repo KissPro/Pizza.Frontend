@@ -8,7 +8,6 @@ import { Component } from '@angular/core';
       <nb-layout-header fixed>
         <ngx-header></ngx-header>
       </nb-layout-header>
-
       <nb-sidebar class="menu-sidebar" tag="menu-sidebar" state="compacted" responsive>
         <ng-content select="nb-menu"></ng-content>
       </nb-sidebar>
@@ -29,4 +28,4 @@ import { Component } from '@angular/core';
     </nb-layout>
   `,
 })
-export class ThreeColumnsLayoutComponent {}
+export class ThreeColumnsLayoutComponent { }

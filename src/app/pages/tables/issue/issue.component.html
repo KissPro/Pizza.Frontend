@@ -1,0 +1,39 @@
+<nb-card>
+    <nb-card-header>
+      Issue Table
+      <button class="float-right" nbButton outline status="success" (click)="downloadIssue()">
+        <nb-icon icon="download-outline"></nb-icon>
+      </button>
+    </nb-card-header>
+    <nb-card-body>
+      <table datatable [dtOptions]="dtOptions[1]" [dtTrigger]="dtTrigger"
+             class="display row-border hover cell-border" style="width:100%">
+        <thead>
+          <tr class="table-secondary">
+            <th>#</th>
+            <th>ISSUE&nbsp;NO</th>
+            <th>TITLE</th>
+            <th>DESCRIPTION</th>
+            <th>TYPE</th>
+            <th>STATUS</th>
+          </tr>
+          <!-- </thead> -->
+        <tbody *ngIf="issueModel?.length != 0">
+          <tr *ngFor="let issue of issueModel;index as i" (click)="selectedRow($event, i)"
+            [class.selected]="i === currentRow">
+            <td>{{i + 1 + indexTable}}</td>
+            <td>{{ issue.issueNo }}</td>
+            <td>{{ issue.title }}</td>
+            <td>{{ issue.failureDesc }}</td>
+            <td>{{ issue.processType }}</td>
+            <td><nb-progress-bar [value]="showIssueStatus(issue.issueStatus)" [status]="progressStatus(showIssueStatus(issue.issueStatus))" size="small">{{ issue.issueStatus }}</nb-progress-bar></td>
+          </tr>
+        </tbody>
+        <tbody *ngIf="issueModel?.length == 0">
+          <tr>
+            <td colspan="3" class="no-data-available">No data!</td>
+          </tr>
+        <tbody>
+      </table>
+    </nb-card-body>
+  </nb-card>
