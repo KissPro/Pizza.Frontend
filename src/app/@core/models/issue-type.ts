@@ -1,27 +1,48 @@
 export interface OBAModel {
 	id: string;
 	issueId: string;
-	detectingTime: string;
+	detectingTime: Date;
 	defectPart: string;
 	defectName: string;
 	defectType: string;
-	samplingQty: number | null;
+	samplingQty?: number;
 	ngphoneOrdinal: string;
 }
+
+export interface IMEIModel {
+	imei: string;
+	psn: string;
+	customer: string;
+	pid: string;
+	product: string;
+	ponno: string;
+	ponsize: number;
+	spcode: string;
+	line: string;
+	shift: string;
+}
+
 
 export interface ITModel {
 	id: string;
 	issueId: string;
-	startTime: string | null;
-	endTime: string | null;
+	startTime: Date | null;
+	endTime: Date | null;
 	customerService: string;
+}
+
+export interface MailModel {
+	name: string;
+	empId: string;
+	email: string;
+	team: string;
 }
 
 export interface ProductModel {
 	id: string;
 	issueId: string;
 	imei: string;
-	custormer: string;
+	customer: string;
 	product: string;
 	psn: string;
 	ponno: number;
@@ -37,7 +58,7 @@ export interface ProcessModel {
 	processName: string;
 	refTable: string;
 	updatedBy: string;
-	updateDate: string | null;
+	updateDate: Date | null;
 	processRemark: string;
 }
 
@@ -57,5 +78,16 @@ export interface VerificationModel {
 	ngqty: number | null;
 	ngrate: string;
 	judgment: string;
-	date: string | null;
+	date: Date | null;
+}
+export interface UploadFileModel {
+	id: string;
+	issueId: string;
+	currentStep: string;
+	type: string;
+	name: string;
+	url: string;
+	remark: string;
+	uploadedBy: string;
+	uploadedDate: Date | null;
 }

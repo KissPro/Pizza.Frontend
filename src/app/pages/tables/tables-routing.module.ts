@@ -13,6 +13,7 @@ import { PlantComponent } from './plant/plant.component';
 import { DNMComponent } from './dn/dnm.component';
 import { IssueComponent } from './issue/issue.component';
 import { CreateIssueComponent } from './create-issue/create-issue.component';
+import { CacaComponent } from './create-issue/caca/caca.component';
 
 const routes: Routes = [{
   path: '',
@@ -84,4 +85,5 @@ export const routedComponents = [
   PlantComponent,
   IssueComponent,
   CreateIssueComponent,
+  CacaComponent,
 ];

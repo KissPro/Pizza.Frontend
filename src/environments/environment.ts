@@ -18,4 +18,7 @@ export const environment = {
   CLIENT_SECRET: '93AqwGzzzgRrnv5pvHVcLptBTRhOBB1t',
   // CLIENT_REDIRECT_URL: 'http://coo-dev.fushan.fihnbb.com/Login/Success',
   CLIENT_REDIRECT_URL: 'http://localhost:55500/Login/Success',
+  // APIPortalURL : 'http://localhost:5100',
+  APIPortalURL : 'http://api-portal-dev.fushan.fihnbb.com',
+  ProjectName: 'PIZZA',
 };

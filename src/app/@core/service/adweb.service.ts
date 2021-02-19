@@ -15,11 +15,17 @@ export class AdwebService {
     }
 
     getUserInfor(token: string): Observable<any> {
-        return this.http.get<Employee[]>(this.adwebUrl + 'user-infor/'+ token);
+        return this.http.get<any>(this.adwebUrl + 'user-infor/'+ token);
     }
 
     getUserDetailByID(token: string, employee_id: string) {
-        return this.http.get(this.adwebUrl + `user-detail/${token}/${employee_id}`);
+        return this.http.get(this.adwebUrl + `user-detail-id/${token}/${employee_id}`);
+    }
+    getUserDetailByName(token: string, name: string) {
+        return this.http.get(this.adwebUrl + `user-detail-name/${token}/${name}`);
+    }
+    getUserDetailByEmail(token: string, email: string) {
+        return this.http.get(this.adwebUrl + `user-detail-email/${token}/${email}`);
     }
 
     getUserRoleByID(token: string, employee_id: string): Observable<string[]> {

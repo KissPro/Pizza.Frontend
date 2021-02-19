@@ -126,7 +126,7 @@ export class DNMComponent implements OnInit, AfterViewInit, OnDestroy, OnChanges
         this.dialogService.open(DialogUploadFileComponent, {
             context: {
                 type: 'COO Manual',
-                fileName: 'DN_Manual_Template.xlsx',
+                templateName: 'DN_Manual_Template.xlsx',
                 urlUpload: '/api/dn/import-excel',
             },
         }).onClose.subscribe(result => (result === 'success') ? this.reloadCOOTable() : null);

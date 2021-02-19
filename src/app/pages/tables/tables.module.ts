@@ -1,8 +1,11 @@
 import { NgModule } from '@angular/core';
-import { NbActionsModule, NbButtonModule, NbCardModule,
-  NbDatepickerModule, NbIconModule, NbInputModule,
+import { NbAccordionModule, NbActionsModule, NbButtonModule, NbCardModule,
+  NbDatepickerModule, NbFormFieldModule, NbIconModule, NbInputModule,
+  NbListModule,
   NbProgressBarModule,
   NbSelectModule,
+  NbSpinnerModule,
+  NbStepperModule,
 NbTabsetModule, NbTreeGridModule, NbWindowModule } from '@nebular/theme';
 import { Ng2SmartTableModule } from 'ng2-smart-table';
 
@@ -21,6 +24,8 @@ import { ConfigService } from 'app/@core/service/config.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { DNMComponent } from './dn/dnm.component';
 import { IssueService } from 'app/@core/service/issue.service';
+import { ConfigIssueService } from 'app/@core/service/issue-config.service';
+import { AssginService } from 'app/@core/service/assign.service';
 
 @NgModule({
   imports: [
@@ -30,8 +35,13 @@ import { IssueService } from 'app/@core/service/issue.service';
     NbWindowModule,
     NbProgressBarModule,
     NbIconModule,
+    NbSpinnerModule,
+    NbAccordionModule,
+    NbFormFieldModule,
+    NbStepperModule,
     NbInputModule,
     NbSelectModule,
+    NbListModule,
     ThemeModule,
     TablesRoutingModule,
     Ng2SmartTableModule,
@@ -49,6 +59,8 @@ import { IssueService } from 'app/@core/service/issue.service';
   ],
   providers: [COOService, BoomEcusService, DNService, 
               CountryShipService, GuidService, PlantService, 
+              ConfigIssueService,
+              AssginService,
               ConfigService, IssueService],
 })
 export class TablesModule { }

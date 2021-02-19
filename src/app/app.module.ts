@@ -50,7 +50,7 @@ import { ReactiveFormsModule } from '@angular/forms';
       parseOptions: { useAdditionalWeekYearTokens: true, useAdditionalDayOfYearTokens: true },
       formatOptions: { useAdditionalWeekYearTokens: true, useAdditionalDayOfYearTokens: true },
     }),
-    NbDateFnsDateModule.forChild({ format: 'dd.MM.yyyy' }),
+    NbDateFnsDateModule.forChild({ format: 'yyyy/MM/dd' }),
 
     NbDatepickerModule.forRoot(),
     NbChatModule.forRoot({

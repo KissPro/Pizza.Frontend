@@ -189,7 +189,7 @@ export class CountryShipComponent {
     this.dialogService.open(DialogUploadFileComponent, {
       context: {
         type: 'CountryShip',
-        fileName: 'CountryShip_Template.xlsx',
+        templateName: 'CountryShip_Template.xlsx',
         urlUpload: '/api/country/import-excel',
       },
     }).onClose.subscribe(result => (result === 'success') ? this.LoadTable() : null);

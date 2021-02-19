@@ -1,136 +1,384 @@
-<nb-card accent="info">
-    <nb-card-header>
-        Problem Description
-    </nb-card-header>
+<nb-card id="GoToTop">
     <nb-card-body>
-        <div class="row">
-            <div class="col-sm-4">
-                <nb-select placeholder="Info" status="info" placeholder="Select Showcase"
-                    [(selected)]="commonSelectedItem">
-                    <nb-option value="1">OBA</nb-option>
-                    <nb-option value="2">IT</nb-option>
-                    <nb-option value="4">Scrap</nb-option>
-                </nb-select>
-                <!-- <nb-select [selected]="currentTheme" (selectedChange)="changeTheme($event)" status="primary">
-                    <nb-option *ngFor="let theme of themes" [value]="theme.value"> {{ theme.name }}</nb-option>
-                  </nb-select> -->
-            </div>
-            <div class="col-sm-4">
-                <div class="form-group">
-                    <input type="text" nbInput fullWidth id="inputFirstName" placeholder="Issue No">
-                </div>
-            </div>
-            <div class="col-sm-4">
-                <div class="form-group">
-                    <input type="text" nbInput fullWidth id="inputFirstName" placeholder="Issue Title">
-                </div>
-            </div>
-        </div>
-        <hr>
-        <div class="row">
-            <div class="col-sm-6">
-                <ngx-tiny-mce [rickText]="inputRick"
-                    (editorKeyup)="getRickText($event)"
-                ></ngx-tiny-mce>
-            </div>
-            <div class="col-sm-6">
-                <div class="form-group">
-                    <label for="inputLastName" class="label">RPN</label>
-                    <input type="text" nbInput fullWidth id="inputLastName" placeholder="Last Name">
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-sm-6">
-                <div class="form-group">
-                    <label for="inputEmail" class="label">Description</label>
-                    <input type="email" nbInput fullWidth id="inputEmail" placeholder="Email">
-                </div>
-            </div>
-            <div class="col-sm-6">
-                <div class="form-group">
-                    <label for="inputWebsite" class="label">Repeated Symptom</label>
-                    <input type="text" nbInput fullWidth id="inputWebsite" placeholder="Website">
-                </div>
-            </div>
-        </div>
+        <nb-stepper orientation="horizontal" #step disableStepNavigation="true">
+            <nb-step [label]="labelOne">
+                <ng-template #labelOne>OPEN ISSUE</ng-template>
+                <!-- <div class="row">
+                    <div class="col-sm-10 row">
+                        <h4>Issue Status :</h4>
+                        <button nbButton outline shape="round" size="small" status="danger">On-going</button>
+                    </div>
+                    <div class="col-sm-2">
+                        <button nbButton disabled nbStepperNext>prev</button>
+                        <button nbButton (click)="testClick('caca')" nbStepperNext id="initNext">next</button>
+                    </div>
+                </div> -->
+            </nb-step>
+            <nb-step [label]="labelTwo">
+                <ng-template #labelTwo>CONTAINMENT ACTION / CAUSE ANALYSIS</ng-template>
+                <!-- <div class="row">
+                    <h4 class="col-sm-10">Step content #4</h4>
+                    <div class="col-sm-2">
+                        <button nbButton (click)="testClick('openIssue')" nbStepperPrevious>prev</button>
+                        <button nbButton (click)="testClick('capa')" nbStepperNext>next</button>
+                    </div>
+                </div> -->
+            </nb-step>
+            <nb-step label="CORRECTIVE & PREVENTIVE ACTIONS">
+                <!-- <div class="row">
+                    <h4 class="col-sm-10">Step content #4</h4>
+                    <div class="col-sm-2">
+                        <button nbButton (click)="testClick('caca')" nbStepperPrevious>prev</button>
+                        <button nbButton (click)="testClick('verifi-close')" nbStepperNext>next</button>
+                    </div>
+                </div> -->
+            </nb-step>
+            <nb-step [label]="labelFour">
+                <ng-template #labelFour>VERIFY & CLOSE</ng-template>
+                <!-- <div class="row">
+                    <h4 class="col-sm-10">Step content #4</h4>
+                    <div class="col-sm-2">
+                        <button nbButton (click)="testClick('capa')" nbStepperPrevious>prev</button>
+                        <button nbButton disabled nbStepperNext>next</button>
+                    </div>
+                </div> -->
+            </nb-step>
+        </nb-stepper>
     </nb-card-body>
 </nb-card>
 
 
-<div class="row">
-    <div class="col-md-4">
+
+
+<nb-card *ngIf="currentStatus == 'openIssue'" accent="info" [nbSpinner]="loading" nbSpinnerStatus="primary"
+    nbSpinnerSize="large">
+    <nb-card-header>
+        Problem Description
+    </nb-card-header>
+    <nb-card-body>
+        <br>
+        <form [formGroup]="issueFormGroup" autocomplete="off">
+            <div class="row">
+                <div class="col-sm-2">
+                    <!-- <nb-select placeholder="Info" status="info" placeholder="Select Showcase"
+                        [(selected)]="commonSelectedItem">
+                        <nb-option value="1">OBA</nb-option>
+                        <nb-option value="2">IT</nb-option>
+                        <nb-option value="4">Scrap</nb-option>
+                    </nb-select> -->
+                    <nb-select status="info" placeholder="Select Process" (selectedChange)="changeProcess($event)">
+                        <nb-option *ngFor="let process of listProcess" [value]="process"> {{
+                            process.processName }}
+                        </nb-option>
+                    </nb-select>
+                </div>
+                <div class="col-sm-1">
+                    <div class="form-group">
+                        <input
+                            [status]="(issueFormGroup.controls.rpn.invalid && (issueFormGroup.controls.rpn.dirty || issueFormGroup.controls.rpn.touched)) ? 'danger' : 'info'"
+                            #inputPRN min="50" type="number" nbInput fullWidth id="inputFirstName" formControlName="rpn"
+                            placeholder="RPN">
+                        <!-- <div *ngIf="issueFormGroup.controls.rpn.invalid && (issueFormGroup.controls.rpn.dirty || issueFormGroup.controls.rpn.touched)">
+                                    rpn is required.
+                            </div> -->
+                    </div>
+                </div>
+                <div class="offset-sm-1 col-sm-3">
+                    <div class="form-group">
+                        <input type="text" nbInput [value]="initIssueNo()" fullWidth id="inputFirstName"
+                            formControlName="issueNo" placeholder="Issue No">
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <input type="text" nbInput [value]="initIssueTitle()" fullWidth id="inputFirstName"
+                            formControlName="title" placeholder="Issue Title">
+                    </div>
+                </div>
+                <div class="col-sm-1 text-center" *ngIf="inputPRN.value >= 50">
+                    <button nbButton outline [status]="inputPRN.value >= 100 ? 'danger' : 'warning'"
+                        (click)="submitForm()">
+                        {{inputPRN.value >= 100 ? ' Critical ' : ' Major '}}</button>
+                </div>
+            </div>
+        </form>
+        <hr>
+        <!-- Show Input By Process -->
+        <!-- OBA Table -->
+        <div *ngIf="currentProcess != null && currentProcess.refTable.includes('tbl_OBA')">
+            <p>OBA Information</p>
+            <form [formGroup]="obaFormGroup" autocomplete="off">
+                <div class="row">
+                    <div class="col-sm-2">
+                        <!-- <div class="form-group">
+                            <label for="inputDetectingDate" class="label">Detected Date</label>
+                            <input [nbDatepicker]="inputDetectingDate" [(ngModel)]="obaFormGroup.value.detectingDate"
+                                nbInput fullWidth id="inputDetectingDate" placeholder="Choose Date"
+                                formControlName="detectingDate">
+                            <nb-datepicker #inputDetectingDate></nb-datepicker>
+                        </div> -->
+                        <label for="inputDetectingDate" class="label">Detected Date</label>
+                        <nb-form-field>
+                            <input #dateInput [nbDatepicker]="inputDetectingDate"
+                                [status]="(obaFormGroup.controls.detectingDate.invalid && (obaFormGroup.controls.detectingDate.dirty || obaFormGroup.controls.detectingDate.touched)) ? 'danger' : 'info'"
+                                [(ngModel)]="obaFormGroup.value.detectingDate" nbInput fullWidth id="inputDetectingDate"
+                                placeholder="Choose Date" formControlName="detectingDate">
+                            <nb-icon nbSuffix icon="calendar-outline" style="color: #5d5d5d;" pack="eva"
+                                (click)="dateInput.click()"></nb-icon>
+                            <nb-datepicker #inputDetectingDate></nb-datepicker>
+                        </nb-form-field>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label for="inputDetectingTime" class="label">Detected Time</label>
+                            <input
+                                [status]="(obaFormGroup.controls.detectingTime.invalid && (obaFormGroup.controls.detectingTime.dirty || obaFormGroup.controls.detectingTime.touched)) ? 'danger' : 'info'"
+                                type="time" nbInput fullWidth id="inputDetectingTime" placeholder="00:00"
+                                class="form-control" formControlName="detectingTime">
+                        </div>
+                    </div>
+                    <div class="col-sm-1">
+                        <div class="form-group">
+                            <label for="inputSamplingQty" class="label">Sampling Qty</label>
+                            <input type="number" min="0" nbInput fullWidth id="inputSamplingQty" class="form-control"
+                                formControlName="samplingQty">
+                        </div>
+                    </div>
+                    <div class="col-sm-1">
+                        <div class="form-group">
+                            <label for="inputNGOrdinal" class="label">NG Ordinal</label>
+                            <input type="text" nbInput fullWidth id="inputNGOrdinal" placeholder="NG Ordinal"
+                                class="form-control" formControlName="ngphoneOrdinal">
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label for="inputDefectPart" class="label">Defect Part</label>
+                            <nb-select
+                                [status]="(obaFormGroup.controls.defectPart.invalid && (obaFormGroup.controls.defectPart.dirty || obaFormGroup.controls.defectPart.touched)) ? 'danger' : 'info'"
+                                class="form-control" id="inputDefectPart" formControlName="defectPart"
+                                placeholder="Select Part">
+                                <nb-option *ngFor="let drop of listDefectPart" [value]="drop.value">{{drop.value}}
+                                </nb-option>
+                            </nb-select>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label for="inputDefectName" class="label">Defect Name</label>
+                            <nb-select
+                                [status]="(obaFormGroup.controls.defectName.invalid && (obaFormGroup.controls.defectName.dirty || obaFormGroup.controls.defectName.touched)) ? 'danger' : 'info'"
+                                class="form-control" id="inputDefectName" formControlName="defectName"
+                                placeholder="Select Name">
+                                <nb-option *ngFor="let drop of listDefectName" [value]="drop.value">{{drop.value}}
+                                </nb-option>
+                            </nb-select>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label for="inputDefectType" class="label">Defect Type</label>
+                            <nb-select
+                                [status]="(obaFormGroup.controls.defectType.invalid && (obaFormGroup.controls.defectType.dirty || obaFormGroup.controls.defectType.touched)) ? 'danger' : 'info'"
+                                class="form-control" id="inputDefectType" formControlName="defectType"
+                                placeholder="Select Type">
+                                <nb-option *ngFor="let drop of listDefectType" [value]="drop.value">{{drop.value}}
+                                </nb-option>
+                            </nb-select>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <hr>
+        </div>
+        <div *ngIf="currentProcess != null && currentProcess.refTable.includes('tbl_Product')">
+            <p>Product Information</p>
+            <form [formGroup]="productFormGroup" autocomplete="off">
+                <div class="row">
+                    <div class="col-sm-4">
+                        <div class="form-group">
+                            <label for="inputIMEI" class="label">IMEI</label>
+                            <!-- <input type="text" nbInput fullWidth id="inputIMEI" placeholder="Input/Scan IMEI"
+                                class="form-control" formControlName="imei"> -->
+                            <nb-form-field>
+                                <input #imei
+                                    [status]="(productFormGroup.controls.imei.invalid && (productFormGroup.controls.imei.dirty || productFormGroup.controls.imei.touched)) ? 'danger' : 'info'"
+                                    type="text" nbInput fullWidth id="inputIMEI" placeholder="Input/Scan IMEI"
+                                    class="form-control" formControlName="imei">
+                                <button *ngIf="imei.value.length === 15" nbSuffix nbButton ghost
+                                    (click)="getInforByIMEI(imei.value)">
+                                    <nb-icon icon="flash-outline" pack="eva">
+                                    </nb-icon>
+                                </button>
+                            </nb-form-field>
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label for="inputCustomer" class="label">Customer</label>
+                            <input type="text" nbInput fullWidth id="inputCustomer" placeholder="Input Customer"
+                                class="form-control" formControlName="customer">
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label for="inputProduct" class="label">Product</label>
+                            <input type="text" nbInput fullWidth id="inputProduct" placeholder="Input Product"
+                                class="form-control" formControlName="product">
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label for="inputPon" class="label">Pon</label>
+                            <input type="text" nbInput fullWidth id="inputPon" placeholder="Input Pon"
+                                class="form-control" formControlName="ponno">
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label for="inputPonSize" class="label">Pon Size</label>
+                            <input type="text" nbInput fullWidth id="inputPonSize" placeholder="Input Pon Size"
+                                class="form-control" formControlName="ponsize">
+                        </div>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label for="inputPSN" class="label">PSN</label>
+                            <input type="text" nbInput fullWidth id="inputPSN" placeholder="Input PSN"
+                                class="form-control" formControlName="psn">
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label for="inputSPCode" class="label">SPCode</label>
+                            <input type="text" nbInput fullWidth id="inputSPCode" placeholder="Input SP Code"
+                                class="form-control" formControlName="spcode">
+                        </div>
+                    </div>
+                    <div class="col-sm-2">
+                        <div class="form-group">
+                            <label for="inputLine" class="label">Line</label>
+                            <input type="text" nbInput fullWidth id="inputLine" placeholder="Input Line"
+                                class="form-control" formControlName="line">
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label for="inputShift" class="label">Shift</label>
+                            <input type="text" nbInput fullWidth id="inputShift" placeholder="Input Shift"
+                                class="form-control" formControlName="shift">
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <div class="form-group">
+                            <label for="inputPattern" class="label">Pattern</label>
+                            <nb-select class="form-control" id="inputPattern" formControlName="pattern"
+                                placeholder="Input Pattern">
+                                <nb-option *ngFor="let drop of listPattern" [value]="drop.value">{{drop.value}}
+                                </nb-option>
+                            </nb-select>
+                        </div>
+                    </div>
+                </div>
+            </form>
+            <hr>
+        </div>
+        <p>Detail Description</p>
+        <div class="row">
+            <div class="col-md-9">
+                <ngx-tiny-mce [rickText]="inputRick" (editorKeyup)="updateRickText($event)"></ngx-tiny-mce>
+            </div>
+            <div class="col-md-3">
+                <nb-card class="list-card">
+                    <nb-card-header>File Uploaded
+                        <button class="mr-2 float-right" outline nbButton status="primary" (click)="uploadFile()">
+                            <nb-icon icon="plus-outline"></nb-icon>
+                        </button>
+                    </nb-card-header>
+                    <nb-list>
+                        <nb-list-item *ngFor="let file of listAttack">
+                            <div class="row">
+                                <div class="col-sm-2">
+                                    <img src="{{file.icon}}" alt="">
+                                </div>
+                                <div class="col-sm-6" style="width: 10rem;word-wrap: break-word;">
+                                    {{file.name}}
+                                </div>
+                                <div class="col-sm-2 float-right">
+                                    <nb-icon icon="download-outline" (click)="downloadFile(file)"></nb-icon>
+                                </div>
+                                <div class="col-sm-2 float-right">
+                                    <nb-icon icon="trash-outline" (click)="deleteFile(file.link)"></nb-icon>
+                                </div>
+                            </div>
+                        </nb-list-item>
+                    </nb-list>
+                </nb-card>
+            </div>
+        </div>
+        <br>
+        <hr>
+        <p>Notification Information</p>
         <nb-card>
-            <nb-card-header>
-                OBA Information
-            </nb-card-header>
-            <nb-card-body>
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label for="inputFirstName" class="label">First Name</label>
-                            <input type="text" nbInput fullWidth id="inputFirstName" placeholder="First Name">
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label for="inputLastName" class="label">Last Name</label>
-                            <input type="text" nbInput fullWidth id="inputLastName" placeholder="Last Name">
-                        </div>
-                    </div>
+            <nb-list-item>
+                <div class="col-md-3">
+                    <input [(ngModel)]="emailNoti" (keyup.enter)="checkMailInformation()" shape="semi-round" type="text"
+                        fullWidth nbInput placeholder="Input Email" />
                 </div>
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label for="inputEmail" class="label">Email</label>
-                            <input type="email" nbInput fullWidth id="inputEmail" placeholder="Email">
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label for="inputWebsite" class="label">Website</label>
-                            <input type="text" nbInput fullWidth id="inputWebsite" placeholder="Website">
-                        </div>
-                    </div>
+                <div class="col-md-3">
+                    <input [(ngModel)]="nameNoti" (keyup.enter)="checkMailInformation()" shape="semi-round" type="text"
+                        fullWidth nbInput placeholder="Input Name" />
                 </div>
-            </nb-card-body>
+                <div class="col-md-2">
+                    <input [(ngModel)]="idNoti" (keyup.enter)="checkMailInformation()" shape="semi-round" type="text"
+                        nbInput placeholder="Employee ID" />
+                </div>
+                <div class="col-md-3">
+                </div>
+                <div class="col-md-1">
+                    <button (click)="checkMailInformation()" nbButton outline status="info">
+                        <nb-icon icon="checkmark-outline"></nb-icon>
+                    </button>
+                </div>
+            </nb-list-item>
+            <nb-list>
+                <nb-list-item *ngFor="let mail of listNotify">
+                    <div class="col-md-3">
+                        {{ mail.email}}
+                    </div>
+                    <div class="col-md-3">
+                        {{ mail.name }}
+                    </div>
+                    <div class="col-md-2">
+                        {{ mail.empId}}
+                    </div>
+                    <div class="col-md-3">
+                        {{ mail.team}}
+                    </div>
+                    <div class="col-md-1">
+                        <button (click)="removeNoti(mail.email)" nbButton outline status="danger">
+                            <nb-icon icon="close-outline"></nb-icon>
+                        </button>
+                    </div>
+                </nb-list-item>
+            </nb-list>
         </nb-card>
-    </div>
-    <div class="col-md-4">
-        <nb-card>
-            <nb-card-header>
-                Product Information
-            </nb-card-header>
-            <nb-card-body>
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label for="inputFirstName" class="label">First Name</label>
-                            <input type="text" nbInput fullWidth id="inputFirstName" placeholder="First Name">
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label for="inputLastName" class="label">Last Name</label>
-                            <input type="text" nbInput fullWidth id="inputLastName" placeholder="Last Name">
-                        </div>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label for="inputEmail" class="label">Email</label>
-                            <input type="email" nbInput fullWidth id="inputEmail" placeholder="Email">
-                        </div>
-                    </div>
-                    <div class="col-sm-6">
-                        <div class="form-group">
-                            <label for="inputWebsite" class="label">Website</label>
-                            <input type="text" nbInput fullWidth id="inputWebsite" placeholder="Website">
-                        </div>
-                    </div>
-                </div>
-            </nb-card-body>
-        </nb-card>
-    </div>
-</div>
+
+
+
+    </nb-card-body>
+    <nb-card-footer>
+        <div class="d-flex justify-content-end"
+            *ngIf="issueFormGroup.status == 'VALID' && productFormGroup.status == 'VALID' && obaFormGroup.status == 'VALID'">
+            <button class="mr-2" type="submit" (click)="saveIssue()" nbButton status="primary">Save</button>
+            <button class="mr-2" type="submit" (click)="submitForm()" nbButton status="danger">Submit</button>
+        </div>
+        <button (click)="next('caca')" nbButton status="info">Process</button>
+    </nb-card-footer>
+</nb-card>
+
+<ng-container *ngIf="currentStatus == 'caca'">
+    <ngx-caca></ngx-caca>
+</ng-container>

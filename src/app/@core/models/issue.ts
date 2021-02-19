@@ -17,6 +17,7 @@ export interface IssueModel {
 	stepStatus: string;
 	containmentAction?: any;
 	analysisDetail?: any;
+	sampleReceivingTime?: Date;
 	recommendedAction?: any;
 	escapeCause?: any;
 	capadetail?: any;

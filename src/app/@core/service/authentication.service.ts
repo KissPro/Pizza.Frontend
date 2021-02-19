@@ -1,14 +1,7 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { map } from 'rxjs/operators';
-
-
 import { environment } from 'environments/environment';
-import { Router } from '@angular/router';
-import { data, post } from 'jquery';
-import { Employee, EmployeeModel } from '../models/Employee';
-import { from } from 'rxjs';
+import { EmployeeModel } from '../models/Employee';
 
 @Injectable({ providedIn: 'root' })
 export class AuthenticationService {
@@ -19,8 +12,6 @@ export class AuthenticationService {
     public loginStatus: boolean = true;
 
     constructor(
-        private router: Router,
-        private http: HttpClient,
     ) {
         this.userSubject = new BehaviorSubject<EmployeeModel>(JSON.parse(localStorage.getItem('user')));
         this.user = this.userSubject.asObservable();
@@ -32,22 +23,16 @@ export class AuthenticationService {
 
     // Get user infor
     userId() {
-        return (<EmployeeModel>JSON.parse(localStorage.getItem('user'))).employee["employee_id"];
+        return JSON.parse(localStorage.getItem('user')).employee.employee["employee_id"];
     }
     userName() {
-        return (<EmployeeModel>JSON.parse(localStorage.getItem('user'))).employee["display_name"];
+        return JSON.parse(localStorage.getItem('user')).employee.employee["display_name"];
     }
 
     logout() {
-        // remove user from local storage to log user out
-        // localStorage.removeItem('user');
-        // localStorage.removeItem('user-role');
-        // localStorage.removeItem('authorize-token');
-
         localStorage.removeItem('user');
         localStorage.removeItem('role');
         this.userSubject.next(null);
-
         // redirect logout session adweb
         window.location.href = this.logout_uri;
     }

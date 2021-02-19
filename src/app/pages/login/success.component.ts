@@ -4,7 +4,7 @@ import { concatMap } from 'rxjs/operators';
 import { AuthenticationService } from 'app/@core/service/authentication.service';
 import { AdwebService } from 'app/@core/service/adweb.service';
 import { AuthorizationService } from 'app/@core/service/authorization.service.';
-import { EmployeeRole } from 'app/@core/models/Employee';
+import { EmployeeModel, EmployeeRole } from 'app/@core/models/Employee';
 
 @Component({ templateUrl: 'success.component.html' })
 export class SuccessComponent implements OnInit {
@@ -21,7 +21,7 @@ export class SuccessComponent implements OnInit {
     ngOnInit() {
         this.activeRoute.queryParams.subscribe(params => {
             this.code = params['code'];
-            console.log(this.code);
+            console.log('Day la code' + this.code);
             if (this.code != undefined) {
                 this.adwebService.getAccessToken(this.code)
                     .pipe(
@@ -31,7 +31,11 @@ export class SuccessComponent implements OnInit {
                         }),
                     )
                     .subscribe(user => {
-                        localStorage.setItem('user', JSON.stringify(user));
+                        var employeeModel: EmployeeModel = {
+                            employee: user,
+                            token: this.token
+                        }
+                        localStorage.setItem('user', JSON.stringify(employeeModel));
                         // Get list user roles
                         this.adwebService.getUserRoleByID(this.token["access_token"], user.employee["employee_id"])
                             .subscribe(roles => {

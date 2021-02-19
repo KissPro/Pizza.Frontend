@@ -65,7 +65,6 @@ export class ToastrComponent {
 
     this.showToast(type, quote.title, quote.body);
   }
-
   showToast(type: NbComponentStatus, title: string, body: string) {
     const config = {
       status: type,
