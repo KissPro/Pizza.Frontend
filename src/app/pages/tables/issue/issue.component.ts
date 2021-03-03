@@ -9,6 +9,9 @@ import { DataTableDirective } from 'angular-datatables';
 import { UploadService } from 'app/@core/service/upload-file.service';
 import { IssueModel } from 'app/@core/models/issue';
 import { IssueService } from 'app/@core/service/issue.service';
+import { Router } from '@angular/router';
+import { GuidService } from 'app/@core/service/guid.service';
+import { AdwebService } from 'app/@core/service/adweb.service';
 
 @Component({
   selector: 'ngx-issue',
@@ -29,7 +32,11 @@ export class IssueComponent implements OnInit {
     private issueService: IssueService,
     private uploadService: UploadService,
     private sidebarService: NbSidebarService,
-    private layoutService: LayoutService) { }
+    private guidService: GuidService,
+    private layoutService: LayoutService,
+    private adwebService: AdwebService,
+    private router: Router,
+  ) { }
 
   ngOnInit(): void {
     const that = this;
@@ -61,7 +68,7 @@ export class IssueComponent implements OnInit {
       columns: [
         // tslint:disable-next-line: max-line-length
         { data: 'index' }, { data: 'issueNo' }, { data: 'title' },
-        { data: 'failureDesc' }, { data: 'issueStatus' }, { data: 'processType' },
+        { data: 'failureDesc' }, { data: 'issueStatus' }, { data: 'processType' }, { data: 'open' }
       ],
     };
   }
@@ -78,7 +85,6 @@ export class IssueComponent implements OnInit {
       dtInstance.columns.adjust();
     });
   }
-
   toggleSidebar() {
     this.sidebarService.compact('menu-sidebar');
     this.layoutService.changeLayoutSize();
@@ -125,5 +131,16 @@ export class IssueComponent implements OnInit {
       return 'success';
     }
   }
-  
+
+  openIssue(issueId: string) {
+    console.log(issueId);
+    this.router.navigate(['/pages/tables/create-issue', {'issueId': issueId}]);
+  }
+  newIssue() {
+    this.router.navigate(['/pages/tables/create-issue', {'issueId': this.guidService.getGuid()}]);
+  }
+
+  testAdweb() {
+    this.adwebService.camOnATung('e08nixwI4LicM21hAqBx82VlJWVKErAC').subscribe(result => console.log(result));
+  }
 }

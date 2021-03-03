@@ -22,6 +22,8 @@ export interface IssueModel {
 	escapeCause?: any;
 	capadetail?: any;
 	verifyNote?: any;
+	createdDate?: Date;
+	createdBy?: string;
 }
 
 export abstract class IssueData {

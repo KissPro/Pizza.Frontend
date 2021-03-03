@@ -1,4 +1,6 @@
-import { ChangeDetectorRef, Component, ElementRef, OnInit, QueryList, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
+import { Input } from '@angular/core';
+import { EventEmitter } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, OnInit, Output, QueryList, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
 import { AssignModel, ExtendDLModel } from 'app/@core/models/assign';
@@ -32,10 +34,13 @@ export class CacaComponent implements OnInit {
   // Init 
   alert = new ToastrComponent(this.toastrService);
   inputOwner = '';
-  inputAnalysis = '<p>Hello world!</p>'
-  inputRecommended = '<p>Hello world!</p>';
+  // IssueID = '2D864EC3-3DBC-4C06-BC12-31E50D880B16';
   inputOwner2 = '';
   listDeadline: ExtendDLModel[] = [];
+
+  @Input() IssueID: any;
+  @Output() nextStatus = new EventEmitter<any>();
+  @Output() backStatus = new EventEmitter<any>();
 
 
 
@@ -46,7 +51,7 @@ export class CacaComponent implements OnInit {
 
   showListAssign() {
     this.listAssign().clear();
-    this.assignService.getListAssign('2D864EC3-3DBC-4C06-BC12-31E50D880B16').subscribe(result => {
+    this.assignService.getListAssign(this.IssueID).subscribe(result => {
       result.forEach((item) => {
         if (item.currentStep === 'containment action')
           this.listAssign().push(this.initAssign(item))
@@ -61,7 +66,7 @@ export class CacaComponent implements OnInit {
   }
 
   showCauseAnalysis() {
-    this.assignService.getListAssign('2D864EC3-3DBC-4C06-BC12-31E50D880B16').subscribe(result => {
+    this.assignService.getListAssign(this.IssueID).subscribe(result => {
       result.forEach((item) => {
         if (item.currentStep === 'cause analysis')
           this.analysisFormGroup.patchValue({
@@ -76,18 +81,18 @@ export class CacaComponent implements OnInit {
           })
       });
     });
-    this.issueService.getIssueById('2D864EC3-3DBC-4C06-BC12-31E50D880B16').subscribe(result => {
+    this.issueService.getIssueById(this.IssueID).subscribe(result => {
       // setTimeout(() => this.inputRecommended = 'hoanghoagn', 4000);
 
       // Update issue information 
       this.analysisFormGroup.patchValue({
-        analysisDetail: result.analysisDetail,
+        analysisDetail: result.analysisDetail ? result.analysisDetail : '<p></p>',
         sampleReceivingDate: new Date(result.sampleReceivingTime),
         sampleReceivingTime: format(new Date(result.sampleReceivingTime), 'HH:mm'),
-        recommendedAction: result.recommendedAction,
+        recommendedAction: result.recommendedAction ? result.recommendedAction : '<p></p>',
         escapeCause: result.escapeCause
       });
-      this.ref.markForCheck();
+      // this.ref.markForCheck();
     })
   }
 
@@ -199,7 +204,7 @@ export class CacaComponent implements OnInit {
       const deadLine = new Date(format(new Date(assignForm.deadLine), 'yyyy/MM/dd') + ' ' + assignForm.deadLineTime);
       const assignNew: AssignModel = {
         'id': this.guidService.getGuid(),
-        'issueNo': '2D864EC3-3DBC-4C06-BC12-31E50D880B16',
+        'issueNo': this.IssueID,
         'currentStep': 'containment action',
         'team': assignForm.team,
         'ownerId': assignForm.ownerId,
@@ -364,7 +369,7 @@ export class CacaComponent implements OnInit {
     const deadLine = new Date(format(new Date(this.analysisFormGroup.value.deadLine), 'yyyy/MM/dd') + ' ' + this.analysisFormGroup.value.deadLineTime);
     const assignNew: AssignModel = {
       'id': this.guidService.getGuid(),
-      'issueNo': '2D864EC3-3DBC-4C06-BC12-31E50D880B16',
+      'issueNo': this.IssueID,
       'currentStep': 'cause analysis',
       'team': this.analysisFormGroup.value.team,
       'ownerId': this.analysisFormGroup.value.ownerId,
@@ -393,8 +398,9 @@ export class CacaComponent implements OnInit {
   AnalysisSubmit() {
     const receiveDate = new Date(format(new Date(this.analysisFormGroup.value.sampleReceivingDate), 'yyyy/MM/dd') + ' ' + this.analysisFormGroup.value.sampleReceivingTime);
     console.log(receiveDate);
-    this.issueService.getIssueById('2D864EC3-3DBC-4C06-BC12-31E50D880B16').subscribe(result => {
+    this.issueService.getIssueById(this.IssueID).subscribe(result => {
       // Update issue information 
+      result.issueStatus = 'On-going',
       result.analysisDetail = this.analysisFormGroup.value.analysisDetail;
       result.sampleReceivingTime = receiveDate;
       result.recommendedAction = this.analysisFormGroup.value.recommendedAction;
@@ -408,10 +414,12 @@ export class CacaComponent implements OnInit {
     })
   }
 
-  TestSubmit() {
-    console.log(this.analysisFormGroup.value);
+  NextStep() {
+    this.nextStatus.emit('capa');
   }
-
+  BackStep() {
+    this.backStatus.emit('openIssue');
+  }
   //#endregion
 }
 

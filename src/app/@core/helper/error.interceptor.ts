@@ -20,11 +20,14 @@ export class ErrorInterceptor implements HttpInterceptor {
 
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
         return next.handle(request).pipe(catchError(err => {
-            if (err.status === 401) {
-                if (this.tokenExpired()) {
-                    this.authenticationService.logout();
-                }
-            }
+            const error = err.error.message || err.statusText;
+            if (error == 'OK')
+                return;
+            // if (err.status === 401) {
+            //     if (this.tokenExpired()) {
+            //         this.authenticationService.logout();
+            //     }
+            // }
             if (err.status === 403) {
                 this.router.navigate(['/permission-denied']);
             }
@@ -38,7 +41,6 @@ export class ErrorInterceptor implements HttpInterceptor {
                     this.alert.showToast('danger', 'Error Server', 'Kindly contact IT team!');
                 }
             }
-            const error = err.error.message || err.statusText;
             console.log(error);
             return throwError(error);
         }));

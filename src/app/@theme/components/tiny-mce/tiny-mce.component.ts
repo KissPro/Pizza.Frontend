@@ -48,6 +48,10 @@ export class TinyMCEComponent implements OnDestroy, AfterViewInit {
       plugins: ['link', 'paste', 'table'],
       skin_url: `${this.locationStrategy.getBaseHref()}assets/skins/lightgray`,
       toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image imageupload",
+      // inline: true,
+      // menubar: false,
+      // toolbar: false,
+      
       setup: editor => {
         this.editor = editor;
 
@@ -57,9 +61,12 @@ export class TinyMCEComponent implements OnDestroy, AfterViewInit {
 
         });
         // get context
-        editor.on('keyup', () => {
+        editor.on('change', () => {
           this.editorKeyup.emit(editor.getContent());
         });
+        // editor.on('ObjectResized', function (e) {
+        //   this.editorKeyup.emit(editor.getContent());
+        // });
 
         editor.on('KeyDown', (e) => {
           if ((e.keyCode == 8 || e.keyCode == 46) && editor.selection) { // delete & backspace keys

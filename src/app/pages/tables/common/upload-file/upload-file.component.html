@@ -1,1 +1,25 @@
-<p>upload-file works!</p>
+<nb-card class="list-card">
+    <nb-card-header>File Uploaded
+        <button size="small" class="mr-2 float-right" outline nbButton status="primary" (click)="uploadFile()">
+            <nb-icon icon="plus-outline"></nb-icon>
+        </button>
+    </nb-card-header>
+    <nb-list>
+        <nb-list-item *ngFor="let file of listAttack">
+            <div class="row">
+                <div class="col-sm-2">
+                    <img src="{{file.icon}}" alt="">
+                </div>
+                <div class="col-sm-6" style="width: 10rem;word-wrap: break-word;">
+                    {{file.name}}
+                </div>
+                <div class="col-sm-2 float-right">
+                    <nb-icon icon="download-outline" (click)="downloadFile(file)"></nb-icon>
+                </div>
+                <div class="col-sm-2 float-right">
+                    <nb-icon icon="trash-outline" (click)="deleteFile(file.id,file.link)"></nb-icon>
+                </div>
+            </div>
+        </nb-list-item>
+    </nb-list>
+</nb-card>

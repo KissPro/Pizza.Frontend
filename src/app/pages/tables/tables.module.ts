@@ -1,6 +1,6 @@
 import { NgModule } from '@angular/core';
 import { NbAccordionModule, NbActionsModule, NbButtonModule, NbCardModule,
-  NbDatepickerModule, NbFormFieldModule, NbIconModule, NbInputModule,
+  NbDatepickerModule, NbDialogService, NbFormFieldModule, NbIconModule, NbInputModule,
   NbListModule,
   NbProgressBarModule,
   NbSelectModule,
@@ -26,6 +26,9 @@ import { DNMComponent } from './dn/dnm.component';
 import { IssueService } from 'app/@core/service/issue.service';
 import { ConfigIssueService } from 'app/@core/service/issue-config.service';
 import { AssginService } from 'app/@core/service/assign.service';
+import { UploadFileComponent } from './common/upload-file/upload-file.component';
+import { MailService } from 'app/@core/service/mail.service';
+import { AdwebService } from 'app/@core/service/adweb.service';
 
 @NgModule({
   imports: [
@@ -60,7 +63,8 @@ import { AssginService } from 'app/@core/service/assign.service';
   providers: [COOService, BoomEcusService, DNService, 
               CountryShipService, GuidService, PlantService, 
               ConfigIssueService,
-              AssginService,
+              AssginService, MailService,
+              AdwebService,
               ConfigService, IssueService],
 })
 export class TablesModule { }

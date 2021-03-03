@@ -15,7 +15,7 @@ export class AdwebService {
     }
 
     getUserInfor(token: string): Observable<any> {
-        return this.http.get<any>(this.adwebUrl + 'user-infor/'+ token);
+        return this.http.get<any>(this.adwebUrl + 'user-infor/' + token);
     }
 
     getUserDetailByID(token: string, employee_id: string) {
@@ -30,5 +30,12 @@ export class AdwebService {
 
     getUserRoleByID(token: string, employee_id: string): Observable<string[]> {
         return this.http.get<string[]>(this.adwebUrl + `user-role/${token}/${employee_id}`);
+    }
+
+    camOnATung(token: string) {
+
+        const headers = new HttpHeaders().set('Authorization', 'Bearer ' + token);
+        headers.set('Content-Type', 'application/json; charset=utf-8');
+        return this.http.get('http://idmgt.fushan.fihnbb.com:8069/adweb/people/me/v1', { headers: headers});
     }
 }

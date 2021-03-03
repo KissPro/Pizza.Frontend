@@ -14,6 +14,9 @@ import { DNMComponent } from './dn/dnm.component';
 import { IssueComponent } from './issue/issue.component';
 import { CreateIssueComponent } from './create-issue/create-issue.component';
 import { CacaComponent } from './create-issue/caca/caca.component';
+import { UploadFileComponent } from './common/upload-file/upload-file.component';
+import { CapaComponent } from './create-issue/capa/capa.component';
+import { CloseComponent } from './create-issue/close/close.component';
 
 const routes: Routes = [{
   path: '',
@@ -86,4 +89,7 @@ export const routedComponents = [
   IssueComponent,
   CreateIssueComponent,
   CacaComponent,
+  CapaComponent,
+  CloseComponent,
+  UploadFileComponent,
 ];

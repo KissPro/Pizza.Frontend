@@ -1,0 +1,213 @@
+<nb-card accent="danger">
+    <nb-card-header>
+        Corrective & Preventive Actions
+    </nb-card-header>
+    <nb-card-body>
+        <div class="row">
+            <div class="col-md-10">
+                <input type="text" (keyup.enter)="addNewAssign(inputOwner)" [(ngModel)]="inputOwner" nbInput
+                    class="form-control float-right" shape="semi-round" placeholder="Input Owner's ID or Owner's email">
+            </div>
+            <div class="col-md-2">
+                <button [disabled]="inputOwner.length === 0" class="float-right" outline nbButton status="primary"
+                    (click)="addNewAssign(inputOwner)">
+                    <nb-icon icon="plus-outline"></nb-icon>
+                </button>
+            </div>
+        </div>
+        <!-- Form information -->
+        <form [formGroup]="capaFormGroup" autocomplete="off">
+            <!-- show user information -->
+            <p>Owner information</p>
+            <div class="row">
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        <label for="inputOwnerId" class="label">OwnerId</label>
+                        <input type="text" nbInput fullWidth id="inputOwnerId" placeholder="Input OwnerId"
+                            class="form-control" formControlName="ownerId">
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        <label for="inputName" class="label">Name</label>
+                        <input type="text" nbInput fullWidth id="inputName" placeholder="Input Name"
+                            class="form-control" formControlName="name">
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        <label for="inputEmail" class="label">Email</label>
+                        <input type="text" nbInput fullWidth id="inputEmail" placeholder="Input Email"
+                            class="form-control" formControlName="email">
+                    </div>
+                </div>
+                <div class="col-sm-3">
+                    <div class="form-group">
+                        <label for="inputTeam" class="label">Team</label>
+                        <input type="text" nbInput fullWidth id="inputTeam" placeholder="Input Team"
+                            class="form-control" formControlName="team">
+                    </div>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label for="inputRequestContent" class="label">Request Content -
+                            <i>{{capaFormGroup.value.assignedDate | date: 'yyyy/MM/dd HH:mm' }}</i></label>
+                        <textarea nbInput fullWidth formControlName="requestContent" id="inputRequestContent"
+                            placeholder="Input Content"></textarea>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <label for="inputLastName" class="label">Deadline</label>
+                        <div class="row">
+                            <div class="col-sm-5">
+                                <nb-form-field>
+                                    <input #dateInput2 [nbDatepicker]="inputDeadLine2"
+                                        [(ngModel)]="capaFormGroup.value.deadLine" nbInput fullWidth id="inputDeadLine2"
+                                        class="form-control" placeholder="Choose Date" formControlName="deadLine">
+                                    <nb-icon nbSuffix icon="calendar-outline" style="color: #5d5d5d;" pack="eva"
+                                        (click)="dateInput2.click()"></nb-icon>
+                                    <nb-datepicker #inputDeadLine2></nb-datepicker>
+                                </nb-form-field>
+                            </div>
+                            <div class="col-sm-5">
+                                <input type="time" nbInput fullWidth id="inputDeadLineTime2" placeholder="00:00"
+                                    class="form-control" formControlName="deadLineTime">
+                            </div>
+                            <div class="col-sm-2">
+                                <button [disabled]="capaFormGroup.value.id == null"
+                                    (click)="openDeadline(dialog, capaFormGroup.value.id, capaFormGroup.value.deadLine,capaFormGroup.value.deadLineTime)"
+                                    nbButton outline status="info">
+                                    Extend
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <hr>
+            <p>Corrective & Preventive Actions</p>
+            <div class="row">
+                <div class="col-sm-9">
+                    <label class="label">corrective & preventive detail</label>
+                    <ngx-tiny-mce *ngIf="capaFormGroup.value.capaDetail != ''"
+                        [rickText]="capaFormGroup.value.capaDetail" (editorKeyup)="updateRickText($event)">
+                    </ngx-tiny-mce>
+                </div>
+                <div class="col-sm-3">
+                    <label class="label">List File Uploaded</label>
+                    <ngx-upload-file [issueId]="IssueID" currentStep="CAPA">
+                    </ngx-upload-file>
+                </div>
+            </div>
+        </form>
+    </nb-card-body>
+    <nb-card-footer>
+        <!-- <button (click)="openDeadline(dialog)">Submit</button> -->
+        <div class="row d-flex">
+            <button (click)="BackStep()" class="mr-auto" nbButton><nb-icon icon="arrowhead-left-outline"></nb-icon>Back</button>
+
+            <button (click)="AssignSubmit2()" nbButton status="danger">
+                Assign <nb-icon icon="navigation-2-outline"></nb-icon>
+            </button>
+            <button (click)="CAPASubmit()" class="ml-2" nbButton status="primary">
+                Submit
+            </button>
+            <button (click)="NextStep()" class="ml-2" nbButton status="primary">
+                Proceed<nb-icon icon="arrowhead-right-outline"></nb-icon>
+            </button>
+        </div>
+    </nb-card-footer>
+</nb-card>
+
+<ng-template #dialog let-data let-ref="dialogRef">
+    <nb-card accent="info" id="deadlineCard">
+        <nb-card-header>Deadline Timeline</nb-card-header>
+        <nb-card-body>
+            <ng-container
+                *ngIf="listDeadline.length == 0 || (listDeadline.length > 0 
+                                && listDeadline.slice(-1)[0].status != 'Open' && listDeadline.slice(-1)[0].status != 'On-going')">
+                <label class="label">New extend Deadline</label>
+                <div class="row">
+                    <div class="col-sm-3">
+                        <nb-form-field>
+                            <input #dateInput2 [nbDatepicker]="inputDeadLine2" nbInput fullWidth id="inputDeadLine2"
+                                class="form-control" placeholder="Choose Date">
+                            <nb-icon nbSuffix icon="calendar-outline" style="color: #5d5d5d;" pack="eva"
+                                (click)="dateInput2.click()"></nb-icon>
+                            <nb-datepicker #inputDeadLine2></nb-datepicker>
+                        </nb-form-field>
+                    </div>
+                    <div class="col-sm-3">
+                        <input type="time" #inputTime2 nbInput fullWidth id="inputDeadLineTime2" placeholder="00:00"
+                            class="form-control">
+                    </div>
+                    <div class="col-sm-5">
+                        <textarea nbInput #inputReason2 fullWidth #extendReason placeholder="Extend reason"></textarea>
+                    </div>
+                    <div class="col-sm-1">
+                        <button
+                            (click)="AddDeadLine(dateInput2.value, inputTime2.value, inputReason2.value, data.id, data.currentDeadLine)"
+                            [disabled]="extendReason.value.length === 0" class="float-right" outline nbButton
+                            status="primary">
+                            <nb-icon icon="plus-outline"></nb-icon>
+                        </button>
+                    </div>
+                </div>
+                <br>
+            </ng-container>
+            <label class="label">Deadline Timeline Table</label>
+            <table class="table table-bordered table-striped">
+                <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Current Deadline</th>
+                        <th scope="col">Request Deadline</th>
+                        <th scope="col">Reason</th>
+                        <th scope="col">Approval Content</th>
+                        <th scope="col">Request Date</th>
+                        <th scope="col">Approval Date</th>
+                        <th scope="col">Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr *ngFor="let dl of listDeadline;let i = index">
+                        <td scope="row">{{i + 1}}</td>
+                        <td>{{dl.currentDeadLine | date: 'yyyy/MM/dd HH:mm'}}</td>
+                        <td>{{dl.requestDeadLine | date: 'yyyy/MM/dd HH:mm'}}</td>
+                        <td style="max-width: 30rem;">{{dl.reason}}</td>
+                        <td>{{dl.approvalContent}}</td>
+                        <td>{{dl.requestDate | date: 'yyyy/MM/dd HH:mm'}} </td>
+                        <td>{{dl.approvalDate | date: 'yyyy/MM/dd HH:mm'}}</td>
+                        <td>{{dl.status}}</td>
+                    </tr>
+                </tbody>
+            </table>
+            <ng-container *ngIf="listDeadline.length > 0 && listDeadline.slice(-1)[0].status == 'On-going'">
+                <label class="label">Approval Information</label>
+                <div class="row">
+                    <div class="col-sm-9">
+                        <textarea nbInput #inputApprovalContent fullWidth placeholder="Approval comment"></textarea>
+                    </div>
+                    <div class="col-sm-3">
+                        <button class="mr-2" type="submit"
+                            (click)="ApprovalDeadLine(data.id, 1,inputApprovalContent.value)" nbButton outline
+                            status="success">Approval</button>
+                        <button class="mr-2" type="submit"
+                            (click)="ApprovalDeadLine(data.id, -1,inputApprovalContent.value)" nbButton outline
+                            status="danger">Reject</button>
+                    </div>
+                </div>
+            </ng-container>
+        </nb-card-body>
+        <nb-card-footer>
+            <div class="d-flex justify-content-end">
+                <button *ngIf="listDeadline.length > 0 && listDeadline.slice(-1)[0].status == 'Open'" class="mr-2"
+                    type="submit" (click)="SubmitDeadLine()" nbButton status="danger">Submit</button>
+                <button nbButton (click)="ref.close()">Close Dialog</button>
+            </div>
+        </nb-card-footer>
+    </nb-card>
+</ng-template>

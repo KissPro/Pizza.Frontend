@@ -67,7 +67,7 @@
                                                     formControlName="deadLineTime">
                                             </div>
                                             <div class="col-sm-2">
-                                                <button
+                                                <button [disabled]="assignList.value.id == null"
                                                     (click)="openDeadline(dialog, assignList.value.id, assignList.value.deadLine,assignList.value.deadLineTime)"
                                                     nbButton outline status="info">
                                                     Extend
@@ -100,8 +100,8 @@
             <button (click)="AssignSubmit()" [disabled]="this.createAssignFormGroup.invalid" nbButton status="danger">
                 Assign <nb-icon icon="navigation-2-outline"></nb-icon>
             </button>
-            <button class="ml-2" nbButton status="primary">
-                Proceed
+            <button (click)="AssignSubmit()" [disabled]="this.createAssignFormGroup.invalid" class="ml-2" nbButton status="primary">
+                Submit
             </button>
         </div>
     </nb-card-footer>
@@ -187,7 +187,7 @@
                                     class="form-control" formControlName="deadLineTime">
                             </div>
                             <div class="col-sm-2">
-                                <button
+                                <button [disabled]="analysisFormGroup.value.id == null"
                                     (click)="openDeadline(dialog, analysisFormGroup.value.id, analysisFormGroup.value.deadLine,analysisFormGroup.value.deadLineTime)"
                                     nbButton outline status="info">
                                     Extend
@@ -226,68 +226,48 @@
             <div class="row">
                 <div class="col-sm-6">
                     <label class="label">Analysis Detail</label>
-                    <ngx-tiny-mce *ngIf="analysisFormGroup.value.analysisDetail != ''"  [rickText]="analysisFormGroup.value.analysisDetail"
-                        (editorKeyup)="updateRickText2(1,$event)">
+                    <ngx-tiny-mce *ngIf="analysisFormGroup.value.analysisDetail != ''"
+                        [rickText]="analysisFormGroup.value.analysisDetail" (editorKeyup)="updateRickText2(1,$event)">
                     </ngx-tiny-mce>
                 </div>
                 <div class="col-sm-6">
                     <label class="label">Recommended Action</label>
-                    <ngx-tiny-mce *ngIf="analysisFormGroup.value.recommendedAction != ''" [rickText]="analysisFormGroup.value.recommendedAction"
+                    <ngx-tiny-mce *ngIf="analysisFormGroup.value.recommendedAction != ''"
+                        [rickText]="analysisFormGroup.value.recommendedAction"
                         (editorKeyup)="updateRickText2(2,$event)">
                     </ngx-tiny-mce>
                 </div>
             </div>
             <br>
             <div class="row">
-                <div class="col-sm-6">
+                <div class="col-sm-9">
                     <div class="form-group">
                         <label class="label">Escape Cause</label>
-                        <textarea nbInput fullWidth formControlName="escapeCause" id="inputEscapeCause"
+                        <textarea nbInput fullWidth formControlName="escapeCause" rows="4" id="inputEscapeCause"
                             placeholder="Input escape cause"></textarea>
                     </div>
                 </div>
-                <div class="col-sm-6">
-                    <!-- <nb-card class="list-card">
-                        <nb-card-header>File Uploaded
-                            <button class="mr-2 float-right" outline nbButton status="primary" (click)="uploadFile()">
-                                <nb-icon icon="plus-outline"></nb-icon>
-                            </button>
-                        </nb-card-header>
-                        <nb-list>
-                            <nb-list-item *ngFor="let file of listAttack">
-                                <div class="row">
-                                    <div class="col-sm-2">
-                                        <img src="{{file.icon}}" alt="">
-                                    </div>
-                                    <div class="col-sm-6" style="width: 10rem;word-wrap: break-word;">
-                                        {{file.name}}
-                                    </div>
-                                    <div class="col-sm-2 float-right">
-                                        <nb-icon icon="download-outline" (click)="downloadFile(file)"></nb-icon>
-                                    </div>
-                                    <div class="col-sm-2 float-right">
-                                        <nb-icon icon="trash-outline" (click)="deleteFile(file.link)"></nb-icon>
-                                    </div>
-                                </div>
-                            </nb-list-item>
-                        </nb-list>
-                    </nb-card> -->
+                <div class="col-sm-3">
+                    <label class="label">List File Uploaded</label>
+                    <ngx-upload-file [issueId]="IssueID" currentStep="CACA">
+                    </ngx-upload-file>
                 </div>
             </div>
-
         </form>
     </nb-card-body>
     <nb-card-footer>
         <!-- <button (click)="openDeadline(dialog)">Submit</button> -->
-        <div class="row float-right" *ngIf="listAssign().length > 0">
+        <div class="row d-flex">
+            <button (click)="BackStep()" class="mr-auto" nbButton><nb-icon icon="arrowhead-left-outline"></nb-icon>Back</button>
+
             <button (click)="AssignSubmit2()" nbButton status="danger">
                 Assign <nb-icon icon="navigation-2-outline"></nb-icon>
             </button>
-            <button (click)="AnalysisSubmit()"  class="ml-2" nbButton status="primary">
+            <button (click)="AnalysisSubmit()" class="ml-2" nbButton status="primary">
                 Submit
             </button>
-            <button (click)="TestSubmit()" class="ml-2" nbButton status="primary">
-                Proceed
+            <button (click)="NextStep()" class="ml-2" nbButton status="primary">
+                Proceed<nb-icon icon="arrowhead-right-outline"></nb-icon>
             </button>
         </div>
     </nb-card-footer>
