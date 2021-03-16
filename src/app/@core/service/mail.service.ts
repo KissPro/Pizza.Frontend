@@ -10,7 +10,7 @@ export class MailService{
   }
 
   SendMail(mail: Mail) {
-    return this.http.post(this.url + "/send-mail", mail);
+    return this.http.post(this.url + "/send-mail",mail);
   }
 }
 

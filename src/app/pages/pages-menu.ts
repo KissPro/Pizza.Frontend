@@ -13,22 +13,12 @@ export const MENU_ITEMS: NbMenuItem[] = [
   },
   {
     title: 'Create Issue',
-    icon: 'car-outline',
+    icon: 'plus-outline',
     link: '/pages/tables/create-issue',
   },
   {
     title: 'SETTINGS',
     group: true,
-  },
-  {
-    title: 'Plant',
-    icon: 'paper-plane-outline',
-    link: '/pages/tables/plant',
-  },
-  {
-    title: 'Country Ship',
-    icon: 'globe-outline',
-    link: '/pages/tables/country-ship',
   },
   {
     title: 'System Config',

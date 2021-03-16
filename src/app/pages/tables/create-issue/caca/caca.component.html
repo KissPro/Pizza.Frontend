@@ -15,7 +15,7 @@
                 </button>
             </div>
         </div>
-        <form [formGroup]="createAssignFormGroup" (ngSubmit)="onSubmit()">
+        <form [formGroup]="createAssignFormGroup" autocomplete="off" (ngSubmit)="onSubmit()">
             <nb-accordion #accord multi formArrayName="assignList"
                 *ngFor="let assignList of listAssign().controls; let i = index">
                 <nb-accordion-item style="border-bottom: 1px solid #ecedef">
@@ -97,10 +97,12 @@
     <nb-card-footer>
         <!-- <button (click)="openDeadline(dialog)">Submit</button> -->
         <div class="row float-right" *ngIf="listAssign().length > 0">
-            <button (click)="AssignSubmit()" [disabled]="this.createAssignFormGroup.invalid" nbButton status="danger">
+            <button (click)="AssignSubmit('assign')" [disabled]="this.createAssignFormGroup.invalid" nbButton
+                status="danger">
                 Assign <nb-icon icon="navigation-2-outline"></nb-icon>
             </button>
-            <button (click)="AssignSubmit()" [disabled]="this.createAssignFormGroup.invalid" class="ml-2" nbButton status="primary">
+            <button (click)="AssignSubmit('submit')" [disabled]="this.createAssignFormGroup.invalid" class="ml-2"
+                nbButton status="primary">
                 Submit
             </button>
         </div>
@@ -171,7 +173,7 @@
                     <div class="form-group">
                         <label for="inputLastName" class="label">Deadline</label>
                         <div class="row">
-                            <div class="col-sm-5">
+                            <div class="col-sm-4">
                                 <nb-form-field>
                                     <input #dateInput2 [nbDatepicker]="inputDeadLine2"
                                         [(ngModel)]="analysisFormGroup.value.deadLine" nbInput fullWidth
@@ -182,7 +184,7 @@
                                     <nb-datepicker #inputDeadLine2></nb-datepicker>
                                 </nb-form-field>
                             </div>
-                            <div class="col-sm-5">
+                            <div class="col-sm-4">
                                 <input type="time" nbInput fullWidth id="inputDeadLineTime2" placeholder="00:00"
                                     class="form-control" formControlName="deadLineTime">
                             </div>
@@ -193,64 +195,73 @@
                                     Extend
                                 </button>
                             </div>
+                            <div class="col-sm-1">
+                                <button [disabled]="analysisFormGroup.value.id == null"
+                                    nbButton outline status="danger">
+                                    Remove
+                                </button>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
             <hr>
-            <p>Cause analysis information</p>
-            <div class="row">
-                <div class="col-sm-6">
-                    <div class="form-group">
-                        <label for="inputLastName" class="label">Sample Receive Time</label>
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <nb-form-field>
-                                    <input #dateInput3 [nbDatepicker]="inputDeadLine3"
-                                        [(ngModel)]="analysisFormGroup.value.sampleReceivingDate" nbInput fullWidth
-                                        id="inputDeadLine3" class="form-control" placeholder="Choose Date"
-                                        formControlName="sampleReceivingDate">
-                                    <nb-icon nbSuffix icon="calendar-outline" style="color: #5d5d5d;" pack="eva"
-                                        (click)="dateInput3.click()"></nb-icon>
-                                    <nb-datepicker #inputDeadLine3></nb-datepicker>
-                                </nb-form-field>
-                            </div>
-                            <div class="col-sm-6">
-                                <input type="time" nbInput fullWidth id="inputsampleReceiveTime" placeholder="00:00"
-                                    class="form-control" formControlName="sampleReceivingTime">
+            <div *ngIf="analysisFormGroup.value.requestContent">
+                <p>Cause analysis information</p>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <label for="inputLastName" class="label">Sample Receive Time</label>
+                            <div class="row">
+                                <div class="col-sm-6">
+                                    <nb-form-field>
+                                        <input #dateInput3 [nbDatepicker]="inputDeadLine3"
+                                            [(ngModel)]="analysisFormGroup.value.sampleReceivingDate" nbInput fullWidth
+                                            id="inputDeadLine3" class="form-control" placeholder="Choose Date"
+                                            formControlName="sampleReceivingDate">
+                                        <nb-icon nbSuffix icon="calendar-outline" style="color: #5d5d5d;" pack="eva"
+                                            (click)="dateInput3.click()"></nb-icon>
+                                        <nb-datepicker #inputDeadLine3></nb-datepicker>
+                                    </nb-form-field>
+                                </div>
+                                <div class="col-sm-6">
+                                    <input type="time" nbInput fullWidth id="inputsampleReceiveTime" placeholder="00:00"
+                                        class="form-control" formControlName="sampleReceivingTime">
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-            </div>
-            <div class="row">
-                <div class="col-sm-6">
-                    <label class="label">Analysis Detail</label>
-                    <ngx-tiny-mce *ngIf="analysisFormGroup.value.analysisDetail != ''"
-                        [rickText]="analysisFormGroup.value.analysisDetail" (editorKeyup)="updateRickText2(1,$event)">
-                    </ngx-tiny-mce>
-                </div>
-                <div class="col-sm-6">
-                    <label class="label">Recommended Action</label>
-                    <ngx-tiny-mce *ngIf="analysisFormGroup.value.recommendedAction != ''"
-                        [rickText]="analysisFormGroup.value.recommendedAction"
-                        (editorKeyup)="updateRickText2(2,$event)">
-                    </ngx-tiny-mce>
-                </div>
-            </div>
-            <br>
-            <div class="row">
-                <div class="col-sm-9">
-                    <div class="form-group">
-                        <label class="label">Escape Cause</label>
-                        <textarea nbInput fullWidth formControlName="escapeCause" rows="4" id="inputEscapeCause"
-                            placeholder="Input escape cause"></textarea>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <label class="label">Analysis Detail</label>
+                        <ngx-tiny-mce *ngIf="analysisFormGroup.value.analysisDetail != ''"
+                            [rickText]="analysisFormGroup.value.analysisDetail"
+                            (editorKeyup)="updateRickText2(1,$event)">
+                        </ngx-tiny-mce>
+                    </div>
+                    <div class="col-sm-6">
+                        <label class="label">Recommended Action</label>
+                        <ngx-tiny-mce *ngIf="analysisFormGroup.value.recommendedAction != ''"
+                            [rickText]="analysisFormGroup.value.recommendedAction"
+                            (editorKeyup)="updateRickText2(2,$event)">
+                        </ngx-tiny-mce>
                     </div>
                 </div>
-                <div class="col-sm-3">
-                    <label class="label">List File Uploaded</label>
-                    <ngx-upload-file [issueId]="IssueID" currentStep="CACA">
-                    </ngx-upload-file>
+                <br>
+                <div class="row">
+                    <div class="col-sm-9">
+                        <div class="form-group">
+                            <label class="label">Escape Cause</label>
+                            <textarea nbInput fullWidth formControlName="escapeCause" rows="4" id="inputEscapeCause"
+                                placeholder="Input escape cause"></textarea>
+                        </div>
+                    </div>
+                    <div class="col-sm-3">
+                        <label class="label">List File Uploaded</label>
+                        <ngx-upload-file [issueId]="IssueID" currentStep="CACA">
+                        </ngx-upload-file>
+                    </div>
                 </div>
             </div>
         </form>
@@ -258,15 +269,17 @@
     <nb-card-footer>
         <!-- <button (click)="openDeadline(dialog)">Submit</button> -->
         <div class="row d-flex">
-            <button (click)="BackStep()" class="mr-auto" nbButton><nb-icon icon="arrowhead-left-outline"></nb-icon>Back</button>
+            <button (click)="BackStep()" class="mr-auto" nbButton>
+                <nb-icon icon="arrowhead-left-outline"></nb-icon>Back
+            </button>
 
-            <button (click)="AssignSubmit2()" nbButton status="danger">
+            <button (click)="AssignAnalysis('assign')" nbButton status="danger">
                 Assign <nb-icon icon="navigation-2-outline"></nb-icon>
             </button>
-            <button (click)="AnalysisSubmit()" class="ml-2" nbButton status="primary">
+            <button (click)="AssignAnalysis('submit')" class="ml-2" nbButton status="primary">
                 Submit
             </button>
-            <button (click)="NextStep()" class="ml-2" nbButton status="primary">
+            <button (click)="NextStep()" class="ml-2" nbButton>
                 Proceed<nb-icon icon="arrowhead-right-outline"></nb-icon>
             </button>
         </div>

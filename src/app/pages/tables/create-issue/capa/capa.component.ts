@@ -1,7 +1,7 @@
 import { Input } from '@angular/core';
 import { ChangeDetectorRef, EventEmitter, Output, TemplateRef } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NbToastrService, NbDialogService } from '@nebular/theme';
 import { AssignModel, ExtendDLModel } from 'app/@core/models/assign';
 import { AdwebService } from 'app/@core/service/adweb.service';
@@ -22,7 +22,7 @@ export class CapaComponent implements OnInit {
   // Init
   alert = new ToastrComponent(this.toastrService);
 
-  
+
   @Input() IssueID: any;
   @Output() nextStatus = new EventEmitter<any>();
   @Output() backStatus = new EventEmitter<any>();
@@ -44,42 +44,237 @@ export class CapaComponent implements OnInit {
   ) { }
 
   ngOnInit(): void {
-    this.showCaPa();
+    this.showListAssign();
   }
 
+  showListAssign() {
+    this.listAssign().clear();
+    this.assignService.getListAssign(this.IssueID).subscribe(result => {
+      result.forEach((item) => {
+        if (item.currentStep === 'capa')
+          this.listAssign().push(this.initAssign(item))
+      });
+    });
+  }
   showListDeadLine(assignId: string) {
     this.listDeadline = [];
     this.assignService.getListDeadLine(assignId).subscribe(result => {
       result.forEach((item) => this.listDeadline.push(item));
     });
   }
-  showCaPa() {
-    this.assignService.getListAssign(this.IssueID).subscribe(result => {
-      result.forEach((item) => {
-        if (item.currentStep === 'capa')
-          this.capaFormGroup.patchValue({
-            id: item.id,
-            ownerId: item.ownerId,
-            name: item.name,
-            email: item.email,
-            team: item.team,
-            requestContent: item.requestContent,
-            deadLine: new Date(item.deadLine),
-            deadLineTime: format(new Date(item.deadLine), 'HH:mm'),
-          })
-      });
-    });
-    this.issueService.getIssueById(this.IssueID).subscribe(result => {
-      // setTimeout(() => this.inputRecommended = 'hoanghoagn', 4000);
-      // Update issue information 
-      this.capaFormGroup.patchValue({
-        capaDetail: result.capadetail == null ? '<p></p>' : result.capadetail,
-      });
-      console.log(result.capadetail);
-      this.ref.markForCheck();
+
+  //#region Assign
+  createAssignFormGroup: FormGroup = this.formBuilder.group({
+    assignList: this.formBuilder.array([])
+  });
+
+  listAssign(): FormArray {
+    return this.createAssignFormGroup.get("assignList") as FormArray;
+  }
+  initAssign(assign: AssignModel) {
+    return this.formBuilder.group({
+      id: assign.id,
+      ownerId: assign.ownerId,
+      name: assign.name,
+      email: assign.email,
+      team: assign.team,
+      requestContent: assign.requestContent,
+      deadLine: new Date(assign.deadLine),
+      deadLineTime: format(new Date(assign.deadLine), 'HH:mm'),
+      actionContent: assign.actionContent,
+      actionDate: assign.actionDate,
+      assignedDate: assign.assignedDate,
+      status: assign.status,
+      scheduleDeadLine: assign.scheduleDeadLine,
+      remark: assign.remark,
     })
   }
+
+  newAssign(id: string, name: string, email: string, team: string): FormGroup {
+    this.inputOwner = ''; // reset input textbox
+    return this.formBuilder.group({
+      ownerId: id,
+      name: name,
+      email: email,
+      team: team,
+      requestContent: ['', [Validators.required]],
+      deadLine: ['', [Validators.required]],
+      deadLineTime: ['', [Validators.required]],
+      actionContent: '',
+      actionDate: null,
+      assignedDate: new Date(),
+      status: 'Draft',
+      remark: '',
+    })
+  }
+  addNewAssign(idMail: string) {
+    // Get information
+    var token = JSON.parse(localStorage.getItem('user')).token["access_token"];
+    this.adwebService.getUserDetailByEmail(token, idMail).subscribe(result => {
+      if (result != null) {
+        this.listAssign().push(this.newAssign(result['ad_user_employeeID'], result['ad_user_displayName']
+          , result['work_email'], result['department_id'][1]));
+      }
+      else {
+        this.adwebService.getUserDetailByID(token, idMail).subscribe(result => {
+          if (result != null) {
+            this.listAssign().push(this.newAssign(result['ad_user_employeeID'], result['ad_user_displayName']
+              , result['work_email'], result['department_id'][1]));
+          }
+          else {
+            this.alert.showToast('danger', 'Error', 'This id or email not exists in the system!');
+          }
+        });
+      }
+    });
+  }
+
+  // Richtext information
+  updateRickText(index: number, value: string) {
+    this.listAssign().at(index).patchValue({ actionContent: value })
+  }
+
+  removeAssign(index: number, assignId: string) {
+    // remove in list
+    this.listAssign().removeAt(index);
+    // remove in server
+    if (assignId != null)
+      this.assignService.removeAssign(assignId).subscribe(result => {
+        if (result == true) this.alert.showToast('success', 'Success', 'Remove assign successfully!');
+      });
+  }
+
+  onSubmit() {
+    //console.log(this.createAssignFormGroup.value);
+  }
+
+
+  checkAssignStatus(type: string, deadline: Date, actionContent: string): string {
+    if (type == 'submit' && actionContent)
+      return 'Done';
+    if (type == 'draft')
+      return 'Draft'
+    if (type == 'submit-draft')
+      return 'Draft-Submit'
+    else {
+      if (new Date() <= deadline)
+        return 'On-going';
+      else
+        return 'Pending';
+    }
+  }
+
+
+  async reassignSubmit(assignForm: any, type: string) {
+    let check;
+    // Update old assign
+    let oldAssign = await this.assignService.getAssign(assignForm.id).toPromise();
+    oldAssign.status = 'Reassigned'
+    await this.assignService.createAssign(oldAssign).toPromise().then(res => console.log(res));
+
+    // Create new assign
+    const deadLine = new Date(format(new Date(assignForm.deadLine), 'yyyy/MM/dd') + ' ' + assignForm.deadLineTime);
+    const assignNew: AssignModel = {
+      'id': this.guidService.getGuid(),
+      'issueNo': this.IssueID,
+      'currentStep': 'capa',
+      'team': assignForm.team,
+      'ownerId': assignForm.ownerId,
+      'name': assignForm.name,
+      'email': assignForm.email,
+      'requestContent': assignForm.requestContent,
+      'actionResult': assignForm.actionResult,
+      'actionContent': (type == 'submit' || type == 'submit-draft') ? assignForm.actionContent : '',
+      'actionDate': ((type == 'submit' || type == 'submit-draft') && assignForm.actionContent?.length > 0 && assignForm.actionDate == null) ? new Date() : assignForm.actionDate,
+      'assignedDate': new Date(),
+      'deadLine': deadLine,
+      'deadLevel': 0,
+      'status': this.checkAssignStatus(type, deadLine, assignForm.actionContent),
+      'remark': '',
+      'scheduleDeadLine': assignForm.scheduleDeadLine,
+      'updatedBy': this.userService.userId(),
+      'updatedDate': new Date(),
+    }
+
+    console.log(assignNew);
+
+    this.assignService.createAssign(assignNew).subscribe(
+      result => {
+        if (result == true)
+          this.alert.showToast('success', 'Success', 'Create/Update assign successfully!');
+        // Check deadline service - send mail
+        this.assignService.checkDeadline(assignNew, this.userService.token()).toPromise().then(result => {
+          console.log('Check deadline:' + result);
+        });
+        // Reset list assign
+        this.showListAssign();
+      }
+    )
+
+  }
+
+
+  assignSubmit(assignForm: any, type: string) {
+    // new model - for update in server
+    const deadLine = new Date(format(new Date(assignForm.deadLine), 'yyyy/MM/dd') + ' ' + assignForm.deadLineTime);
+    const assignNew: AssignModel = {
+      'id': assignForm.id ? assignForm.id : this.guidService.getGuid(),
+      'issueNo': this.IssueID,
+      'currentStep': 'capa',
+      'team': assignForm.team,
+      'ownerId': assignForm.ownerId,
+      'name': assignForm.name,
+      'email': assignForm.email,
+      'requestContent': assignForm.requestContent,
+      'actionResult': assignForm.actionResult,
+      'actionContent': (type == 'submit' || type == 'submit-draft') ? assignForm.actionContent : '',
+      'actionDate': ((type == 'submit' || type == 'submit-draft') && assignForm.actionContent?.length > 0 && assignForm.actionDate == null) ? new Date() : assignForm.actionDate,
+      'assignedDate': assignForm.assignedDate,
+      'deadLine': deadLine,
+      'deadLevel': 0,
+      'status': this.checkAssignStatus(type, deadLine, assignForm.actionContent),
+      'remark': '',
+      'scheduleDeadLine': assignForm.scheduleDeadLine,
+      'updatedBy': this.userService.userId(),
+      'updatedDate': new Date(),
+    }
+    console.log(assignNew);
+    this.assignService.createAssign(assignNew).subscribe(
+      result => {
+        if (result == true)
+          this.alert.showToast('success', 'Success', 'Create/Update assign successfully!');
+
+        // Check deadline service - send mail
+        this.assignService.checkDeadline(assignNew, this.userService.token()).toPromise().then(result => {
+          console.log('Check deadline:' + result);
+        });
+        // Reset list assign
+        this.showListAssign();
+      }
+    )
+
+    // Update Issue Step
+    if (type == 'submit') {
+      this.issueService.getIssueById(this.IssueID).subscribe(result => {
+        result.currentStep = (result.currentStep == 'Caca') ? 'Capa' : result.currentStep;
+        this.issueService.createIssue(result).subscribe(resultCreate => {
+          if (resultCreate == true) {
+            this.alert.showToast('success', 'Success', 'Create/Update assign successfully!');
+          }
+        })
+      })
+    }
+  }
+
+
+  //#endregion
+
+
+
+
+
   //#region DeadLine Extend
+
   openDeadline(dialog: TemplateRef<any>, assignId: string, deadLine: string, deadLineTime: string) {
     this.dialogService.open(
       dialog,
@@ -112,18 +307,18 @@ export class CapaComponent implements OnInit {
     this.listDeadline.slice(-1)[0].status = 'On-going';
     // Insert DeadLine
     this.assignService.createDeadLine(this.listDeadline.slice(-1)[0]).subscribe(result => {
-      console.log(result);
+      //console.log(result);
     });
   }
 
   ApprovalDeadLine(assignId: string, result: number, content: string) {
-    console.log(assignId);
+    //console.log(assignId);
     if (result == 1) {
       this.listDeadline.slice(-1)[0].status = 'Approved';
       this.listDeadline.slice(-1)[0].approvalContent = content;
       this.listDeadline.slice(-1)[0].approvalDate = new Date();
       this.assignService.createDeadLine(this.listDeadline.slice(-1)[0]).subscribe(result => {
-        console.log(result);
+        //console.log(result);
       });
       // Update in assign table
       this.assignService.getAssign(assignId).subscribe(result => {
@@ -131,7 +326,7 @@ export class CapaComponent implements OnInit {
         this.assignService.createAssign(result).subscribe(res => {
           if (res == true) this.alert.showToast('success', 'Success', 'Approval deadline successfully!');
           // Update current assign array
-          this.showCaPa();
+          this.showListAssign();
         });
       });
     } else if (content.length > 0) {
@@ -145,106 +340,8 @@ export class CapaComponent implements OnInit {
       this.alert.showToast('danger', 'Error', 'Comment required with reject selection!');
     }
   }
-
   //#endregion
 
-  capaFormGroup: FormGroup = this.formBuilder.group({
-    id: '',
-    ownerId: '',
-    name: '',
-    email: '',
-    team: '',
-    requestContent: ['', [Validators.required]],
-    deadLine: ['', [Validators.required]],
-    deadLineTime: ['', [Validators.required]],
-    assignedDate: new Date(),
-    capaDetail: '',
-  })
-  updateRickText(value: string) {
-    this.capaFormGroup.patchValue({ capaDetail: value })
-  }
-
-  addNewAssign(idMail: string) {
-    // Get information
-    var token = JSON.parse(localStorage.getItem('user')).token["access_token"];
-    this.adwebService.getUserDetailByEmail(token, idMail).subscribe(result => {
-      if (result != null) {
-        this.capaFormGroup.patchValue({
-          ownerId: result['ad_user_employeeID'],
-          name: result['ad_user_displayName'],
-          email: result['work_email'],
-          team: result['department_id'][1],
-        })
-      }
-      else {
-        this.adwebService.getUserDetailByID(token, idMail).subscribe(result => {
-          if (result != null) {
-            this.capaFormGroup.patchValue({
-              ownerId: result['ad_user_employeeID'],
-              name: result['ad_user_displayName'],
-              email: result['work_email'],
-              team: result['department_id'][1],
-            })
-          }
-          else {
-            this.alert.showToast('danger', 'Error', 'This id or email not exists in the system!');
-          }
-        });
-      }
-    });
-  }
-  checkAssignStatus(deadline: Date, actionContent: string): string {
-    if (actionContent != undefined && actionContent?.length > 0)
-      return 'Done';
-    else if (new Date() <= deadline)
-      return 'On-going';
-    else
-      return 'Pending';
-  }
-  AssignSubmit2() {
-    // Insert assign value
-    // new model - for update in server
-    const deadLine = new Date(format(new Date(this.capaFormGroup.value.deadLine), 'yyyy/MM/dd') + ' ' + this.capaFormGroup.value.deadLineTime);
-    const assignNew: AssignModel = {
-      'id': this.guidService.getGuid(),
-      'issueNo': this.IssueID,
-      'currentStep': 'capa',
-      'team': this.capaFormGroup.value.team,
-      'ownerId': this.capaFormGroup.value.ownerId,
-      'name': this.capaFormGroup.value.name,
-      'email': this.capaFormGroup.value.email,
-      'requestContent': this.capaFormGroup.value.requestContent,
-      'actionResult': null,
-      'actionContent': null,
-      'actionDate': (this.capaFormGroup.value.capaDetail?.length > 0 && this.capaFormGroup.value.actionDate == null) ? new Date() : this.capaFormGroup.value.actionDate,
-      'assignedDate': this.capaFormGroup.value.assignedDate,
-      'deadLine': deadLine,
-      'deadLevel': 0,
-      'status': this.checkAssignStatus(deadLine, this.capaFormGroup.value.capaDetail),
-      'remark': '',
-      'updatedBy': this.userService.userId(),
-      'updatedDate': new Date(),
-    }
-    this.assignService.createAssign(assignNew).subscribe(
-      result => {
-        if (result == true)
-          this.alert.showToast('success', 'Success', 'Create/Update assign successfully!');
-      }
-    )
-  }
-
-  CAPASubmit() {
-    this.issueService.getIssueById(this.IssueID).subscribe(result => {
-      // Update issue information 
-      result.capadetail = this.capaFormGroup.value.capaDetail;
-      this.issueService.createIssue(result).subscribe(resultCreate => {
-        if (resultCreate == true) {
-          // Update assign status (status of step)
-          this.AssignSubmit2();
-        }
-      })
-    })
-  }
 
   NextStep() {
     this.nextStatus.emit('close');

@@ -2,7 +2,7 @@ import { ViewportScroller } from '@angular/common';
 import { nullSafeIsEquivalent } from '@angular/compiler/src/output/output_ast';
 import { resolveSanitizationFn } from '@angular/compiler/src/render3/view/template';
 import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { FormBuilder, FormGroup, PatternValidator, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
 import { FileModel } from 'app/@core/models/file-attach';
@@ -52,8 +52,11 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
   @ViewChild(UploadFileComponent) fileUpload: UploadFileComponent;
 
   IssueID: string = '';
-  IssueIndex: number = 1; // default is 1
-  IssueTitleIndex: number = 0;
+  IssueIndex: number = 1; // default is 1 - định danh id
+  IssueTitleIndex: number = 0; // đã sãy ra bao nhiêu lần. (sym repeat)
+  IssueType: string = ''; // New - Open
+  IssueStep: string = ''; // 4 Step init
+
   createdDate: Date = null;
 
   loading = false;
@@ -86,15 +89,12 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
 
   ngOnInit() {
     this.route.params.subscribe(params => {
-      if (params['issueId'])
-        this.IssueID = params['issueId'];
-      else
-        this.IssueID = this.guidService.getGuid();
+      console.log(params['step']);
+      this.IssueID = params['issueId'] == undefined ? this.guidService.getGuid() : params['issueId'];
+      this.IssueType = params['type'];
+      this.IssueStep = params['step'];
     });
     this.showIssueOpen();
-
-
-
 
     this.issueService.getListProcess().subscribe(
       result => {
@@ -117,12 +117,24 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
   }
 
 
-  ngAfterViewInit(): void {
-    var el: HTMLElement = document.getElementById('initNext');
-    // el.click();
-    // el.click();
+  clickStep(step: string) {
+    // check this step with current status
+    this.currentStatus = step;
+  }
 
-    // this.currentStatus = 'close';
+  ngAfterViewInit(): void {
+    this.currentStatus = this.IssueStep;
+    // if (this.currentStatus == 'openIssue')
+    // {
+
+    // }
+    // set current step
+    // this.step.next();
+    // this.step.next();
+    // this.step.next();
+    // this.step.previous();
+
+    this.ref.detectChanges(); // giá trị thay đổi sau khi đã kiểm tra thì thêm thằng này.
   }
 
   // Control Stepper
@@ -193,7 +205,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
         // Select process type
         this.issueService.getProcessByName(issueModel.processType).subscribe(result => {
           this.currentProcess = result;
-          console.log(this.currentProcess);
+          //console.log(this.currentProcess);
         })
         // Shows OBA
         await this.issueService.getOBAById(this.IssueID).toPromise().then(result => {
@@ -224,7 +236,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
             shift: result.shift,
           })
         }).then(() => {
-          this.IssueTitleIndex = issueModel.repeateddSymptom != null ? Number(issueModel.repeateddSymptom) : 0;
+          // this.IssueTitleIndex = issueModel.repeateddSymptom ? Number(issueModel.repeateddSymptom) : 0;
         })
       }
     } else {
@@ -241,7 +253,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
   changeProcess(event: any) {
     this.currentProcess = event;
 
-    console.log(this.currentProcess);
+    //console.log(this.currentProcess);
     this.issueFormGroup.reset();
     this.obaFormGroup.reset();
     this.productFormGroup.reset();
@@ -315,6 +327,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
         }
         this.loading = false;
         this.updateIssueIndex();
+        this.updateIssueTitle();
       }
     );
   }
@@ -329,7 +342,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
     issueTitle += ((this.obaFormGroup.value?.defectName !== '' && this.obaFormGroup.value?.defectName !== null) ? ('-' + this.obaFormGroup.value.defectName) : '');
     issueTitle += ((this.obaFormGroup.value?.defectType !== '' && this.obaFormGroup.value?.defectType !== null) ? ('-' + this.obaFormGroup.value.defectType) : '');
     issueTitle += '-' + (this.createdDate ? format(new Date(this.createdDate), "yyyyMMdd").toString() : format(new Date(), "yyyyMMdd").toString());
-    issueTitle += '-' + this.IssueIndex;
+    issueTitle += '-' + this.IssueTitleIndex;
     return issueTitle;
   }
   initIssueNo() {
@@ -342,13 +355,21 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
     return issueNo;
   }
   updateIssueIndex() {
-    this.issueService.getListIssueByIssueNo(this.initIssueNo()).subscribe(result => {
-      this.IssueIndex = 1 + result.length;
+    this.issueService.getListIssueByIssueNo(this.initIssueNo()).toPromise().then(result => {
+      this.IssueIndex = result.length + ((this.IssueType == 'open') ? 0 : 1);
+    }).then(() => {
+      this.issueFormGroup.patchValue({
+        issueNo: this.initIssueNo(),
+      })
     })
   }
   updateIssueTitle() {
-    this.issueService.getListIssueByIssueTitle(this.initIssueTitle()).subscribe(result => {
-      this.IssueTitleIndex = result.length;
+    this.issueService.getListIssueByIssueTitle(this.initIssueTitle()).toPromise().then(result => {
+      this.IssueTitleIndex = result.length + ((this.IssueType == 'open') ? -1 : 0);
+    }).then(() => {
+      this.issueFormGroup.patchValue({
+        title: this.initIssueTitle(),
+      })
     })
   }
   //#endregion

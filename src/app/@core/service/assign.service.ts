@@ -18,6 +18,11 @@ export class AssginService {
     return this.http.post(this.url + 'insert-update-deadline', deadLine);
   }
 
+  // Check deadline and sendmail
+  checkDeadline(assign: AssignModel, token: string) {
+    return this.http.post(this.url + 'check-deadline/'+ token, assign);
+  }
+
   // Get Information
 
   getListDeadLine(assignId: string) : Observable<ExtendDLModel[]> {

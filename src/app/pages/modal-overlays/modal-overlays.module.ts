@@ -36,6 +36,7 @@ import { TooltipComponent } from './tooltip/tooltip.component';
 import { DialogConfirmComponent } from './dialog/dialog-confirm/dialog-confirm.component';
 import { DialogUploadFileComponent } from './dialog/dialog-upload-file/dialog-upload-file.component';
 import { UploadService } from 'app/@core/service/upload-file.service';
+import { DialogApprovalComponent } from './dialog/dialog-aproval/dialog-approvalcomponent';
 
 
 const COMPONENTS = [
@@ -45,6 +46,7 @@ const COMPONENTS = [
   ShowcaseDialogComponent,
   DialogNamePromptComponent,
   DialogConfirmComponent,
+  DialogApprovalComponent,
   DialogUploadFileComponent,
   WindowComponent,
   WindowFormComponent,

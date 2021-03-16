@@ -57,7 +57,7 @@ export class TinyMCEComponent implements OnDestroy, AfterViewInit {
 
         // set content
         editor.on('init', () => {
-          editor.setContent(this.rickText);
+          editor.setContent(this.rickText ? this.rickText : '<p></p>');
 
         });
         // get context

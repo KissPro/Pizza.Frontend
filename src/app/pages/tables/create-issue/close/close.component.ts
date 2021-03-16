@@ -4,10 +4,13 @@ import { EventEmitter, Output } from '@angular/core';
 import { Input } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
+import { ApprovalModel } from 'app/@core/models/issue-approval';
 import { AuthenticationService } from 'app/@core/service/authentication.service';
 import { GuidService } from 'app/@core/service/guid.service';
+import { ApprovalService } from 'app/@core/service/issue-approval.service';
 import { IssueService } from 'app/@core/service/issue.service';
 import { PlantService } from 'app/@core/service/plant.service';
+import { DialogApprovalComponent } from 'app/pages/modal-overlays/dialog/dialog-aproval/dialog-approvalcomponent';
 import { DialogConfirmComponent } from 'app/pages/modal-overlays/dialog/dialog-confirm/dialog-confirm.component';
 import { DialogUploadFileComponent } from 'app/pages/modal-overlays/dialog/dialog-upload-file/dialog-upload-file.component';
 import { ToastrComponent } from 'app/pages/modal-overlays/toastr/toastr.component';
@@ -24,7 +27,7 @@ export class CloseComponent implements OnInit {
   source: LocalDataSource;
   @Input() IssueID: any;
   @Output() backStatus = new EventEmitter<any>();
-
+  listApproval: ApprovalModel[] = [];
 
 
   alert = new ToastrComponent(this.toastrService);
@@ -91,18 +94,18 @@ export class CloseComponent implements OnInit {
   };
 
   constructor(
-    private plantConfig: PlantService,
-    private authen: AuthenticationService,
+    private userService: AuthenticationService,
     private guidService: GuidService,
     private dialogService: NbDialogService,
     private toastrService: NbToastrService,
     private isssueService: IssueService,
-
+    private approvalService: ApprovalService,
   ) {
     this.source = new LocalDataSource();
   }
   ngOnInit(): void {
     this.LoadTable();
+    this.showListApproval();
   }
 
   LoadTable() {
@@ -183,10 +186,41 @@ export class CloseComponent implements OnInit {
     }).onClose.subscribe(result => (result === 'success') ? this.LoadTable() : null);
   }
 
-  BackStep() {
-    this.backStatus.emit('openIssue');
+  openApproval() {
+    this.dialogService.open(DialogApprovalComponent)
+      .onClose.subscribe(result => {
+        if (result) {
+          // Approval information
+          const approval: ApprovalModel = {
+            id: this.guidService.getGuid(),
+            issueNo: this.IssueID,
+            approverId: this.userService.userName(),
+            team: this.userService.team(),
+            action: (result.status == 1) ? 'Approval' : 'Reject',
+            approverRemark: result.remark,
+            updatedBy: this.userService.userId(),
+            updatedDate: new Date(),
+          }
+          this.approvalService.insertOrUpdate(approval).subscribe(result => {
+            if (result) this.alert.showToast('success', 'Success', 'Insert/Update approval sucessfully!');
+            this.showListApproval();
+          })
+        }
+      });
   }
-  
+
+  // show approval information
+  showListApproval() {
+    this.approvalService.getListApprovalByIssueId(this.IssueID).subscribe(result => {
+      this.listApproval = result;
+    });
+  }
+
+
+  BackStep() {
+    this.backStatus.emit('capa');
+  }
+
 }
 
 // Custome input

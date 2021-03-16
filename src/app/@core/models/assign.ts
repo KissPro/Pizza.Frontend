@@ -15,6 +15,7 @@ export interface AssignModel {
 	deadLevel: number;
 	status: string;
 	remark: string;
+	scheduleDeadLine: string;
 	updatedBy: string;
 	updatedDate: Date;
 }

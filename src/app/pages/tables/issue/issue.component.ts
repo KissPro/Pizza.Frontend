@@ -1,6 +1,6 @@
 import { AfterContentChecked, AfterViewChecked, AfterViewInit, Component, OnChanges, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { HttpClient, HttpHeaders, HttpResponse } from '@angular/common/http';
-import { NbSidebarService } from '@nebular/theme';
+import { NbSidebarService, NbToastrService } from '@nebular/theme';
 import { LayoutService } from 'app/@core/utils';
 import { BoomEcusModel } from 'app/@core/models/boom-ecus';
 import { BoomEcusService } from 'app/@core/service/boom-ecus.service';
@@ -12,6 +12,7 @@ import { IssueService } from 'app/@core/service/issue.service';
 import { Router } from '@angular/router';
 import { GuidService } from 'app/@core/service/guid.service';
 import { AdwebService } from 'app/@core/service/adweb.service';
+import { ToastrComponent } from 'app/pages/modal-overlays/toastr/toastr.component';
 
 @Component({
   selector: 'ngx-issue',
@@ -28,20 +29,26 @@ export class IssueComponent implements OnInit {
   @ViewChild(DataTableDirective, { static: false })
   dtElement: DataTableDirective;
 
+  alert = new ToastrComponent(this.toastrService);
+
+
   constructor(private http: HttpClient,
     private issueService: IssueService,
     private uploadService: UploadService,
     private sidebarService: NbSidebarService,
     private guidService: GuidService,
     private layoutService: LayoutService,
+    private toastrService: NbToastrService,
     private adwebService: AdwebService,
     private router: Router,
   ) { }
 
   ngOnInit(): void {
-    const that = this;
-    const headers = new HttpHeaders().set('Content-Type', 'application/json');
+    this.loadIssueTable();
+  }
 
+  loadIssueTable() {
+    const that = this;
     this.toggleSidebar();
     this.dtOptions[1] = {
       pagingType: 'full_numbers',
@@ -55,11 +62,11 @@ export class IssueComponent implements OnInit {
       ajax: (dataTablesParameters: any, callback) => {
         that.issueService.getIssue(dataTablesParameters)
           .subscribe(resp => {
-            that.issueModel = resp.data;
-            that.indexTable = resp.start;
+            that.issueModel = resp?.data;
+            that.indexTable = resp?.start;
             callback({
-              recordsTotal: resp.recordsTotal,
-              recordsFiltered: resp.recordsFiltered,
+              recordsTotal: resp?.recordsTotal,
+              recordsFiltered: resp?.recordsFiltered,
               data: [],
             });
             // setTimeout(() => this.rerender(), 1); // resize header
@@ -106,6 +113,12 @@ export class IssueComponent implements OnInit {
       );
   }
 
+  reloadIssueTable() {
+    this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
+        dtInstance.ajax.reload();
+    });
+}
+
 
   // Show progress bar
   showIssueStatus(status: string) {
@@ -132,12 +145,22 @@ export class IssueComponent implements OnInit {
     }
   }
 
+
+  // Action
   openIssue(issueId: string) {
     console.log(issueId);
-    this.router.navigate(['/pages/tables/create-issue', {'issueId': issueId}]);
+    this.router.navigate(['/pages/tables/create-issue', { 'issueId': issueId, 'type': 'open', 'step' : 'openIssue' }]);
   }
   newIssue() {
-    this.router.navigate(['/pages/tables/create-issue', {'issueId': this.guidService.getGuid()}]);
+    this.router.navigate(['/pages/tables/create-issue', { 'issueId': this.guidService.getGuid(), 'type': 'new', 'step' : 'openIssue' }]);
+  }
+  removeIssue(issueId: string, type: string) {
+    this.issueService.removeIssue(issueId, type).subscribe(result => {
+      if (result == true) {
+        this.alert.showToast('success', 'Success', 'Remove issue successfully!');
+        this.reloadIssueTable();
+      }
+    })
   }
 
   testAdweb() {

@@ -82,16 +82,17 @@ export class CacaComponent implements OnInit {
       });
     });
     this.issueService.getIssueById(this.IssueID).subscribe(result => {
-      // setTimeout(() => this.inputRecommended = 'hoanghoagn', 4000);
-
+      // setTimeout(() =, 4000);
+      //console.log(result);
       // Update issue information 
       this.analysisFormGroup.patchValue({
         analysisDetail: result.analysisDetail ? result.analysisDetail : '<p></p>',
-        sampleReceivingDate: new Date(result.sampleReceivingTime),
-        sampleReceivingTime: format(new Date(result.sampleReceivingTime), 'HH:mm'),
+        sampleReceivingDate: result.sampleReceivingTime ? new Date(result.sampleReceivingTime) : null,
+        sampleReceivingTime: result.sampleReceivingTime ? format(new Date(result.sampleReceivingTime), 'HH:mm') : null,
         recommendedAction: result.recommendedAction ? result.recommendedAction : '<p></p>',
         escapeCause: result.escapeCause
       });
+      //console.log(result.analysisDetail == null);
       // this.ref.markForCheck();
     })
   }
@@ -180,13 +181,13 @@ export class CacaComponent implements OnInit {
   }
 
   onSubmit() {
-    console.log(this.createAssignFormGroup.value);
+    //console.log(this.createAssignFormGroup.value);
   }
 
 
 
-  checkAssignStatus(deadline: Date, actionContent: string): string {
-    if (actionContent != undefined && actionContent?.length > 0)
+  checkAssignStatus(type: string, deadline: Date, actionContent: string): string {
+    if (type == 'submit' && actionContent != undefined && actionContent?.length > 0)
       return 'Done';
     else if (new Date() <= deadline)
       return 'On-going';
@@ -194,12 +195,11 @@ export class CacaComponent implements OnInit {
       return 'Pending';
   }
 
-  AssignSubmit() {
-    console.log(this.listAssign().value);
+  AssignSubmit(type: string) {
     // Insert that value
+    //console.log(type)
     const listAssign = this.listAssign().value;
     listAssign.forEach((assignForm, index) => {
-      console.log(assignForm.actionContent);
       // new model - for update in server
       const deadLine = new Date(format(new Date(assignForm.deadLine), 'yyyy/MM/dd') + ' ' + assignForm.deadLineTime);
       const assignNew: AssignModel = {
@@ -212,17 +212,16 @@ export class CacaComponent implements OnInit {
         'email': assignForm.email,
         'requestContent': assignForm.requestContent,
         'actionResult': assignForm.actionResult,
-        'actionContent': assignForm.actionContent,
-        'actionDate': (assignForm.actionContent?.length > 0 && assignForm.actionDate == null) ? new Date() : assignForm.actionDate,
+        'actionContent': type == 'submit' ? assignForm.actionContent : '',
+        'actionDate': (type == 'submit' && assignForm.actionContent?.length > 0 && assignForm.actionDate == null) ? new Date() : assignForm.actionDate,
         'assignedDate': assignForm.assignedDate,
         'deadLine': deadLine,
         'deadLevel': 0,
-        'status': this.checkAssignStatus(deadLine, assignForm.actionContent),
+        'status': this.checkAssignStatus(type, deadLine, assignForm.actionContent),
         'remark': '',
         'updatedBy': this.userService.userId(),
         'updatedDate': new Date(),
       }
-      console.log((assignForm.actionContent?.length > 0 && assignForm.actionDate == null));
       this.assignService.createAssign(assignNew).subscribe(
         result => {
           if (result == true)
@@ -270,18 +269,18 @@ export class CacaComponent implements OnInit {
     this.listDeadline.slice(-1)[0].status = 'On-going';
     // Insert DeadLine
     this.assignService.createDeadLine(this.listDeadline.slice(-1)[0]).subscribe(result => {
-      console.log(result);
+      //console.log(result);
     });
   }
 
   ApprovalDeadLine(assignId: string, result: number, content: string) {
-    console.log(assignId);
+    //console.log(assignId);
     if (result == 1) {
       this.listDeadline.slice(-1)[0].status = 'Approved';
       this.listDeadline.slice(-1)[0].approvalContent = content;
       this.listDeadline.slice(-1)[0].approvalDate = new Date();
       this.assignService.createDeadLine(this.listDeadline.slice(-1)[0]).subscribe(result => {
-        console.log(result);
+        //console.log(result);
       });
       // Update in assign table
       this.assignService.getAssign(assignId).subscribe(result => {
@@ -320,8 +319,8 @@ export class CacaComponent implements OnInit {
     deadLine: ['', [Validators.required]],
     deadLineTime: ['', [Validators.required]],
     assignedDate: new Date(),
-    sampleReceivingDate: null,
-    sampleReceivingTime: null,
+    sampleReceivingDate: '',
+    sampleReceivingTime: '',
     analysisDetail: '',
     recommendedAction: '',
     escapeCause: '',
@@ -363,7 +362,7 @@ export class CacaComponent implements OnInit {
     });
   }
 
-  AssignSubmit2() {
+  AssignAnalysis(type: string) {
     // Insert assign value
     // new model - for update in server
     const deadLine = new Date(format(new Date(this.analysisFormGroup.value.deadLine), 'yyyy/MM/dd') + ' ' + this.analysisFormGroup.value.deadLineTime);
@@ -382,7 +381,7 @@ export class CacaComponent implements OnInit {
       'assignedDate': this.analysisFormGroup.value.assignedDate,
       'deadLine': deadLine,
       'deadLevel': 0,
-      'status': this.checkAssignStatus(deadLine, this.analysisFormGroup.value.analysisDetail),
+      'status': this.checkAssignStatus(type, deadLine, this.analysisFormGroup.value.analysisDetail),
       'remark': '',
       'updatedBy': this.userService.userId(),
       'updatedDate': new Date(),
@@ -393,26 +392,48 @@ export class CacaComponent implements OnInit {
           this.alert.showToast('success', 'Success', 'Create/Update assign successfully!');
       }
     )
+    if (type == 'submit') {
+      const receiveDate = new Date(format(new Date(this.analysisFormGroup.value.sampleReceivingDate), 'yyyy/MM/dd') + ' ' + this.analysisFormGroup.value.sampleReceivingTime);
+      //console.log(receiveDate);
+      this.issueService.getIssueById(this.IssueID).subscribe(result => {
+        // Update issue information 
+        result.issueStatus = 'On-going',
+          result.currentStep = (result.currentStep == 'Open') ? 'Caca' : result.currentStep;
+        result.analysisDetail = this.analysisFormGroup.value.analysisDetail;
+        result.sampleReceivingTime = receiveDate;
+        result.recommendedAction = this.analysisFormGroup.value.recommendedAction;
+        result.escapeCause = this.analysisFormGroup.value.escapeCause;
+        this.issueService.createIssue(result).subscribe(resultCreate => {
+          if (resultCreate == true) {
+            // Update assign status (status of step)
+            // this.AssignSubmit2();
+            this.alert.showToast('success', 'Success', 'Create/Update assign successfully!');
+
+          }
+        })
+      })
+    }
   }
 
-  AnalysisSubmit() {
-    const receiveDate = new Date(format(new Date(this.analysisFormGroup.value.sampleReceivingDate), 'yyyy/MM/dd') + ' ' + this.analysisFormGroup.value.sampleReceivingTime);
-    console.log(receiveDate);
-    this.issueService.getIssueById(this.IssueID).subscribe(result => {
-      // Update issue information 
-      result.issueStatus = 'On-going',
-      result.analysisDetail = this.analysisFormGroup.value.analysisDetail;
-      result.sampleReceivingTime = receiveDate;
-      result.recommendedAction = this.analysisFormGroup.value.recommendedAction;
-      result.escapeCause = this.analysisFormGroup.value.escapeCause;
-      this.issueService.createIssue(result).subscribe(resultCreate => {
-        if (resultCreate == true) {
-          // Update assign status (status of step)
-          this.AssignSubmit2();
-        }
-      })
-    })
-  }
+  // AnalysisSubmit() {
+  //   const receiveDate = new Date(format(new Date(this.analysisFormGroup.value.sampleReceivingDate), 'yyyy/MM/dd') + ' ' + this.analysisFormGroup.value.sampleReceivingTime);
+  //   //console.log(receiveDate);
+  //   this.issueService.getIssueById(this.IssueID).subscribe(result => {
+  //     // Update issue information 
+  //     result.issueStatus = 'On-going',
+  //       result.currentStep = (result.currentStep == 'Open') ? 'Caca' : result.currentStep;
+  //     result.analysisDetail = this.analysisFormGroup.value.analysisDetail;
+  //     result.sampleReceivingTime = receiveDate;
+  //     result.recommendedAction = this.analysisFormGroup.value.recommendedAction;
+  //     result.escapeCause = this.analysisFormGroup.value.escapeCause;
+  //     this.issueService.createIssue(result).subscribe(resultCreate => {
+  //       if (resultCreate == true) {
+  //         // Update assign status (status of step)
+  //         this.AssignSubmit2();
+  //       }
+  //     })
+  //   })
+  // }
 
   NextStep() {
     this.nextStatus.emit('capa');

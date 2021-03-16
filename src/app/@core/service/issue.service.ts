@@ -71,8 +71,8 @@ export class IssueService extends IssueData {
   }
 
   // Remove
-  removeIssue(issueId: string) {
-    return this.http.delete(this.url + 'remove-issue-id/' + issueId);
+  removeIssue(issueId: string, type: string) {
+    return this.http.delete(this.url + 'remove-issue-id/' + issueId + '/' + type);
   }
   removeFileByIssueId(issueId: string) {
     return this.http.delete(this.url + 'remove-file-issueId/' + issueId);

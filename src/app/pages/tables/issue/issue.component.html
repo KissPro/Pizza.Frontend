@@ -42,13 +42,16 @@
             </nb-progress-bar>
           </td>
           <td class="text-center">
-            <button (click)="openIssue(issue.id)" nbButton outline status="info">
+            <button size="small" (click)="openIssue(issue.id)" nbButton outline status="info">
               Open <nb-icon icon="book-open-outline"></nb-icon>
+            </button>
+            <button size="small" (click)="removeIssue(issue.id, issue.processType)" class="float-right" nbButton outline status="danger">
+              <nb-icon icon="close-outline"></nb-icon>
             </button>
           </td>
         </tr>
       </tbody>
-      <tbody *ngIf="issueModel?.length == 0">
+      <tbody *ngIf="issueModel?.length == 0 || !issueModel">
         <tr>
           <td colspan="3" class="no-data-available">No data!</td>
         </tr>

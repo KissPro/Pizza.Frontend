@@ -28,6 +28,13 @@ export class AuthenticationService {
     userName() {
         return JSON.parse(localStorage.getItem('user')).employee.employee["display_name"];
     }
+    team() {
+        return JSON.parse(localStorage.getItem('user')).employee.employee["department"][1];
+    }
+
+    token() {
+        return JSON.parse(localStorage.getItem('user')).token["access_token"];
+    }
 
     logout() {
         localStorage.removeItem('user');
