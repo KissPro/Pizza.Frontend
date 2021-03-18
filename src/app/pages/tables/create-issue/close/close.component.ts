@@ -5,15 +5,21 @@ import { Input } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
 import { ApprovalModel } from 'app/@core/models/issue-approval';
+import { VerificationModel } from 'app/@core/models/issue-type';
+import { Mail } from 'app/@core/models/mail';
+import { AdwebService } from 'app/@core/service/adweb.service';
 import { AuthenticationService } from 'app/@core/service/authentication.service';
 import { GuidService } from 'app/@core/service/guid.service';
 import { ApprovalService } from 'app/@core/service/issue-approval.service';
 import { IssueService } from 'app/@core/service/issue.service';
+import { MailService } from 'app/@core/service/mail.service';
 import { PlantService } from 'app/@core/service/plant.service';
 import { DialogApprovalComponent } from 'app/pages/modal-overlays/dialog/dialog-aproval/dialog-approvalcomponent';
 import { DialogConfirmComponent } from 'app/pages/modal-overlays/dialog/dialog-confirm/dialog-confirm.component';
 import { DialogUploadFileComponent } from 'app/pages/modal-overlays/dialog/dialog-upload-file/dialog-upload-file.component';
 import { ToastrComponent } from 'app/pages/modal-overlays/toastr/toastr.component';
+import { he } from 'date-fns/locale';
+import { environment } from 'environments/environment';
 import { LocalDataSource, DefaultEditor } from 'ng2-smart-table';
 
 @Component({
@@ -26,9 +32,15 @@ export class CloseComponent implements OnInit {
 
   source: LocalDataSource;
   @Input() IssueID: any;
+  @Input() IssueTitle: any;
+  @Input() IssueCreator: any;
+
   @Output() backStatus = new EventEmitter<any>();
   listApproval: ApprovalModel[] = [];
+  listVerifi: VerificationModel[] = [];
 
+  headQAInfor: any;
+  headAOInfor: any;
 
   alert = new ToastrComponent(this.toastrService);
   // Setting is setting table
@@ -94,24 +106,32 @@ export class CloseComponent implements OnInit {
   };
 
   constructor(
+    private adwebService: AdwebService,
     private userService: AuthenticationService,
     private guidService: GuidService,
     private dialogService: NbDialogService,
     private toastrService: NbToastrService,
-    private isssueService: IssueService,
+    private issueService: IssueService,
     private approvalService: ApprovalService,
+    private mailService: MailService,
   ) {
     this.source = new LocalDataSource();
+
   }
-  ngOnInit(): void {
+  async ngOnInit() {
     this.LoadTable();
     this.showListApproval();
+
+    // Get head approval information
+    this.headQAInfor = await (await this.adwebService.getUserDetailByDepartment(this.userService.token(), "Quality")).toPromise();
+    this.headAOInfor = await (await this.adwebService.getUserDetailByDepartment(this.userService.token(), "Assembly Operations")).toPromise();
   }
 
   LoadTable() {
-    this.isssueService.getListVerificationByIssueId(this.IssueID)
+    this.issueService.getListVerificationByIssueId(this.IssueID)
       .subscribe(result => {
         this.source.load(result);
+        this.listVerifi = result;
       });
   }
 
@@ -129,10 +149,17 @@ export class CloseComponent implements OnInit {
       'date': new Date(),
     };
     console.log(vefify);
-    this.isssueService.createVerification(vefify)
+    this.issueService.createVerification(vefify)
       .subscribe(result => {
         console.log(result);
         this.alert.showToast('success', 'Success', 'Create verification successfully!');
+        // Update issue status
+        this.issueService.getIssueById(this.IssueID).subscribe(result => {
+          // Update issue information 
+          result.issueStatus = 'Monitoring';
+          result.currentStep = (result.currentStep == 'Capa') ? 'Close' : result.currentStep;
+          this.issueService.createIssue(result).subscribe(resultCreate => console.log(resultCreate));
+        })
         // Show data -> local source
         event.confirm.resolve(event.newData);
       });
@@ -150,10 +177,11 @@ export class CloseComponent implements OnInit {
       'date': new Date(),
     };
     const id = event.newData.id;
-    this.isssueService.createVerification(vefify)
+    this.issueService.createVerification(vefify)
       .subscribe(result => {
         console.log(result);
         this.alert.showToast('success', 'Success', 'Create verification successfully!');
+
         // Show data -> local source
         event.confirm.resolve(event.newData);
       });
@@ -164,7 +192,7 @@ export class CloseComponent implements OnInit {
       .onClose.subscribe(result => {
         if (result === 1) {
           const id = event.data.id;
-          this.isssueService.removeVerification(id)
+          this.issueService.removeVerification(id)
             .subscribe(() => {
               this.alert.showToast('success', 'Success', 'Delete the config successfully!');
               event.confirm.resolve();
@@ -175,38 +203,103 @@ export class CloseComponent implements OnInit {
       });
   }
 
-  // upload file
-  uploadFile(): void {
-    this.dialogService.open(DialogUploadFileComponent, {
-      context: {
-        type: 'Plant',
-        templateName: 'Plant_Template.xlsx',
-        urlUpload: '/api/plant/import-excel',
-      },
-    }).onClose.subscribe(result => (result === 'success') ? this.LoadTable() : null);
-  }
-
   openApproval() {
     this.dialogService.open(DialogApprovalComponent)
-      .onClose.subscribe(result => {
-        if (result) {
+      .onClose.subscribe(resultApproval => {
+        if (resultApproval) {
           // Approval information
           const approval: ApprovalModel = {
             id: this.guidService.getGuid(),
             issueNo: this.IssueID,
             approverId: this.userService.userName(),
             team: this.userService.team(),
-            action: (result.status == 1) ? 'Approval' : 'Reject',
-            approverRemark: result.remark,
+            action: (resultApproval.status == 1) ? 'Approval' : 'Reject',
+            approverRemark: resultApproval.remark,
             updatedBy: this.userService.userId(),
             updatedDate: new Date(),
           }
           this.approvalService.insertOrUpdate(approval).subscribe(result => {
             if (result) this.alert.showToast('success', 'Success', 'Insert/Update approval sucessfully!');
+
+            // Send mail
+            // If approver from AO -> send new approval QA
+            if (this.headAOInfor.work_email == this.userService.email() && resultApproval.status == 1) {
+              this.sendMailApproval(this.headQAInfor);
+            }
+
+            // If approval from QA -> update issue status
+            if (this.headQAInfor.work_email == this.userService.email() && resultApproval.status == 1) {
+              this.issueService.getIssueById(this.IssueID).subscribe(result => {
+                // Update issue information 
+                result.issueStatus = 'Done';
+                this.issueService.createIssue(result).subscribe(resultCreate => {
+                  if (resultCreate == true) {
+                    this.alert.showToast('success', 'Success', 'Create/Update assign successfully!');
+                  }
+                })
+              })
+            }
+
+            // Send mail notification -> Initiator
+            this.sendApproved(approval);
+
             this.showListApproval();
           })
         }
       });
+  }
+
+  // Approval callback
+  async sendApproved(approval: ApprovalModel) {
+    let initiatorMail = await this.adwebService.getUserDetailByID(this.userService.token(), this.IssueCreator).toPromise();
+    const mail: Mail = {
+      sender: 'Pizza Systems',
+      to: initiatorMail['work_email'],
+      cc: '',
+      bcc: '',
+      subject: 'Approval Notification-' + this.IssueTitle,
+      content:
+        "Dear Mr/Ms. " + initiatorMail['ad_user_displayName'] + ",</br></br>" +
+        "You have received a an approval notification from " + this.userService.userName() + " in Pizza system.</br>" +
+        "Approval result: " + approval.action + "</br>" +
+        "Remark: " + approval.approverRemark + "</br>" +
+        "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=openIssue" + "'>Pizza - Open Issue</a></br></br>" +
+        "Best regards," +
+        "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
+    }
+    this.mailService.SendMail(mail).subscribe(result => result ? console.log('send mail successfully!') : console.log('send mail error!'));
+  }
+  async sendMailApproval(headInfor: any) {
+    // Send mail to QA - Quality
+    let initiatorMail = await this.adwebService.getUserDetailByID(this.userService.token(), this.IssueCreator).toPromise();
+
+
+    const mail: Mail = {
+      sender: 'Pizza Systems',
+      to: headInfor['work_email'],
+      cc: '',
+      bcc: initiatorMail['work_email'],
+      subject: 'Approval Request-' + this.IssueTitle,
+      content:
+        "Dear Mr/Ms. " + headInfor.ad_user_displayName + ",</br></br>" +
+        "You have received an approval request from " + this.userService.userName() + " in Pizza system.</br>" +
+        "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=openIssue" + "'>Pizza - Open Issue</a></br></br>" +
+        "Best regards," +
+        "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
+    }
+    this.mailService.SendMail(mail).subscribe(result => result ? console.log('send mail successfully!') : console.log('send mail error!'));
+    // Create approval in-review
+    const approval: ApprovalModel = {
+      id: this.guidService.getGuid(),
+      issueNo: this.IssueID,
+      approverId: headInfor.ad_user_displayName,
+      team: headInfor.job_title,
+      action: 'In Review',
+      approverRemark: null,
+      updatedBy: this.userService.userId(),
+      updatedDate: new Date(),
+    }
+    this.approvalService.insertOrUpdate(approval).toPromise();
   }
 
   // show approval information
@@ -216,11 +309,9 @@ export class CloseComponent implements OnInit {
     });
   }
 
-
   BackStep() {
     this.backStatus.emit('capa');
   }
-
 }
 
 // Custome input

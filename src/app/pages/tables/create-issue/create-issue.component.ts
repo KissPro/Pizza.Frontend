@@ -20,6 +20,7 @@ import { UploadService } from 'app/@core/service/upload-file.service';
 import { DialogUploadFileComponent } from 'app/pages/modal-overlays/dialog/dialog-upload-file/dialog-upload-file.component';
 import { ToastrComponent } from 'app/pages/modal-overlays/toastr/toastr.component';
 import { format, isThisSecond } from 'date-fns';
+import { environment } from 'environments/environment';
 import { merge, parseHTML } from 'jquery';
 import { forkJoin, Observable, of } from 'rxjs';
 import { UploadFileComponent } from '../common/upload-file/upload-file.component';
@@ -52,10 +53,12 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
   @ViewChild(UploadFileComponent) fileUpload: UploadFileComponent;
 
   IssueID: string = '';
-  IssueIndex: number = 1; // default is 1 - định danh id
-  IssueTitleIndex: number = 0; // đã sãy ra bao nhiêu lần. (sym repeat)
   IssueType: string = ''; // New - Open
   IssueStep: string = ''; // 4 Step init
+
+  IssueIndex: number = 0; // default is 0 - định danh id
+  IssueTitleIndex: number = 0; // đã sãy ra bao nhiêu lần. (sym repeat)
+
 
   createdDate: Date = null;
 
@@ -91,10 +94,11 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
     this.route.params.subscribe(params => {
       console.log(params['step']);
       this.IssueID = params['issueId'] == undefined ? this.guidService.getGuid() : params['issueId'];
-      this.IssueType = params['type'];
+      this.IssueType = params['type'] == undefined ? 'new' : params['type'];
       this.IssueStep = params['step'];
     });
     this.showIssueOpen();
+
 
     this.issueService.getListProcess().subscribe(
       result => {
@@ -119,11 +123,15 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
 
   clickStep(step: string) {
     // check this step with current status
-    this.currentStatus = step;
+    // when review to submit -> view all
+    if (this.issueFormGroup.value?.currentStep == 'Close')
+      this.currentStatus = step;
   }
 
   ngAfterViewInit(): void {
     this.currentStatus = this.IssueStep;
+    // this.updateIssueNo();
+    // this.updateIssueTitle();
     // if (this.currentStatus == 'openIssue')
     // {
 
@@ -167,11 +175,18 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
 
   // Get information from server base on issueId
   async showIssueOpen() {
+    // Clear information before
+    this.issueFormGroup.reset();
+    this.obaFormGroup.reset();
+    this.productFormGroup.reset();
+
+
     // this.IssueID = '2D864EC3-3DBC-4C06-BC12-31E50D880B16';
     let issueModel = await this.issueService.getIssueById(this.IssueID).toPromise();
     if (issueModel) {
       // Select process type
       this.currentProcess = await this.issueService.getProcessByName('OBA').toPromise();
+
       // Show Issue common information
       this.createdDate = issueModel?.createdDate ? issueModel.createdDate : new Date();
 
@@ -191,7 +206,6 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
         createdDate: issueModel.createdDate,
         createdBy: issueModel.createdBy,
       })
-
       // Show list notfication
       let emailList = issueModel.notifiedList?.split(';');
       emailList.forEach(email => {
@@ -237,6 +251,10 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
           })
         }).then(() => {
           // this.IssueTitleIndex = issueModel.repeateddSymptom ? Number(issueModel.repeateddSymptom) : 0;
+
+          // Load issue no and title after load full data
+          this.updateIssueNo();
+          this.updateIssueTitle();
         })
       }
     } else {
@@ -253,10 +271,17 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
   changeProcess(event: any) {
     this.currentProcess = event;
 
+    // Update issue no
+    this.updateIssueNo();
+    this.updateIssueTitle();
+
     //console.log(this.currentProcess);
     this.issueFormGroup.reset();
     this.obaFormGroup.reset();
     this.productFormGroup.reset();
+    this.issueFormGroup.patchValue({
+      failureDesc: '<p></p>',
+    })
   }
 
   //#region Mail notification
@@ -304,7 +329,23 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
     this.listNotify = this.listNotify.filter(x => x.email !== mail);
   }
   //#endregion
+  // - NBB : DOHA, PCM, QUE, KIG, NEB, KIG, RETRO, QEN, NEB, NEB, LIO, SPARKLER, GMN, SUEZ, DUBA, GMN, NKL, KIG, CNT, NEO, QEN, OTR, KESA, BTS, PIS
+  // - BLU : BT1
+  // - FLC : KE11, KE13, KE15, KE16
 
+  getCustomerName(customer: string) {
+    const listNBB = ['DOHA', 'PCM', 'QUE', 'KIG', 'NEB', 'KIG', 'RETRO', 'QEN', 'NEB', 'NEB', 'LIO', 'SPARKLER', 'GMN', 'SUEZ', 'DUBA', 'GMN', 'NKL', 'KIG', 'CNT', 'NEO', 'QEN', 'OTR', 'KESA', 'BTS', 'PIS']
+    const listBLU = ['BT1']
+    const listFLC = ['KE11', 'KE13', 'KE15', 'KE16']
+    if (listBLU.includes(customer))
+      return 'BLU'
+    else if (listNBB.includes(customer))
+      return 'NBB'
+    else if (listFLC.includes(customer))
+      return 'FLC'
+    else
+      return customer.toUpperCase();
+  }
   getInforByIMEI(imei: string) {
     this.loading = true;
     this.issueService.getIMEIInformation(imei).subscribe(
@@ -312,7 +353,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
         if (result.length > 0) {
           this.productFormGroup.patchValue({
             imei: result[0].imei,
-            customer: result[0].customer,
+            customer: this.getCustomerName(result[0].product.toUpperCase()),
             product: result[0].product,
             psn: result[0].psn,
             ponno: result[0].ponno,
@@ -326,69 +367,84 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
           this.productFormGroup.reset();
         }
         this.loading = false;
-        this.updateIssueIndex();
+        this.updateIssueNo();
         this.updateIssueTitle();
       }
     );
   }
 
   //#region Auto Assign Issue Number, Title
+
+  initIssueNo() {
+    let issueNo = '';
+    issueNo += this.productFormGroup.value?.customer ? (this.productFormGroup.value?.customer + '-') : '';
+    issueNo += this.currentProcess.processName ? this.currentProcess.processName : '';
+    issueNo += '-' + (this.createdDate ? format(new Date(this.createdDate), "yyyyMMdd").toString() : format(new Date(), "yyyyMMdd").toString());
+    issueNo += '-' + this.IssueIndex;
+    return issueNo;
+  }
   initIssueTitle() {
     let issueTitle = '';
-    issueTitle += this.productFormGroup.value?.customer !== null && this.productFormGroup.value?.customer !== '' ? (this.productFormGroup.value.customer + '-') : '';
-    issueTitle += this.currentProcess != null ? this.currentProcess.processName : '';
-    issueTitle += this.productFormGroup.value?.product !== null ? ('-' + this.productFormGroup.value.product) : '';
-    issueTitle += ((this.obaFormGroup.value?.defectPart !== '' && this.obaFormGroup.value?.defectPart !== null) ? ('-' + this.obaFormGroup.value.defectPart) : '');
-    issueTitle += ((this.obaFormGroup.value?.defectName !== '' && this.obaFormGroup.value?.defectName !== null) ? ('-' + this.obaFormGroup.value.defectName) : '');
-    issueTitle += ((this.obaFormGroup.value?.defectType !== '' && this.obaFormGroup.value?.defectType !== null) ? ('-' + this.obaFormGroup.value.defectType) : '');
+    issueTitle += this.productFormGroup.value?.customer ? (this.productFormGroup.value?.customer + '-') : '';
+    issueTitle += this.currentProcess.processName ? this.currentProcess.processName : '';
+    issueTitle += this.obaFormGroup.value?.defectPart ? '-' + this.obaFormGroup.value.defectPart : '';
+    issueTitle += this.obaFormGroup.value?.defectName ? '-' + this.obaFormGroup.value.defectName : '';
+    issueTitle += this.obaFormGroup.value?.defectType ? '-' + this.obaFormGroup.value.defectType : '';
     issueTitle += '-' + (this.createdDate ? format(new Date(this.createdDate), "yyyyMMdd").toString() : format(new Date(), "yyyyMMdd").toString());
     issueTitle += '-' + this.IssueTitleIndex;
     return issueTitle;
   }
-  initIssueNo() {
-    let issueNo = '';
-    issueNo += this.productFormGroup.value?.customer !== null && this.productFormGroup.value?.customer !== '' ? (this.productFormGroup.value.customer + '-') : '';
-    issueNo += ((this.currentProcess != null) ? this.currentProcess.processName : '');
-    issueNo += '-' + (this.createdDate ? format(new Date(this.createdDate), "yyyyMMdd").toString() : format(new Date(), "yyyyMMdd").toString());
-    issueNo += '-' + this.IssueIndex;
 
-    return issueNo;
-  }
-  updateIssueIndex() {
-    this.issueService.getListIssueByIssueNo(this.initIssueNo()).toPromise().then(result => {
-      this.IssueIndex = result.length + ((this.IssueType == 'open') ? 0 : 1);
-    }).then(() => {
-      this.issueFormGroup.patchValue({
-        issueNo: this.initIssueNo(),
+  updateIssueNo() {
+    if (this.issueFormGroup.value?.issueStatus == 'Draft' || !this.issueFormGroup.value?.issueStatus)
+      this.issueService.getListIssueByIssueNo(this.initIssueNo()).toPromise().then(result => {
+        // Nếu đang mở - không tăng index
+        // this.IssueIndex = (Number(result.length) > 0 && this.IssueType == 'open') ? Number(result.length) - 1 : Number(result.length);
+        this.IssueIndex = Number(result.length);
+      }).then(() => {
+        this.issueFormGroup.patchValue({
+          issueNo: this.initIssueNo(),
+        })
       })
-    })
   }
+
+
   updateIssueTitle() {
-    this.issueService.getListIssueByIssueTitle(this.initIssueTitle()).toPromise().then(result => {
-      this.IssueTitleIndex = result.length + ((this.IssueType == 'open') ? -1 : 0);
-    }).then(() => {
-      this.issueFormGroup.patchValue({
-        title: this.initIssueTitle(),
+    if (this.issueFormGroup.value?.issueStatus == 'Draft' || !this.issueFormGroup.value?.issueStatus)
+      this.issueService.getListIssueByIssueTitle(this.initIssueTitle()).toPromise().then(result => {
+        // this.IssueTitleIndex = (Number(result.length) > 0 && this.IssueType == 'open') ? Number(result.length) - 1 : Number(result.length);
+        this.IssueTitleIndex = Number(result.length);
+      }).then(() => {
+        this.issueFormGroup.patchValue({
+          title: this.initIssueTitle(),
+        })
       })
-    })
+    else
+      this.IssueTitleIndex = this.issueFormGroup.value?.repeateddSymptom;
   }
   //#endregion
   submitForm() {
     // Send email
     const mail: Mail = {
-      sender: 'Pizza Tool',
+      sender: 'Pizza Systems',
       to: this.listNotify.map(x => x.email).join(";"),
       cc: '',
-      bcc: '',
-      subject: 'Notification-' + this.initIssueTitle(),
-      content: "This is test email"
+      bcc: this.userService.email(),
+      subject: 'Notification-' + this.issueFormGroup.value?.title,
+      content:
+        "You have received a Notification in Pizza system.</br>" +
+        "Issue number: " + this.issueFormGroup.value?.issueNo + "</br>" +
+        "Requester: " + this.userService.userName() + "</br>" +
+        "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=openIssue" + "'>Pizza - Open Issue</a></br></br>" +
+        "Best regards," +
+        "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
     }
-    this.mailService.SendMail(mail).subscribe(result => {
-      console.log(result);
-    });
+    this.mailService.SendMail(mail).subscribe(result => result ? this.issueFormGroup.patchValue({
+      issueStatus: 'Open',
+    }) : console.log('send mail error!'));
+
     this.saveIssueInformation('Open');
   }
-
   saveDraft() {
     this.saveIssueInformation('Draft');
   }
@@ -466,7 +522,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
     rpn: [null, [Validators.required]],
     severity: '',
     repeateddSymptom: '',
-    failureDesc: '',
+    failureDesc: '<p></p>',
     fileAttack: null,
     notifiedList: '',
     issueStatus: '',

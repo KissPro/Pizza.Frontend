@@ -1,52 +1,24 @@
 <nb-card id="GoToTop">
     <nb-card-body>
-        <nb-stepper orientation="horizontal" disableStepNavigation="false" #step selected="testClick()"
+        <nb-stepper orientation="horizontal" [disableStepNavigation]="this.issueFormGroup.value?.currentStep != 'Close'" #step
             stepper-step-index-border-width="50px">
             <nb-step [label]="labelOne">
-                <ng-template #labelOne><span style="padding-top:50px;" (click)="clickStep('openIssue')">OPEN ISSUE</span>
+                <ng-template #labelOne><span style="padding-top:50px;" (click)="clickStep('openIssue')">OPEN
+                        ISSUE</span>
                 </ng-template>
-                <!-- <div class="row">
-                    <div class="col-sm-10 row">
-                        <h4>Issue Status :</h4>
-                        <button nbButton outline shape="round" size="small" status="danger">On-going</button>
-                    </div>
-                    <div class="col-sm-2">
-                        <button nbButton disabled nbStepperNext>prev</button>
-                        <button nbButton (click)="testClick('caca')" nbStepperNext id="initNext">next</button>
-                    </div>
-                </div> -->
             </nb-step>
             <nb-step [label]="labelTwo">
-                <ng-template #labelTwo><span style="padding-top:50px;" (click)="clickStep('caca')">CONTAINMENT ACTION / CAUSE ANALYSIS</span>
+                <ng-template #labelTwo><span style="padding-top:50px;" (click)="clickStep('caca')">CONTAINMENT ACTION /
+                        CAUSE ANALYSIS</span>
                 </ng-template>
-                <!-- <div class="row">
-                    <h4 class="col-sm-10">Step content #4</h4>
-                    <div class="col-sm-2">
-                        <button nbButton (click)="testClick('openIssue')" nbStepperPrevious>prev</button>
-                        <button nbButton (click)="testClick('capa')" nbStepperNext>next</button>
-                    </div>
-                </div> -->
             </nb-step>
             <nb-step [label]="laberThree">
-                <ng-template #laberThree><span style="padding-top:50px;" (click)="clickStep('capa')">CORRECTIVE & PREVENTIVE ACTIONS</span></ng-template>
-                <!-- <div class="row">
-                    <h4 class="col-sm-10">Step content #4</h4>
-                    <div class="col-sm-2">
-                        <button nbButton (click)="testClick('caca')" nbStepperPrevious>prev</button>
-                        <button nbButton (click)="testClick('verifi-close')" nbStepperNext>next</button>
-                    </div>
-                </div> -->
+                <ng-template #laberThree><span style="padding-top:50px;" (click)="clickStep('capa')">CORRECTIVE &
+                        PREVENTIVE ACTIONS</span></ng-template>
             </nb-step>
             <nb-step [label]="labelFour">
                 <ng-template #labelFour><span style="padding-top:50px;" (click)="clickStep('close')">VERIFY &
                         CLOSE</span></ng-template>
-                <!-- <div class="row">
-                    <h4 class="col-sm-10">Step content #4</h4>
-                    <div class="col-sm-2">
-                        <button nbButton (click)="testClick('capa')" nbStepperPrevious>prev</button>
-                        <button nbButton disabled nbStepperNext>next</button>
-                    </div>
-                </div> -->
             </nb-step>
         </nb-stepper>
     </nb-card-body>
@@ -87,14 +59,14 @@
                 </div>
                 <div class="col-sm-2">
                     <div class="form-group">
-                        <input type="text" nbInput 
-                            fullWidth id="inputFirstName" formControlName="issueNo" placeholder="Issue No">
+                        <input type="text" nbInput fullWidth id="inputFirstName" formControlName="issueNo"
+                            placeholder="Issue No">
                     </div>
                 </div>
                 <div class="col-sm-4">
                     <div class="form-group">
-                        <input type="text" nbInput 
-                            fullWidth id="inputFirstName" formControlName="title" placeholder="Issue Title">
+                        <input type="text" nbInput fullWidth id="inputFirstName" formControlName="title"
+                            placeholder="Issue Title">
                     </div>
                 </div>
                 <div class="col-sm-2 text-center" *ngIf="IssueTitleIndex > 0">
@@ -222,8 +194,9 @@
                     <div class="col-sm-2">
                         <div class="form-group">
                             <label for="inputCustomer" class="label">Customer</label>
-                            <input type="text" nbInput fullWidth id="inputCustomer" placeholder="Input Customer"
-                                class="form-control" formControlName="customer">
+                            <input type="text" (ngModelChange)="updateIssueNo();updateIssueTitle()" nbInput fullWidth
+                                id="inputCustomer" placeholder="Input Customer" class="form-control"
+                                formControlName="customer">
                         </div>
                     </div>
                     <div class="col-sm-2">
@@ -294,7 +267,7 @@
         <p>Detail Description - <i>{{issueFormGroup.value.createdDate | date: 'yyyy/MM/dd HH:mm' }}</i></p>
         <div class="row">
             <div class="col-md-9">
-                <ngx-tiny-mce *ngIf="issueFormGroup.value.failureDesc != ''"
+                <ngx-tiny-mce *ngIf="issueFormGroup.value.failureDesc"
                     [rickText]="issueFormGroup.value.failureDesc" (editorKeyup)="updateRickText($event)"></ngx-tiny-mce>
             </div>
             <div class="col-md-3">
@@ -353,13 +326,14 @@
     <nb-card-footer>
         <div class="row float-right">
             <div
-                *ngIf="issueFormGroup.status == 'VALID' && productFormGroup.status == 'VALID' && obaFormGroup.status == 'VALID'">
+                [disabled]="issueFormGroup.status == 'VALID' && productFormGroup.status == 'VALID' && obaFormGroup.status == 'VALID'">
                 <button *ngIf="!issueFormGroup.value?.issueStatus || issueFormGroup.value?.issueStatus == 'Draft'"
                     class="mr-2" type="submit" (click)="saveDraft()" nbButton status="primary">Save</button>
-                <button *ngIf="!issueFormGroup.value?.issueStatus" class="mr-2" type="submit" (click)="submitForm()"
-                    nbButton status="danger">Submit</button>
+                <button *ngIf="!issueFormGroup.value?.issueStatus || issueFormGroup.value?.issueStatus == 'Draft'"
+                    class="mr-2" type="submit" (click)="submitForm()" nbButton status="danger">Submit</button>
             </div>
-            <button *ngIf="issueFormGroup.value?.issueStatus || issueFormGroup.value?.issueStatus != 'Draft'"
+            <!-- Must submit before process next step -->
+            <button *ngIf="issueFormGroup.value?.issueStatus && issueFormGroup.value?.issueStatus != 'Draft'"
                 (click)="next('caca')" nbButton>Process
                 <nb-icon icon="arrowhead-right-outline"></nb-icon>
             </button>
@@ -368,13 +342,18 @@
 </nb-card>
 
 <ng-container *ngIf="currentStatus == 'caca'">
-    <ngx-caca [IssueID]="IssueID" (nextStatus)="next($event)" (backStatus)="previous($event)"></ngx-caca>
+    <ngx-caca [IssueID]="IssueID" [IssueCreator]="issueFormGroup.value?.createdBy"
+        [IssueTitle]="issueFormGroup.value?.title" (nextStatus)="next($event)" (backStatus)="previous($event)">
+    </ngx-caca>
 </ng-container>
 
 <ng-container *ngIf="currentStatus == 'capa'">
-    <ngx-capa [IssueID]="IssueID" (nextStatus)="next($event)" (backStatus)="previous($event)"></ngx-capa>
+    <ngx-capa [IssueID]="IssueID" [IssueCreator]="issueFormGroup.value?.createdBy"
+        [IssueTitle]="issueFormGroup.value?.title" (nextStatus)="next($event)" (backStatus)="previous($event)">
+    </ngx-capa>
 </ng-container>
 
 <ng-container *ngIf="currentStatus == 'close'">
-    <ngx-close [IssueID]="IssueID" (backStatus)="previous($event)"></ngx-close>
+    <ngx-close [IssueID]="IssueID" [IssueCreator]="issueFormGroup.value?.createdBy"
+        [IssueTitle]="issueFormGroup.value?.title" (backStatus)="previous($event)"></ngx-close>
 </ng-container>

@@ -32,6 +32,15 @@ export class AdwebService {
         return this.http.get<string[]>(this.adwebUrl + `user-role/${token}/${employee_id}`);
     }
 
+    async getUserDetailByDepartment(token: string, department: string) {
+        var result = this.http.get<string>(this.adwebUrl + `head-of-department/${token}/${department}`).toPromise();
+        return this.getUserDetailByUserID(token, await result);
+    }
+
+    getUserDetailByUserID(token: string, user_id: string) {
+        return this.http.get(this.adwebUrl + `user-id/${token}/${user_id}`);
+    }
+
     camOnATung(token: string) {
 
         const headers = new HttpHeaders().set('Authorization', 'Bearer ' + token);

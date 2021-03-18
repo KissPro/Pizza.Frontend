@@ -4,13 +4,16 @@ import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NbToastrService, NbDialogService } from '@nebular/theme';
 import { AssignModel, ExtendDLModel } from 'app/@core/models/assign';
+import { Mail } from 'app/@core/models/mail';
 import { AdwebService } from 'app/@core/service/adweb.service';
 import { AssginService } from 'app/@core/service/assign.service';
 import { AuthenticationService } from 'app/@core/service/authentication.service';
 import { GuidService } from 'app/@core/service/guid.service';
 import { IssueService } from 'app/@core/service/issue.service';
+import { MailService } from 'app/@core/service/mail.service';
 import { ToastrComponent } from 'app/pages/modal-overlays/toastr/toastr.component';
 import { format } from 'date-fns';
+import { environment } from 'environments/environment';
 
 @Component({
   selector: 'ngx-capa',
@@ -24,6 +27,9 @@ export class CapaComponent implements OnInit {
 
 
   @Input() IssueID: any;
+  @Input() IssueTitle: any;
+  @Input() IssueCreator: any;
+
   @Output() nextStatus = new EventEmitter<any>();
   @Output() backStatus = new EventEmitter<any>();
 
@@ -35,6 +41,7 @@ export class CapaComponent implements OnInit {
     private formBuilder: FormBuilder,
     private adwebService: AdwebService,
     private toastrService: NbToastrService,
+    private mailService: MailService,
     private userService: AuthenticationService,
     private dialogService: NbDialogService,
     private assignService: AssginService,
@@ -134,13 +141,33 @@ export class CapaComponent implements OnInit {
     this.listAssign().at(index).patchValue({ actionContent: value })
   }
 
-  removeAssign(index: number, assignId: string) {
+  removeAssign(index: number, assign: any) {
     // remove in list
     this.listAssign().removeAt(index);
     // remove in server
-    if (assignId != null)
-      this.assignService.removeAssign(assignId).subscribe(result => {
-        if (result == true) this.alert.showToast('success', 'Success', 'Remove assign successfully!');
+    if (assign.id != null)
+      this.assignService.removeAssign(assign.id).subscribe(result => {
+        if (result == true) {
+          this.alert.showToast('success', 'Success', 'Remove assign successfully!');
+
+          // send mail cancel assign
+          // Send first email  
+          const mail: Mail = {
+            sender: 'Pizza Systems',
+            to: assign.email,
+            cc: '',
+            bcc: this.userService.email(),
+            subject: 'Cancel-Assignment-Notification' + this.IssueTitle,
+            content:
+              "Dear Mr/Ms. " + assign.name + ",</br></br>" +
+              "You have received a Cancel Assignment Notification in Pizza system.</br>" +
+              "you would not need to fulfill data for this request anymore</br>" +
+              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=openIssue" + "'>Pizza - Open Issue</a></br></br>" +
+              "Best regards," +
+              "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
+          }
+          this.mailService.SendMail(mail).subscribe(result => result ? console.log('send mail successfully!') : console.log('send mail error!'));
+        }
       });
   }
 
@@ -155,7 +182,7 @@ export class CapaComponent implements OnInit {
     if (type == 'draft')
       return 'Draft'
     if (type == 'submit-draft')
-      return 'Draft-Submit'
+      return 'Submit-Draft'
     else {
       if (new Date() <= deadline)
         return 'On-going';
@@ -196,12 +223,34 @@ export class CapaComponent implements OnInit {
       'updatedDate': new Date(),
     }
 
-    console.log(assignNew);
-
     this.assignService.createAssign(assignNew).subscribe(
       result => {
         if (result == true)
           this.alert.showToast('success', 'Success', 'Create/Update assign successfully!');
+        // Send first email  
+        if (type == 'assign') {
+          const mail: Mail = {
+            sender: 'Pizza Systems',
+            to: assignForm.email,
+            cc: '',
+            bcc: this.userService.email(),
+            subject: 'Re-assign-Notification' + this.IssueTitle,
+            content:
+              "Dear Mr/Ms. " + assignForm.name + ",</br></br>" +
+              "You have received a request to fill again in from " + this.userService.userName() + " in Pizza system.</br>" +
+              "Deadline: " + format(deadLine, 'yyyy/MM/dd HH:mm') + "</br>" +
+              "Current step: Corrective & Preventive Actions</br>" +
+              "Request Content: " + assignForm.requestContent + "</br>" +
+              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=openIssue" + "'>Pizza - Open Issue</a></br></br>" +
+              "Best regards," +
+              "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
+          }
+          this.mailService.SendMail(mail).subscribe(result => result ? console.log('send mail successfully!') : console.log('send mail error!'));
+        }
+        // Check deadline service - send mail
+        this.assignService.checkDeadline(assignNew, this.userService.token()).toPromise().then(result => {
+          console.log('Check deadline:' + result);
+        });
         // Check deadline service - send mail
         this.assignService.checkDeadline(assignNew, this.userService.token()).toPromise().then(result => {
           console.log('Check deadline:' + result);
@@ -240,10 +289,49 @@ export class CapaComponent implements OnInit {
     }
     console.log(assignNew);
     this.assignService.createAssign(assignNew).subscribe(
-      result => {
+      async result => {
         if (result == true)
           this.alert.showToast('success', 'Success', 'Create/Update assign successfully!');
-
+        // Send first email  
+        if (type == 'assign') {
+          const mail: Mail = {
+            sender: 'Pizza Systems',
+            to: assignForm.email,
+            cc: '',
+            bcc: this.userService.email(),
+            subject: 'Assign-' + this.IssueTitle,
+            content:
+              "Dear Mr/Ms. " + assignForm.name + ",</br></br>" +
+              "You have received a request to fill in from " + this.userService.userName() + " in Pizza system.</br>" +
+              "Deadline: " + format(deadLine, 'yyyy/MM/dd HH:mm') + "</br>" +
+              "Current step: Corrective & Preventive Actions</br>" +
+              "Request Content: " + assignForm.requestContent + "</br>" +
+              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=openIssue" + "'>Pizza - Open Issue</a></br></br>" +
+              "Best regards," +
+              "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
+          }
+          this.mailService.SendMail(mail).subscribe(result => result ? console.log('send mail successfully!') : console.log('send mail error!'));
+        }
+        // Send email when submit
+        if (type == 'submit') {
+          let initiatorMail = await this.adwebService.getUserDetailByID(this.userService.token(), this.IssueCreator).toPromise();
+          const mail: Mail = {
+            sender: 'Pizza Systems',
+            to: initiatorMail['work_email'],
+            cc: '',
+            bcc: '',
+            subject: 'Notification-' + this.IssueTitle,
+            content:
+              "Dear Mr/Ms. " + initiatorMail['ad_user_displayName'] + ",</br></br>" +
+              "You have received a Submission Notification from " + this.userService.userName() + " in Pizza system.</br>" +
+              "Current step : Corrective & Preventive Actions</br>" +
+              "Action Content: " + assignForm.actionContent + "</br>" +
+              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=openIssue" + "'>Pizza - Open Issue</a></br></br>" +
+              "Best regards," +
+              "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
+          }
+          this.mailService.SendMail(mail).subscribe(result => result ? console.log('send mail successfully!') : console.log('send mail error!'));
+        }
         // Check deadline service - send mail
         this.assignService.checkDeadline(assignNew, this.userService.token()).toPromise().then(result => {
           console.log('Check deadline:' + result);
@@ -268,8 +356,6 @@ export class CapaComponent implements OnInit {
 
 
   //#endregion
-
-
 
 
 
@@ -302,12 +388,30 @@ export class CapaComponent implements OnInit {
     this.listDeadline.push(newDeadLine);
   }
 
-  SubmitDeadLine(assignId: string) {
+  SubmitDeadLine() {
     // Update status OPEN -> On-going
     this.listDeadline.slice(-1)[0].status = 'On-going';
     // Insert DeadLine
-    this.assignService.createDeadLine(this.listDeadline.slice(-1)[0]).subscribe(result => {
+    this.assignService.createDeadLine(this.listDeadline.slice(-1)[0]).subscribe(async result => {
       //console.log(result);
+      let initiatorMail = await this.adwebService.getUserDetailByID(this.userService.token(), this.IssueCreator).toPromise();
+      const mail: Mail = {
+        sender: 'Pizza Systems',
+        to: initiatorMail['work_email'],
+        cc: '',
+        bcc: '',
+        subject: 'Extend Deadline Request-' + this.IssueTitle,
+        content:
+          "Dear Mr/Ms. " + initiatorMail['ad_user_displayName'] + ",</br></br>" +
+          "You have received a Extend Deadline Request from " + this.userService.userName() + " in Pizza system.</br>" +
+          "Current deadline : " + format(this.listDeadline.slice(-1)[0].currentDeadLine, "yyyy/MM/dd HH:mm") + "</br>" +
+          "Request deadline : " + format(this.listDeadline.slice(-1)[0].requestDeadLine, "yyyy/MM/dd HH:mm") + "</br>" +
+          "Reason: " + this.listDeadline.slice(-1)[0].reason + "</br>" +
+          "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=openIssue" + "'>Pizza - Open Issue</a></br></br>" +
+          "Best regards," +
+          "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
+      }
+      this.mailService.SendMail(mail).subscribe(result => result ? console.log('send mail successfully!') : console.log('send mail error!'));
     });
   }
 
@@ -317,14 +421,35 @@ export class CapaComponent implements OnInit {
       this.listDeadline.slice(-1)[0].status = 'Approved';
       this.listDeadline.slice(-1)[0].approvalContent = content;
       this.listDeadline.slice(-1)[0].approvalDate = new Date();
-      this.assignService.createDeadLine(this.listDeadline.slice(-1)[0]).subscribe(result => {
-        //console.log(result);
+      this.assignService.createDeadLine(this.listDeadline.slice(-1)[0]).subscribe(async result => {
+        let assignInfor = await this.assignService.getAssign(assignId).toPromise();
+        const mail: Mail = {
+          sender: 'Pizza Systems',
+          to: assignInfor.email,
+          cc: '',
+          bcc: this.userService.email(),
+          subject: 'New Deadline Notification-' + this.IssueTitle,
+          content:
+            "Dear Mr/Ms. " + assignInfor.name + ",</br></br>" +
+            "You have received a New Deadline Notification from " + this.userService.userName() + " in Pizza system.</br>" +
+            "Result : Approved</br>" +
+            "Remark: " + content + "</br>" +
+            "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=openIssue" + "'>Pizza - Open Issue</a></br></br>" +
+            "Best regards," +
+            "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
+        }
+        this.mailService.SendMail(mail).subscribe(result => result ? console.log('send mail successfully!') : console.log('send mail error!'));
+
       });
       // Update in assign table
       this.assignService.getAssign(assignId).subscribe(result => {
         result.deadLine = this.listDeadline.slice(-1)[0].requestDeadLine;
         this.assignService.createAssign(result).subscribe(res => {
           if (res == true) this.alert.showToast('success', 'Success', 'Approval deadline successfully!');
+          // Check deadline service - send mail
+          this.assignService.checkDeadline(result, this.userService.token()).toPromise().then(result => {
+            console.log('Check deadline:' + result);
+          });
           // Update current assign array
           this.showListAssign();
         });
@@ -333,8 +458,27 @@ export class CapaComponent implements OnInit {
       this.listDeadline.slice(-1)[0].status = 'Rejected'
       this.listDeadline.slice(-1)[0].approvalContent = content;
       this.listDeadline.slice(-1)[0].approvalDate = new Date();
-      this.assignService.createDeadLine(this.listDeadline.slice(-1)[0]).subscribe(result => {
-        if (result == true) this.alert.showToast('success', 'Success', 'Reject deadline successfully!');
+      this.assignService.createDeadLine(this.listDeadline.slice(-1)[0]).subscribe(async result => {
+        if (result == true) {
+          let assignInfor = await this.assignService.getAssign(assignId).toPromise();
+          const mail: Mail = {
+            sender: 'Pizza Systems',
+            to: assignInfor.email,
+            cc: '',
+            bcc: '',
+            subject: 'New Deadline Notification-' + this.IssueTitle,
+            content:
+              "Dear Mr/Ms. " + assignInfor.name + ",</br></br>" +
+              "You have received a New Deadline Notification from " + this.userService.userName() + " in Pizza system.</br>" +
+              "Result : Rejected</br>" +
+              "Reason: " + content + "</br>" +
+              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=openIssue" + "'>Pizza - Open Issue</a></br></br>" +
+              "Best regards," +
+              "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
+          }
+          this.mailService.SendMail(mail).subscribe(result => result ? console.log('send mail successfully!') : console.log('send mail error!'));
+          this.alert.showToast('success', 'Success', 'Reject deadline successfully!');
+        }
       });
     } else {
       this.alert.showToast('danger', 'Error', 'Comment required with reject selection!');

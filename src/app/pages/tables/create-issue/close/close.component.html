@@ -11,8 +11,8 @@
     <nb-card-footer>
         <!-- <button (click)="openDeadline(dialog)">Submit</button> -->
         <div class="row float-right">
-            <button nbButton status="danger">
-                Submit Approval <nb-icon icon="navigation-2-outline"></nb-icon>
+            <button [disabled]="listVerifi.length < 10" (click)="sendMailApproval(headAOInfor)" nbButton status="danger">
+                {{ listApproval.length > 0 ? 'Re-submit Approval' : 'Submit Approval'}} <nb-icon icon="navigation-2-outline"></nb-icon>
             </button>
         </div>
     </nb-card-footer>
@@ -29,7 +29,7 @@
                     <th>#</th>
                     <th>Approver Name</th>
                     <th>Team</th>
-                    <th>Status</th>
+                    <th>Status</th> 
                     <th>Remark</th>
                     <th>Date</th>
                     <th>Action</th>

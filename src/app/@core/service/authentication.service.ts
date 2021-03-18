@@ -31,6 +31,9 @@ export class AuthenticationService {
     team() {
         return JSON.parse(localStorage.getItem('user')).employee.employee["department"][1];
     }
+    email() {
+        return JSON.parse(localStorage.getItem('user')).employee.employee["email"];
+    }
 
     token() {
         return JSON.parse(localStorage.getItem('user')).token["access_token"];

@@ -75,7 +75,7 @@ export class IssueComponent implements OnInit {
       columns: [
         // tslint:disable-next-line: max-line-length
         { data: 'index' }, { data: 'issueNo' }, { data: 'title' },
-        { data: 'failureDesc' }, { data: 'issueStatus' }, { data: 'processType' }, { data: 'open' }
+        { data: 'failureDesc' }, { data: 'issueStatus' }, { data: 'processType' }, { data: 'currentStep' }, { data: 'open' }
       ],
     };
   }
@@ -115,9 +115,9 @@ export class IssueComponent implements OnInit {
 
   reloadIssueTable() {
     this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
-        dtInstance.ajax.reload();
+      dtInstance.ajax.reload();
     });
-}
+  }
 
 
   // Show progress bar
@@ -149,10 +149,10 @@ export class IssueComponent implements OnInit {
   // Action
   openIssue(issueId: string) {
     console.log(issueId);
-    this.router.navigate(['/pages/tables/create-issue', { 'issueId': issueId, 'type': 'open', 'step' : 'openIssue' }]);
+    this.router.navigate(['/pages/tables/create-issue', { 'issueId': issueId, 'type': 'open', 'step': 'openIssue' }]);
   }
   newIssue() {
-    this.router.navigate(['/pages/tables/create-issue', { 'issueId': this.guidService.getGuid(), 'type': 'new', 'step' : 'openIssue' }]);
+    this.router.navigate(['/pages/tables/create-issue', { 'issueId': this.guidService.getGuid(), 'type': 'new', 'step': 'openIssue' }]);
   }
   removeIssue(issueId: string, type: string) {
     this.issueService.removeIssue(issueId, type).subscribe(result => {

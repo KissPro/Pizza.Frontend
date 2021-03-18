@@ -22,6 +22,7 @@
           <th>TITLE</th>
           <th>DESCRIPTION</th>
           <th>TYPE</th>
+          <th>STEP</th>
           <th>STATUS</th>
           <th>ACTION</th>
         </tr>
@@ -35,7 +36,8 @@
           <td>
             <div style="max-width: 18rem;word-wrap: break-word;">{{ issue.failureDesc | slice:0:100 }}...</div>
           </td>
-          <td>{{ issue.processType }}</td>
+          <td>{{ issue.processType | uppercase }}</td>
+          <td>{{ issue.currentStep | uppercase }}</td>
           <td>
             <nb-progress-bar [value]="showIssueStatus(issue.issueStatus)"
               [status]="progressStatus(showIssueStatus(issue.issueStatus))" size="small">{{ issue.issueStatus }}
@@ -45,7 +47,8 @@
             <button size="small" (click)="openIssue(issue.id)" nbButton outline status="info">
               Open <nb-icon icon="book-open-outline"></nb-icon>
             </button>
-            <button size="small" (click)="removeIssue(issue.id, issue.processType)" class="float-right" nbButton outline status="danger">
+            <button size="small" (click)="removeIssue(issue.id, issue.processType)" class="float-right" nbButton outline
+              status="danger">
               <nb-icon icon="close-outline"></nb-icon>
             </button>
           </td>

@@ -12,5 +12,19 @@ export class MailService{
   SendMail(mail: Mail) {
     return this.http.post(this.url + "/send-mail",mail);
   }
+
+  // Return Template Mail
+  //1. Notifi openissue.
+  // Notification(to: string, cc: string, ) {
+  //   const mail: Mail = {
+  //     sender: 'Pizza System',
+  //     to: this.listNotify.map(x => x.email).join(";"),
+  //     cc: '',
+  //     bcc: '',
+  //     subject: 'Notification-' + this.initIssueTitle(),
+  //     content: "This is test email"
+  //   }
+  // }
+
 }
 
