@@ -1,17 +1,19 @@
-<nb-card>
+<nb-card *ngIf="IssueProcess == 'OBA'">
     <nb-card-header>
         Verification Table
         <!-- <button class="float-right" (click)="uploadFile()" nbButton status="info"><nb-icon icon="cloud-upload-outline"></nb-icon></button> -->
     </nb-card-header>
     <nb-card-body>
         <ng2-smart-table [settings]="settings" [source]="source" (createConfirm)="onCreateConfirm($event)"
-            (editConfirm)="onSaveConfirm($event)" (deleteConfirm)="onDeleteConfirm($event)">
+            (editConfirm)="onSaveConfirm($event)" (deleteConfirm)="onDeleteConfirm($event)" (keyup)="updateRate()">
         </ng2-smart-table>
     </nb-card-body>
     <nb-card-footer>
         <!-- <button (click)="openDeadline(dialog)">Submit</button> -->
         <div class="row float-right">
-            <button [disabled]="listVerifi.length < 10" (click)="sendMailApproval(headAOInfor)" nbButton status="danger">
+            <button 
+                *ngIf="checkPermissionAcion('Initiator')"
+                [disabled]="listVerifi.length < 10" (click)="sendMailApproval(approvalLv1)" nbButton status="danger">
                 {{ listApproval.length > 0 ? 'Re-submit Approval' : 'Submit Approval'}} <nb-icon icon="navigation-2-outline"></nb-icon>
             </button>
         </div>
@@ -44,7 +46,9 @@
                     <td>{{approval.approverRemark}}</td>
                     <td>{{approval.updatedDate | date: 'yyyy/MM/dd HH:mm'}}</td>
                     <td class="text-center">
-                        <button (click)="openApproval()" outline nbButton status="primary">
+                        <button 
+                            *ngIf="checkPermissionAcion('Approval')"
+                            (click)="openApproval()" outline nbButton status="primary">
                             <nb-icon icon="edit-outline"> Edit</nb-icon>
                         </button>
                     </td>
@@ -58,7 +62,9 @@
             <button (click)="BackStep()" class="mr-auto" nbButton>
                 <nb-icon icon="arrowhead-left-outline"></nb-icon>Back
             </button>
-            <button (click)="openApproval()" class="ml-2" nbButton status="primary">
+            <button 
+                *ngIf="checkPermissionAcion('Approval')"
+                (click)="openApproval()" class="ml-2" nbButton status="primary">
                 Approval
             </button>
             <button class="ml-2" nbButton status="success">

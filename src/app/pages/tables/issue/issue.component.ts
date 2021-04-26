@@ -128,7 +128,7 @@ export class IssueComponent implements OnInit {
       return 50;
     else if (status.toLocaleUpperCase() === 'MONITORING')
       return 75;
-    else if (status.toLocaleUpperCase() === 'CLOSED')
+    else if (status.toLocaleUpperCase() === 'DONE')
       return 100;
     else
       return 0; // re-open
@@ -167,3 +167,5 @@ export class IssueComponent implements OnInit {
     this.adwebService.camOnATung('e08nixwI4LicM21hAqBx82VlJWVKErAC').subscribe(result => console.log(result));
   }
 }
+
+

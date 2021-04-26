@@ -17,6 +17,7 @@ import { ConfigIssueService } from 'app/@core/service/issue-config.service';
 import { IssueService } from 'app/@core/service/issue.service';
 import { MailService } from 'app/@core/service/mail.service';
 import { UploadService } from 'app/@core/service/upload-file.service';
+import { messages } from 'app/pages/extra-components/chat/messages';
 import { DialogUploadFileComponent } from 'app/pages/modal-overlays/dialog/dialog-upload-file/dialog-upload-file.component';
 import { ToastrComponent } from 'app/pages/modal-overlays/toastr/toastr.component';
 import { format, isThisSecond } from 'date-fns';
@@ -95,15 +96,13 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
       console.log(params['step']);
       this.IssueID = params['issueId'] == undefined ? this.guidService.getGuid() : params['issueId'];
       this.IssueType = params['type'] == undefined ? 'new' : params['type'];
-      this.IssueStep = params['step'];
+      this.IssueStep = params['step'] == undefined ? 'openIssue' : params['step'];;
     });
     this.showIssueOpen();
 
 
     this.issueService.getListProcess().subscribe(
-      result => {
-        this.listProcess = result;
-      }
+      result => { this.listProcess = result; }
     );
     // Get list dropdownlist config
     this.configIssueService.getDropdown('Defect Part').subscribe(
@@ -185,7 +184,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
     let issueModel = await this.issueService.getIssueById(this.IssueID).toPromise();
     if (issueModel) {
       // Select process type
-      this.currentProcess = await this.issueService.getProcessByName('OBA').toPromise();
+      this.currentProcess = await this.issueService.getProcessByName(issueModel.processType.toUpperCase()).toPromise();
 
       // Show Issue common information
       this.createdDate = issueModel?.createdDate ? issueModel.createdDate : new Date();
@@ -423,27 +422,29 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
       this.IssueTitleIndex = this.issueFormGroup.value?.repeateddSymptom;
   }
   //#endregion
-  submitForm() {
+  async submitForm() {
+    let result = await this.saveIssueInformation('Open');
+    console.log(result);
     // Send email
-    const mail: Mail = {
-      sender: 'Pizza Systems',
-      to: this.listNotify.map(x => x.email).join(";"),
-      cc: '',
-      bcc: this.userService.email(),
-      subject: 'Notification-' + this.issueFormGroup.value?.title,
-      content:
-        "You have received a Notification in Pizza system.</br>" +
-        "Issue number: " + this.issueFormGroup.value?.issueNo + "</br>" +
-        "Requester: " + this.userService.userName() + "</br>" +
-        "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=openIssue" + "'>Pizza - Open Issue</a></br></br>" +
-        "Best regards," +
-        "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
+    if (result == true) {
+      const mail: Mail = {
+        sender: 'Pizza Systems',
+        to: this.listNotify.map(x => x.email).join(";"),
+        cc: '',
+        bcc: this.userService.email(),
+        subject: 'Notification-' + this.issueFormGroup.value?.title,
+        content:
+          "You have received a Notification in Pizza system.</br>" +
+          "Issue number: " + this.issueFormGroup.value?.issueNo + "</br>" +
+          "Requester: " + this.userService.userName() + "</br>" +
+          "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=openIssue" + "'>Pizza - Open Issue</a></br></br>" +
+          "Best regards," +
+          "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
+      }
+      this.mailService.SendMail(mail).subscribe(result => result ? this.issueFormGroup.patchValue({
+        issueStatus: 'Open',
+      }) : console.log('send mail error!'));
     }
-    this.mailService.SendMail(mail).subscribe(result => result ? this.issueFormGroup.patchValue({
-      issueStatus: 'Open',
-    }) : console.log('send mail error!'));
-
-    this.saveIssueInformation('Open');
   }
   saveDraft() {
     this.saveIssueInformation('Draft');
@@ -451,65 +452,81 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
 
   async saveIssueInformation(issueStatus: string) {
     let finalResult;
+    let errorMessage: string;
+
+    // Validation
     if (this.listNotify.length === 0) {
-      this.alert.showToast('warning', 'Warning', 'You need input notification list!');
-      return;
+      errorMessage = 'You need input notification list!';
     }
-    const issueNew: IssueModel = {
-      id: this.IssueID,
-      processType: this.currentProcess.processName,
-      issueNo: this.initIssueNo(),
-      title: this.initIssueTitle(),
-      rpn: this.issueFormGroup.value?.rpn,
-      severity: this.issueFormGroup.value?.rpn < 100 ? 'Major' : 'Critical',
-      repeateddSymptom: this.IssueTitleIndex,
-      failureDesc: this.issueFormGroup.value?.failureDesc,
-      fileAttack: this.issueFormGroup.value?.fileAttack,
-      notifiedList: this.listNotify.map(x => x.email).join(";"),
-      issueStatus: issueStatus,
-      currentStep: 'Open',
-      stepStatus: 'On-going',
-      createdDate: new Date(),
-      createdBy: this.userService.userId(),
+    else if (this.issueFormGroup.invalid) {
+      errorMessage = 'Kindly check issue information!';
     }
-    this.issueService.createIssue(issueNew)
-      .subscribe(async result => {
-        if (result == true) {
-          // Check process type.
-          // Type : OBA -> Insert tblOBA, tblProduct
-          if (this.currentProcess.processName === 'OBA') {
-            const obaNew: OBAModel = {
-              'id': this.obaFormGroup.value?.issueId ? this.obaFormGroup.value.issueId : this.guidService.getGuid(),
-              'issueId': this.IssueID,
-              'detectingTime': new Date(format(new Date(this.obaFormGroup.value?.detectingDate), 'yyyy/MM/dd') + ' ' + this.obaFormGroup.value?.detectingTime),
-              'defectPart': this.obaFormGroup.value?.defectPart,
-              'defectName': this.obaFormGroup.value?.defectName,
-              'defectType': this.obaFormGroup.value?.defectType,
-              'samplingQty': this.obaFormGroup.value?.samplingQty,
-              'ngphoneOrdinal': this.obaFormGroup.value?.ngphoneOrdinal,
-            };
-            finalResult = await this.issueService.createOBA(obaNew).toPromise();
-            const productNew: ProductModel = {
-              'id': this.productFormGroup.value?.issueId ? this.productFormGroup.value.issueId : this.guidService.getGuid(),
-              'issueId': this.IssueID,
-              'imei': this.productFormGroup.value?.imei,
-              'customer': this.productFormGroup.value?.customer,
-              'product': this.productFormGroup.value?.product,
-              'psn': this.productFormGroup.value?.psn,
-              'ponno': this.productFormGroup.value?.ponno,
-              'ponsize': this.productFormGroup.value?.ponsize,
-              'spcode': this.productFormGroup.value?.spcode,
-              'line': this.productFormGroup.value?.line,
-              'pattern': this.productFormGroup.value?.pattern,
-              'shift': this.productFormGroup.value?.shift,
+    else if (this.currentProcess.processName == 'OBA'
+      && (this.obaFormGroup.invalid || this.productFormGroup.invalid)) {
+      errorMessage = 'Kindly check required field!';
+    }
+    if (errorMessage) {
+      this.alert.showToast('warning', 'Warning', errorMessage);
+      return false;
+    }
+    else {
+      const issueNew: IssueModel = {
+        id: this.IssueID,
+        processType: this.currentProcess.processName,
+        issueNo: this.initIssueNo(),
+        title: this.initIssueTitle(),
+        rpn: this.issueFormGroup.value?.rpn,
+        severity: this.issueFormGroup.value?.rpn < 100 ? 'Major' : 'Critical',
+        repeateddSymptom: this.IssueTitleIndex,
+        failureDesc: this.issueFormGroup.value?.failureDesc,
+        fileAttack: this.issueFormGroup.value?.fileAttack,
+        notifiedList: this.listNotify.map(x => x.email).join(";"),
+        issueStatus: issueStatus,
+        currentStep: 'Open',
+        stepStatus: 'On-going',
+        createdDate: new Date(),
+        createdBy: this.userService.userId(),
+      }
+      this.issueService.createIssue(issueNew)
+        .subscribe(async result => {
+          if (result == true) {
+            // Check process type.
+            // Type : OBA -> Insert tblOBA, tblProduct
+            if (this.currentProcess.processName === 'OBA') {
+              const obaNew: OBAModel = {
+                'id': this.obaFormGroup.value?.issueId ? this.obaFormGroup.value.issueId : this.guidService.getGuid(),
+                'issueId': this.IssueID,
+                'detectingTime': new Date(format(new Date(this.obaFormGroup.value?.detectingDate), 'yyyy/MM/dd') + ' ' + this.obaFormGroup.value?.detectingTime),
+                'defectPart': this.obaFormGroup.value?.defectPart,
+                'defectName': this.obaFormGroup.value?.defectName,
+                'defectType': this.obaFormGroup.value?.defectType,
+                'samplingQty': this.obaFormGroup.value?.samplingQty,
+                'ngphoneOrdinal': this.obaFormGroup.value?.ngphoneOrdinal,
+              };
+              finalResult = await this.issueService.createOBA(obaNew).toPromise();
+              const productNew: ProductModel = {
+                'id': this.productFormGroup.value?.issueId ? this.productFormGroup.value.issueId : this.guidService.getGuid(),
+                'issueId': this.IssueID,
+                'imei': this.productFormGroup.value?.imei,
+                'customer': this.productFormGroup.value?.customer,
+                'product': this.productFormGroup.value?.product,
+                'psn': this.productFormGroup.value?.psn,
+                'ponno': this.productFormGroup.value?.ponno,
+                'ponsize': this.productFormGroup.value?.ponsize,
+                'spcode': this.productFormGroup.value?.spcode,
+                'line': this.productFormGroup.value?.line,
+                'pattern': this.productFormGroup.value?.pattern,
+                'shift': this.productFormGroup.value?.shift,
+              }
+              await this.fileUpload.insertListDB();
+              finalResult = await this.issueService.createProduct(productNew).toPromise();
             }
-            await this.fileUpload.insertListDB();
-            finalResult = await this.issueService.createProduct(productNew).toPromise();
           }
-        }
-        if (finalResult == true)
-          this.alert.showToast('success', 'Success', 'Save issue successfully!');
-      });
+          if (finalResult != false)
+            this.alert.showToast('success', 'Success', 'Save issue successfully!');
+        });
+      return true;
+    }
   }
 
 

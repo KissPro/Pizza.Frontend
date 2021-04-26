@@ -14,7 +14,9 @@
   </nb-card-body>
   <nb-card-footer>
     <div class="text-center">
-      <button nbButton status="success" (click)="approval(1)">Approval</button>
+      <button 
+        nbTooltip="Remark required!" nbTooltipPlacement="top"
+        nbButton status="success" (click)="approval(1)">Approval</button>
       <button 
         nbTooltip="Remark required!" nbTooltipPlacement="top"
         class="ml-2 cancel" nbButton status="danger" (click)="approval(-1)">Reject</button>

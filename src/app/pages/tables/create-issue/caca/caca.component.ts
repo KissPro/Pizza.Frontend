@@ -3,6 +3,7 @@ import { EventEmitter } from '@angular/core';
 import { ChangeDetectorRef, Component, ElementRef, OnInit, Output, QueryList, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
+import { reduceTicks } from '@swimlane/ngx-charts';
 import { AssignModel, ExtendDLModel } from 'app/@core/models/assign';
 import { Mail } from 'app/@core/models/mail';
 import { AdwebService } from 'app/@core/service/adweb.service';
@@ -45,6 +46,8 @@ export class CacaComponent implements OnInit {
   @Input() IssueID: any;
   @Input() IssueTitle: any;
   @Input() IssueCreator: any;
+  @Input() ApprovalLv1: any;
+  @Input() ApprovalLv2: any;
 
   @Output() nextStatus = new EventEmitter<any>();
   @Output() backStatus = new EventEmitter<any>();
@@ -54,7 +57,48 @@ export class CacaComponent implements OnInit {
   ngOnInit(): void {
     this.showListAssign();
     this.showCauseAnalysis();
+
   }
+
+  //#region CHECK PERMISSON
+  checkPermissionShow(ownerId: string) {
+    let userId = this.userService.userId();
+    if ((ownerId && userId.toUpperCase() == ownerId.toUpperCase())
+      // initiator role
+      || userId.toUpperCase() == (this.IssueCreator && this.IssueCreator.toUpperCase())
+      // admin role
+      || this.userService.listRole().indexOf("Hanoi_NBB_PIZZA_ADMIN") !== -1
+      // approval role
+      || userId.toUpperCase() == this.ApprovalLv1.toUpperCase() || userId.toUpperCase() == this.ApprovalLv2.toUpperCase()
+    )
+      return true;
+    return false;
+  }
+  // role: Initiator - Owner - Approver - Admin
+  checkPermissionAcion(ownerId: string, actionRole: string) {
+    let userId = this.userService.userId();
+    if (this.userService.listRole().indexOf("Hanoi_NBB_PIZZA_ADMIN") !== -1)
+      return true;
+    if (actionRole == 'Initiator' && userId.toUpperCase() == (this.IssueCreator && this.IssueCreator.toUpperCase()))
+      return true;
+    else if (actionRole == 'Owner' && (ownerId && userId.toUpperCase() == ownerId.toUpperCase()))
+      return true;
+    else
+      return false;
+  }
+  checkRoleByType(type: string) {
+    let initAction = ['draft', 'assign'];
+    let ownerAction = ['submit-draft', 'submit'];
+    if (initAction.includes(type.toLowerCase()))
+      return 'Initiator';
+    else if (ownerAction.includes(type.toLowerCase()))
+      return 'Owner';
+    else
+      return '';
+  }
+  //#endregion
+
+
 
   showListAssign() {
     this.listAssign().clear();
@@ -88,7 +132,6 @@ export class CacaComponent implements OnInit {
             deadLineTime: format(new Date(item.deadLine), 'HH:mm'),
             status: item.status
           })
-        console.log(item);
       });
     });
     this.issueService.getIssueById(this.IssueID).subscribe(result => {
@@ -117,6 +160,15 @@ export class CacaComponent implements OnInit {
   listAssign(): FormArray {
     return this.createAssignFormGroup.get("assignList") as FormArray;
   }
+  checkAssignDone() {
+    for (let assignList of this.listAssign().controls) {
+      const result = assignList.value.status;
+      if (result == 'Done')
+        return true;
+    }
+    return false;
+  }
+
   initAssign(assign: AssignModel) {
     return this.formBuilder.group({
       id: assign.id,
@@ -235,6 +287,9 @@ export class CacaComponent implements OnInit {
   }
 
   async reassignSubmit(assignForm: any, type: string) {
+    // check permission
+    if (!this.checkPermissionAcion(assignForm.ownerId, this.checkRoleByType(type))) { this.alert.showToast('danger', 'Error', "You don't have permission to do it!"); return; }
+
     let check;
     // Update old assign
     let oldAssign = await this.assignService.getAssign(assignForm.id).toPromise();
@@ -300,6 +355,9 @@ export class CacaComponent implements OnInit {
 
   }
   assignSubmit(assignForm: any, type: string) {
+    // check permission
+    if (!this.checkPermissionAcion(assignForm.ownerId, this.checkRoleByType(type))) { this.alert.showToast('danger', 'Error', "You don't have permission to do it!"); return; }
+
     // new model - for update in server
     const deadLine = new Date(format(new Date(assignForm.deadLine), 'yyyy/MM/dd') + ' ' + assignForm.deadLineTime);
     const assignNew: AssignModel = {
@@ -384,19 +442,23 @@ export class CacaComponent implements OnInit {
 
   //#region DeadLine Extend
 
-  openDeadline(dialog: TemplateRef<any>, assignId: string, deadLine: string, deadLineTime: string) {
+  openDeadline(dialog: TemplateRef<any>, assignId: string, ownerId: string, deadLine: string, deadLineTime: string) {
     this.dialogService.open(
       dialog,
       {
         context: {
           id: assignId,
+          ownerId: ownerId,
           currentDeadLine: new Date(format(new Date(deadLine), 'yyyy/MM/dd') + ' ' + deadLineTime),
         },
       });
     this.showListDeadLine(assignId);
   }
 
-  AddDeadLine(date: string, time: string, reason: string, assignId: string, currentDeadLine: Date) {
+  AddDeadLine(date: string, time: string, reason: string, assignId: string, ownerId: string, currentDeadLine: Date) {
+    // check permission
+    if (!this.checkPermissionAcion(ownerId, 'Owner')) { this.alert.showToast('danger', 'Error', "You don't have permission to do it!"); return; }
+
     const newDeadLine: ExtendDLModel = {
       'id': this.guidService.getGuid(),
       'assignNo': assignId,
@@ -411,7 +473,10 @@ export class CacaComponent implements OnInit {
     this.listDeadline.push(newDeadLine);
   }
 
-  SubmitDeadLine() {
+  SubmitDeadLine(ownerId: string) {
+    // check permission
+    if (!this.checkPermissionAcion(ownerId, 'Owner')) { this.alert.showToast('danger', 'Error', "You don't have permission to do it!"); return; }
+
     // Update status OPEN -> On-going
     this.listDeadline.slice(-1)[0].status = 'On-going';
     // Insert DeadLine
@@ -439,6 +504,9 @@ export class CacaComponent implements OnInit {
   }
 
   ApprovalDeadLine(assignId: string, result: number, content: string) {
+    // check permission
+    if (!this.checkPermissionAcion(null, 'Initiator')) { { this.alert.showToast('danger', 'Error', "You don't have permission to do it!"); return; } return; }
+
     //console.log(assignId);
     if (result == 1) {
       this.listDeadline.slice(-1)[0].status = 'Approved';
@@ -568,6 +636,10 @@ export class CacaComponent implements OnInit {
   }
 
   AssignAnalysis(type: string) {
+    // check permission
+    if (!this.checkPermissionAcion(this.analysisFormGroup.value.ownerId, this.checkRoleByType(type))) { { this.alert.showToast('danger', 'Error', "You don't have permission to do it!"); return; } return; }
+
+
     console.log(this.analysisFormGroup.value);
     // Insert assign value
     // new model - for update in server
@@ -617,7 +689,7 @@ export class CacaComponent implements OnInit {
                 "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
             }
             this.mailService.SendMail(mail).subscribe(result => result ? console.log('send mail successfully!') : console.log('send mail error!'));
-            
+
           }
           // Send email when submit
           if (type == 'submit') {
@@ -669,6 +741,9 @@ export class CacaComponent implements OnInit {
     }
   }
   removeAnalysis(assignInfor: any) {
+    // check permission
+    if (!this.checkPermissionAcion(this.analysisFormGroup.value.ownerId, 'Initiator')) { this.alert.showToast('danger', 'Error', "You don't have permission to do it!"); return; }
+
     console.log(assignInfor);
     // remove in server
     if (assignInfor.id != null)

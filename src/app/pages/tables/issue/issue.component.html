@@ -2,12 +2,12 @@
   <nb-card-header>
     Issue Table
 
-    <button (click)="testAdweb()" class="float-right" nbButton outline status="danger">
+    <!-- <button (click)="testAdweb()" class="float-right" nbButton outline status="danger">
       <nb-icon icon="close-outline"></nb-icon>
-    </button>
-    <button class="float-right mr-2" nbButton outline status="success" (click)="downloadIssue()">
+    </button> -->
+    <!-- <button class="float-right mr-2" nbButton outline status="success" (click)="downloadIssue()">
       <nb-icon icon="download-outline"></nb-icon>
-    </button>
+    </button> -->
     <button (click)="newIssue()" class="float-right mr-2" nbButton outline status="primary">New Issue
       <nb-icon icon="plus-outline"></nb-icon>
     </button>
@@ -34,7 +34,12 @@
           <td>{{ issue.issueNo }}</td>
           <td>{{ issue.title }}</td>
           <td>
-            <div style="max-width: 18rem;word-wrap: break-word;">{{ issue.failureDesc | slice:0:100 }}...</div>
+            <div style="max-width: 18rem;word-wrap: break-word;">
+              <ngx-tiny-mce-flat 
+              *ngIf="issue.failureDesc"
+              [rickText]="issue.failureDesc.split(' ', 10).join(' ') + '</p>'">
+              </ngx-tiny-mce-flat>
+            </div>
           </td>
           <td>{{ issue.processType | uppercase }}</td>
           <td>{{ issue.currentStep | uppercase }}</td>

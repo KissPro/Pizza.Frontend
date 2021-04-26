@@ -46,7 +46,7 @@ export interface ProductModel {
 	product: string;
 	psn: string;
 	ponno: number;
-	ponsize: number;
+	ponsize?: number;
 	spcode: string;
 	line: string;
 	pattern: string;
@@ -57,6 +57,8 @@ export interface ProcessModel {
 	id: string;
 	processName: string;
 	refTable: string;
+	approverId_Lv1: string;
+	approverId_Lv2: string;
 	updatedBy: string;
 	updateDate: Date | null;
 	processRemark: string;

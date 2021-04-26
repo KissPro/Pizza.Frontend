@@ -17,7 +17,7 @@ export class DialogApprovalComponent {
   }
 
   approval(status: number) {
-    if (status === -1 && !this.remark) return;
+    if (!this.remark) return;
     const approval : ApprovalDialogModel = {
       status : status,
       remark : this.remark,

@@ -39,6 +39,10 @@ export class AuthenticationService {
         return JSON.parse(localStorage.getItem('user')).token["access_token"];
     }
 
+    listRole() {
+        return JSON.parse(localStorage.getItem('role')).listRole;
+    }
+    
     logout() {
         localStorage.removeItem('user');
         localStorage.removeItem('role');

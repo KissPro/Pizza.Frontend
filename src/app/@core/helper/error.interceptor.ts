@@ -6,6 +6,7 @@ import { AuthenticationService } from '../service/authentication.service';
 import { NbToastrService } from '@nebular/theme';
 import { ToastrComponent } from 'app/pages/modal-overlays/toastr/toastr.component';
 import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 
 
 @Injectable()
@@ -19,9 +20,10 @@ export class ErrorInterceptor implements HttpInterceptor {
     alert = new ToastrComponent(this.toastrService);
 
     intercept(request: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-        return next.handle(request).pipe(catchError(err => {
-            const error = err.error.message || err.statusText;
-            if (error == 'OK')
+        return next.handle(request).pipe(catchError((err: HttpErrorResponse) => {
+            const error = (err.error && err.error.message) || err.statusText;
+            console.log(err);
+            if (error == 'OK') // send mail not return error
                 return;
             // if (err.status === 401) {
             //     if (this.tokenExpired()) {
@@ -32,6 +34,8 @@ export class ErrorInterceptor implements HttpInterceptor {
                 this.router.navigate(['/permission-denied']);
             }
             else {
+                if (err.url.includes('send-mail'))
+                    this.alert.showToast('danger', 'Error client', 'Kindly check email!');
                 if (err.error instanceof ErrorEvent) {
                     // client-side error
                     this.alert.showToast('danger', 'Error client', 'Kindly contact IT team!');
@@ -41,7 +45,7 @@ export class ErrorInterceptor implements HttpInterceptor {
                     this.alert.showToast('danger', 'Error Server', 'Kindly contact IT team!');
                 }
             }
-            console.log(error);
+       
             return throwError(error);
         }));
     }

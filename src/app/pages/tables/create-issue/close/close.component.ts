@@ -34,13 +34,16 @@ export class CloseComponent implements OnInit {
   @Input() IssueID: any;
   @Input() IssueTitle: any;
   @Input() IssueCreator: any;
+  @Input() ApprovalLv1: any;
+  @Input() ApprovalLv2: any;
+  @Input() IssueProcess: any;
 
   @Output() backStatus = new EventEmitter<any>();
   listApproval: ApprovalModel[] = [];
   listVerifi: VerificationModel[] = [];
 
-  headQAInfor: any;
-  headAOInfor: any;
+  approvalLv1: any;
+  approvalLv2: any;
 
   alert = new ToastrComponent(this.toastrService);
   // Setting is setting table
@@ -74,27 +77,46 @@ export class CloseComponent implements OnInit {
         title: "NG Q'ty",
         type: 'number',
       },
+      // ngrate: {
+      //   title: 'NG Rate(%)',
+      //   editor: {
+      //     type: 'list',
+      //     config: {
+      //       selectText: 'Select...',
+      //       list: [{ value: 'true', title: 'OK' }, { value: 'false', title: 'NG' }],
+      //     },
+      //   },
+      // },
       ngrate: {
-        title: 'NG Rate',
-        type: 'string',
+        title: 'NG Rate (%)',
+        editable: false,
+        addable: false,
       },
       judgment: {
         title: 'Judgment',
-        type: 'string',
+        editor: {
+          type: 'list',
+          config: {
+            selectText: 'Select',
+            list: [{ value: 'OK', title: 'OK' }, { value: 'NG', title: 'NG' }],
+          },
+        },
       },
       date: {
         title: 'Updated Date',
         valuePrepareFunction: (created) => {
           if (isNaN(Date.parse(created))) {
-            return formatDate(new Date(), 'MM/dd/yyyy', 'en_US');
+            return formatDate(new Date(), 'dd/MM/yyyy', 'en_US');
           } else
             // return this.datePipe.transform(new Date(created), 'MM/dd/yyyy');
-            return formatDate(new Date(created), 'MM/dd/yyyy', 'en_US');
+            return formatDate(new Date(created), 'dd/MM/yyyy', 'en_US');
         },
-        editor: {
-          type: 'custom',
-          component: CustomInputEditorComponent,
-        },
+        // editor: {
+        //   type: 'custom',
+        //   component: CustomInputEditorComponent,
+        // },
+        editable: true,
+        addable: true,
       },
       id: {
         title: 'Id',
@@ -119,25 +141,50 @@ export class CloseComponent implements OnInit {
 
   }
   async ngOnInit() {
-    this.LoadTable();
-    this.showListApproval();
+    // Get 
+    this.loadVerifyTable();
+    this.loadListApproval();
 
     // Get head approval information
-    this.headQAInfor = await (await this.adwebService.getUserDetailByDepartment(this.userService.token(), "Quality")).toPromise();
-    this.headAOInfor = await (await this.adwebService.getUserDetailByDepartment(this.userService.token(), "Assembly Operations")).toPromise();
+    this.approvalLv1 = await this.adwebService.getUserDetailByID(this.userService.token(), this.ApprovalLv1).toPromise();
+    this.approvalLv2 = await this.adwebService.getUserDetailByID(this.userService.token(), this.ApprovalLv2).toPromise();;
+    // this.approvalLv2 = await (await this.adwebService.getUserDetailByDepartment(this.userService.token(), "Assembly Operations")).toPromise();
   }
 
-  LoadTable() {
+  // role: Initiator - Owner - Approver - Admin
+  checkPermissionAcion(actionRole: string) {
+    let userId = this.userService.userId();
+    if (this.userService.listRole().indexOf("Hanoi_NBB_PIZZA_ADMIN") !== -1)
+      return true;
+    if (actionRole == 'Initiator' && userId.toUpperCase() == this.IssueCreator.toUpperCase())
+      return true;
+    else if (actionRole == 'Approval' 
+        && (userId.toUpperCase() == this.ApprovalLv2.toUpperCase() || userId.toUpperCase() == this.ApprovalLv1.toUpperCase()))
+      return true;
+    else
+      return false;
+  }
+
+  // Load verify table
+  loadVerifyTable() {
     this.issueService.getListVerificationByIssueId(this.IssueID)
       .subscribe(result => {
         this.source.load(result);
         this.listVerifi = result;
       });
   }
+  // show approval information
+  loadListApproval() {
+    this.approvalService.getListApprovalByIssueId(this.IssueID).subscribe(result => {
+      this.listApproval = result;
+    });
+  }
 
   onCreateConfirm(event): void {
     const newId = this.guidService.getGuid();
     event.newData.id = newId;
+    event.newData.ngrate = ((Number(event.newData.ngqty) / Number(event.newData.size)) * 100).toFixed(1);
+    console.log(event.newData);
     const vefify = {
       'id': newId,
       'issueId': this.IssueID,
@@ -146,16 +193,16 @@ export class CloseComponent implements OnInit {
       'ngqty': event.newData.ngqty,
       'ngrate': event.newData.ngrate,
       'judgment': event.newData.judgment,
-      'date': new Date(),
+      'date': new Date(event.newData.date),
     };
-    console.log(vefify);
+
+    // Create verify
     this.issueService.createVerification(vefify)
       .subscribe(result => {
         console.log(result);
         this.alert.showToast('success', 'Success', 'Create verification successfully!');
         // Update issue status
         this.issueService.getIssueById(this.IssueID).subscribe(result => {
-          // Update issue information 
           result.issueStatus = 'Monitoring';
           result.currentStep = (result.currentStep == 'Capa') ? 'Close' : result.currentStep;
           this.issueService.createIssue(result).subscribe(resultCreate => console.log(resultCreate));
@@ -165,7 +212,16 @@ export class CloseComponent implements OnInit {
       });
   }
 
+  updateRate() {
+    let size = $('td:nth-child(3) > ng2-smart-table-cell > table-cell-edit-mode > div > table-cell-default-editor > div > input-editor > input').val();
+    let ngQty = $('td:nth-child(4) > ng2-smart-table-cell > table-cell-edit-mode > div > table-cell-default-editor > div > input-editor > input').val();
+    let rate = $('td:nth-child(5) > ng2-smart-table-cell > table-cell-edit-mode > div > table-cell-default-editor > div > input-editor > input');
+    // Set rate
+    rate.val(((Number(ngQty) / Number(size)) * 100).toFixed(1));
+  }
+
   onSaveConfirm(event): void {
+    event.newData.ngrate = ((Number(event.newData.ngqty) / Number(event.newData.size)) * 100).toFixed(1);
     const vefify = {
       'id': event.newData.id,
       'issueId': this.IssueID,
@@ -222,16 +278,23 @@ export class CloseComponent implements OnInit {
             if (result) this.alert.showToast('success', 'Success', 'Insert/Update approval sucessfully!');
 
             // Send mail
-            // If approver from AO -> send new approval QA
-            if (this.headAOInfor.work_email == this.userService.email() && resultApproval.status == 1) {
-              this.sendMailApproval(this.headQAInfor);
+            // If approver from Lv1 -> send new approval Lv2  
+            // Process: OBA - 2 level
+            ///         IT  - 1 level
+            if (this.approvalLv1.work_email == this.userService.email() 
+                 && resultApproval.status == 1
+                 && this.IssueProcess == 'OBA') {
+              this.sendMailApproval(this.approvalLv2);
             }
 
-            // If approval from QA -> update issue status
-            if (this.headQAInfor.work_email == this.userService.email() && resultApproval.status == 1) {
+            // If approval from lv2 -> update issue status
+            if (this.approvalLv2.work_email == this.userService.email() 
+                && resultApproval.status == 1
+                || this.IssueProcess == 'IT') {
               this.issueService.getIssueById(this.IssueID).subscribe(result => {
                 // Update issue information 
                 result.issueStatus = 'Done';
+                result.currentStep = 'Close';
                 this.issueService.createIssue(result).subscribe(resultCreate => {
                   if (resultCreate == true) {
                     this.alert.showToast('success', 'Success', 'Create/Update assign successfully!');
@@ -239,11 +302,9 @@ export class CloseComponent implements OnInit {
                 })
               })
             }
-
             // Send mail notification -> Initiator
             this.sendApproved(approval);
-
-            this.showListApproval();
+            this.loadListApproval();
           })
         }
       });
@@ -270,10 +331,8 @@ export class CloseComponent implements OnInit {
     this.mailService.SendMail(mail).subscribe(result => result ? console.log('send mail successfully!') : console.log('send mail error!'));
   }
   async sendMailApproval(headInfor: any) {
-    // Send mail to QA - Quality
+    // Send mail to approval lv1
     let initiatorMail = await this.adwebService.getUserDetailByID(this.userService.token(), this.IssueCreator).toPromise();
-
-
     const mail: Mail = {
       sender: 'Pizza Systems',
       to: headInfor['work_email'],
@@ -302,13 +361,6 @@ export class CloseComponent implements OnInit {
     this.approvalService.insertOrUpdate(approval).toPromise();
   }
 
-  // show approval information
-  showListApproval() {
-    this.approvalService.getListApprovalByIssueId(this.IssueID).subscribe(result => {
-      this.listApproval = result;
-    });
-  }
-
   BackStep() {
     this.backStatus.emit('capa');
   }
@@ -326,6 +378,6 @@ export class CustomInputEditorComponent extends DefaultEditor {
     super();
   }
   getDate() {
-    return formatDate(new Date(), 'MM/dd/yyyy', 'en_US');
+    return formatDate(new Date(), 'dd/MM/yyyy', 'en_US');
   }
 }

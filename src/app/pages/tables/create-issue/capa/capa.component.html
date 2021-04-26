@@ -19,7 +19,9 @@
         <form [formGroup]="createAssignFormGroup" autocomplete="off" (ngSubmit)="onSubmit()">
             <nb-accordion #accord multi formArrayName="assignList"
                 *ngFor="let assignList of listAssign().controls; let i = index">
-                <nb-accordion-item style="border-bottom: 1px solid #ecedef">
+                <nb-accordion-item 
+                    *ngIf="checkPermissionShow(assignList.value.ownerId)"
+                    style="border-bottom: 1px solid #ecedef">
                     <nb-accordion-item-header
                         [style.border-left]="assignList.invalid ? '5px solid red' : '5px solid blue'"
                         [style.background]="assignList.value.status == 'Reassigned' ? '#e5e5e5' : '#ffffff'">
@@ -70,7 +72,7 @@
                                             </div>
                                             <div class="col-sm-2">
                                                 <button [disabled]="assignList.value.id == null"
-                                                    (click)="openDeadline(dialog, assignList.value.id, assignList.value.deadLine,assignList.value.deadLineTime)"
+                                                    (click)="openDeadline(dialog, assignList.value.id,assignList.value.ownerId, assignList.value.deadLine,assignList.value.deadLineTime)"
                                                     nbButton outline status="info">
                                                     Extend
                                                 </button>
@@ -150,7 +152,8 @@
             <button (click)="AssignSubmit('draft')" class="ml-2" nbButton outline status="info">
                 Save
             </button> -->
-            <button (click)="NextStep()" class="ml-2" nbButton>
+            <button *ngIf="checkAssignDone()"
+                (click)="NextStep()" class="ml-2" nbButton>
                 Proceed<nb-icon icon="arrowhead-right-outline"></nb-icon>
             </button>
 
@@ -185,7 +188,7 @@
                     </div>
                     <div class="col-sm-1">
                         <button
-                            (click)="AddDeadLine(dateInput2.value, inputTime2.value, inputReason2.value, data.id, data.currentDeadLine)"
+                            (click)="AddDeadLine(dateInput2.value, inputTime2.value, inputReason2.value, data.id,data.ownerId, data.currentDeadLine)"
                             [disabled]="extendReason.value.length === 0" class="float-right" outline nbButton
                             status="primary">
                             <nb-icon icon="plus-outline"></nb-icon>
@@ -240,8 +243,8 @@
         </nb-card-body>
         <nb-card-footer>
             <div class="d-flex justify-content-end">
-                <button *ngIf="listDeadline.length > 0 && listDeadline.slice(-1)[0].status == 'Draft'" class="mr-2"
-                    type="submit" (click)="SubmitDeadLine()" nbButton status="danger">Submit</button>
+                <button *ngIf="listDeadline.length > 0 && listDeadline.slice(-1)[0].status == 'Open'" class="mr-2"
+                    type="submit" (click)="SubmitDeadLine(data.ownerId)" nbButton status="danger">Submit</button>
                 <button nbButton (click)="ref.close()">Close Dialog</button>
             </div>
         </nb-card-footer>
