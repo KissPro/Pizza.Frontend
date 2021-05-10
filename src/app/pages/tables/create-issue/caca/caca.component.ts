@@ -1,4 +1,4 @@
-import { Input } from '@angular/core';
+import { AfterContentInit, AfterViewChecked, AfterViewInit, Input } from '@angular/core';
 import { EventEmitter } from '@angular/core';
 import { ChangeDetectorRef, Component, ElementRef, OnInit, Output, QueryList, TemplateRef, ViewChild, ViewChildren } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -21,7 +21,7 @@ import { environment } from 'environments/environment';
   templateUrl: './caca.component.html',
   styleUrls: ['./caca.component.scss']
 })
-export class CacaComponent implements OnInit {
+export class CacaComponent implements OnInit, AfterViewInit {
 
   constructor(
     private formBuilder: FormBuilder,
@@ -35,6 +35,8 @@ export class CacaComponent implements OnInit {
     private issueService: IssueService,
     private ref: ChangeDetectorRef,
   ) { }
+
+
 
   // Init 
   alert = new ToastrComponent(this.toastrService);
@@ -52,14 +54,21 @@ export class CacaComponent implements OnInit {
   @Output() nextStatus = new EventEmitter<any>();
   @Output() backStatus = new EventEmitter<any>();
 
-
+  // list item
+  @ViewChildren('item') item : QueryList<any>;
 
   ngOnInit(): void {
     this.showListAssign();
     this.showCauseAnalysis();
-
   }
-
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      console.log(this.item);
+      this.item.forEach(element => {
+        element.toggle();
+      });
+    },10);
+  }
   //#region CHECK PERMISSON
   checkPermissionShow(ownerId: string) {
     let userId = this.userService.userId();

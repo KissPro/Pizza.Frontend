@@ -2,12 +2,12 @@ import { Observable } from 'rxjs';
 
 export interface ConfigModel {
     id: string;
-    key: string;
+    name: string;
     value: string;
     updatedBy: string;
-    updatedDate: Date;
+    updateDate: Date | null;
     remarkConfig?: string;
 }
 export abstract class ConfigData {
-    abstract getAllConfig(): Observable<ConfigModel>;
+    abstract getAllConfig(): Observable<ConfigModel[]>;
 }

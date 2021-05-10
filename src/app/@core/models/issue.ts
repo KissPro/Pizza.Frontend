@@ -24,6 +24,7 @@ export interface IssueModel {
 	verifyNote?: any;
 	createdDate?: Date;
 	createdBy?: string;
+	createdByName?: string;
 }
 
 export abstract class IssueData {

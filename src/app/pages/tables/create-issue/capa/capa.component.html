@@ -19,8 +19,7 @@
         <form [formGroup]="createAssignFormGroup" autocomplete="off" (ngSubmit)="onSubmit()">
             <nb-accordion #accord multi formArrayName="assignList"
                 *ngFor="let assignList of listAssign().controls; let i = index">
-                <nb-accordion-item 
-                    *ngIf="checkPermissionShow(assignList.value.ownerId)"
+                <nb-accordion-item #item *ngIf="checkPermissionShow(assignList.value.ownerId)"
                     style="border-bottom: 1px solid #ecedef">
                     <nb-accordion-item-header
                         [style.border-left]="assignList.invalid ? '5px solid red' : '5px solid blue'"
@@ -31,11 +30,12 @@
                         <div class="col-sm-3">{{assignList.value.email}}</div>
                         <div class="col-sm-3">{{assignList.value.team}}</div>
                         <div class="col-sm-1">{{assignList.value.status}}</div>
-                        <div class="col-sm-1 float-left">
-                            <button (click)="removeAssign(i, assignList.value)" size="small" nbButton outline
-                                status="danger">
-                                X
-                            </button>
+                        <div class="col-sm-1 float-left"
+                            *ngIf="assignList.value.status != 'Reassigned' && assignList.value.status != 'Done'">
+                        <button (click)="removeAssign(i, assignList.value)" size="small" nbButton outline
+                            status="danger">
+                            X
+                        </button>
                         </div>
                     </nb-accordion-item-header>
                     <nb-accordion-item-body>
@@ -152,8 +152,7 @@
             <button (click)="AssignSubmit('draft')" class="ml-2" nbButton outline status="info">
                 Save
             </button> -->
-            <button *ngIf="checkAssignDone()"
-                (click)="NextStep()" class="ml-2" nbButton>
+            <button *ngIf="checkAssignDone()" (click)="NextStep()" class="ml-2" nbButton>
                 Proceed<nb-icon icon="arrowhead-right-outline"></nb-icon>
             </button>
 

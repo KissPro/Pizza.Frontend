@@ -13,18 +13,27 @@
     </button>
   </nb-card-header>
   <nb-card-body>
+    <!-- Date range -->
+    <div class="text-center">
+      <input id="dateRange" autocomplete="off" [(ngModel)]="dateRangeValue" nbInput placeholder="Select date range..." [nbDatepicker]="formpicker" (ngModelChange)="searchByDateRange($event)">
+      <nb-rangepicker #formpicker ></nb-rangepicker>
+    </div>
+
+    <!-- Show table -->
     <table datatable [dtOptions]="dtOptions[1]" [dtTrigger]="dtTrigger" class="display row-border hover cell-border"
       style="width:100%">
       <thead>
         <tr class="table-secondary">
-          <th>#</th>
+          <th class="no-sort">#</th>
           <th>ISSUE&nbsp;NO</th>
-          <th>TITLE</th>
+          <th style="min-width: 9rem;">TITLE</th>
           <th>DESCRIPTION</th>
           <th>TYPE</th>
           <th>STEP</th>
+          <th>CREATED BY</th>
+          <th style="max-width: 8rem;">CREATED DATE</th>
           <th>STATUS</th>
-          <th>ACTION</th>
+          <th class="no-sort">ACTION</th>
         </tr>
         <!-- </thead> -->
       <tbody *ngIf="issueModel?.length != 0">
@@ -32,25 +41,34 @@
           [class.selected]="i === currentRow">
           <td>{{i + 1 + indexTable}}</td>
           <td>{{ issue.issueNo }}</td>
-          <td>{{ issue.title }}</td>
           <td>
-            <div style="max-width: 18rem;word-wrap: break-word;">
-              <ngx-tiny-mce-flat 
-              *ngIf="issue.failureDesc"
-              [rickText]="issue.failureDesc.split(' ', 10).join(' ') + '</p>'">
+            <div style="min-width: 9rem;word-wrap: break-word;">
+              {{ issue.title }}
+            </div>
+          </td>
+          <td>
+            <div style="max-width: 15rem;word-wrap: break-word;">
+              <ngx-tiny-mce-flat *ngIf="issue.failureDesc"
+                [rickText]="issue.failureDesc.split(' ', 10).join(' ') + '</p>'">
               </ngx-tiny-mce-flat>
             </div>
           </td>
           <td>{{ issue.processType | uppercase }}</td>
           <td>{{ issue.currentStep | uppercase }}</td>
+          <td>{{ issue.createByName }}</td>
+          <td>
+            <div style="max-width: 8rem;word-wrap: break-word;">
+              {{ issue.createdDate | date: 'yyyy/MM/dd HH:mm' }}
+            </div>
+          </td>
           <td>
             <nb-progress-bar [value]="showIssueStatus(issue.issueStatus)"
-              [status]="progressStatus(showIssueStatus(issue.issueStatus))" size="small">{{ issue.issueStatus }}
+              [status]="progressStatus(showIssueStatus(issue.issueStatus))" size="small"><span style="font-size: 0.65rem !important;">{{ issue.issueStatus }}</span>
             </nb-progress-bar>
           </td>
           <td class="text-center">
             <button size="small" (click)="openIssue(issue.id)" nbButton outline status="info">
-              Open <nb-icon icon="book-open-outline"></nb-icon>
+              <nb-icon icon="book-open-outline"></nb-icon>
             </button>
             <button size="small" (click)="removeIssue(issue.id, issue.processType)" class="float-right" nbButton outline
               status="danger">

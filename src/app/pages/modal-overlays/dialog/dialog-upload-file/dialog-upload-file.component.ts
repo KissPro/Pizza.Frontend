@@ -13,7 +13,7 @@ import { ToastrComponent } from '../../toastr/toastr.component';
 export class DialogUploadFileComponent {
   // Send from caller
   type: string; // as folder
-  templateName: string; 
+  templateName: string;
   urlUpload: string; // for controller upload custome
 
   public progress: number;
@@ -40,17 +40,27 @@ export class DialogUploadFileComponent {
     this.ref.close(null);
   }
 
-  public uploadFile = (files) => {
+  public uploadFile = async (files) => {
     this.statusProcess = 'success';
     if (files.length === 0) {
       return;
     }
+    let url;
     const fileToUpload = <File>files[0];
 
-    console.log(fileToUpload);
+    // file to blob
+    url = await new Promise((resolve, reject) => {
+      const fr = new FileReader();
+      fr.onerror = reject;
+      fr.onload = function () {
+        resolve(fr.result);
+      }
+      fr.readAsDataURL(files[0]);
+    });
+
     this.currentFile.name = fileToUpload.name; // assign to current file -> to collect information
     this.currentFile.type = fileToUpload.type;
-    this.currentFile.icon = this.uploadService.IconFile(fileToUpload.type);
+    this.currentFile.icon = this.uploadService.IconFile(fileToUpload.type, url);
 
     const formData = new FormData();
     formData.append('file', fileToUpload, fileToUpload.name);
@@ -71,11 +81,12 @@ export class DialogUploadFileComponent {
       );
   }
 
+
   submit() {
     this.statusProcess = 'danger';
     if (this.filePath !== undefined)
       // If upload excel -> collect data
-      if (this.urlUpload !== undefined) { 
+      if (this.urlUpload !== undefined) {
         this.uploadService.SubmitUpload(this.urlUpload, this.filePath).
           subscribe(
             () => {

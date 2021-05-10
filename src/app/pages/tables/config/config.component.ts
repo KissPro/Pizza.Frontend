@@ -37,22 +37,22 @@ export class ConfigComponent {
       confirmDelete: true,
     },
     columns: {
-      key: {
-        title: 'Key',
+      name: {
+        title: 'Name',
         type: 'string',
       },
       value: {
         title: 'Value',
         type: 'string',
       },
-      updatedDate: {
+      updateDate: {
         title: 'Updated Date',
         valuePrepareFunction: (created) => {
           if (isNaN(Date.parse(created))) {
-            return formatDate(new Date(), 'MM/dd/yyyy', 'en_US');
+            return formatDate(new Date(), 'dd/MM/yyyy', 'en_US');
           } else
             // return this.datePipe.transform(new Date(created), 'MM/dd/yyyy');
-            return formatDate(new Date(created), 'MM/dd/yyyy', 'en_US');
+            return formatDate(new Date(created), 'dd/MM/yyyy', 'en_US');
         },
         editor: {
           type: 'custom',
@@ -90,7 +90,7 @@ export class ConfigComponent {
     event.newData.id = newId;
     const config = {
       'id': newId,
-      'key': event.newData.key,
+      'name': event.newData.name,
       'value': event.newData.value,
       'updatedBy': this.authen.userName(),
       'updatedDate': new Date(),
@@ -98,7 +98,7 @@ export class ConfigComponent {
     };
 
     console.log(config);
-    this.serviceConfig.createConfig(config)
+    this.serviceConfig.createOrUpdateConfig(config)
       .subscribe(result => {
         console.log(result);
         this.alert.showToast('success', 'Success', 'Create config successfully!');
@@ -119,14 +119,14 @@ export class ConfigComponent {
   onSaveConfirm(event): void {
     const config = {
       'id': event.newData.id,
-      'key': event.newData.key,
+      'name': event.newData.name,
       'value': event.newData.value,
       'updatedBy': this.authen.userName(),
       'updatedDate': new Date(),
       'remarkConfig': event.newData.remarkConfig,
     };
     const id = event.newData.id;
-    this.serviceConfig.editConfig(id, config)
+    this.serviceConfig.createOrUpdateConfig(config)
       .subscribe(() => {
         this.alert.showToast('success', 'Success', 'Update config successfully!');
         event.confirm.resolve(event.newData);
@@ -181,6 +181,6 @@ export class CustomInputEditorComponent extends DefaultEditor {
     super();
   }
   getDate() {
-    return formatDate(new Date(), 'MM/dd/yyyy', 'en_US');
+    return formatDate(new Date(), 'dd/MM/yyyy', 'en_US');
   }
 }

@@ -4,28 +4,32 @@
     </nb-card-header>
     <nb-card-body>
         <div class="row">
-            <div class="col-md-10">
+            <div class="col-md-9">
                 <input type="text" (keyup.enter)="addNewAssign(inputOwner)" [(ngModel)]="inputOwner" nbInput
                     class="form-control float-right" shape="semi-round" placeholder="Input Owner's ID or Owner's email">
             </div>
-            <div class="col-md-2">
+            <div class="col-md-3">
+                <button class="float-right ml-3" outline nbButton status="success" (click)="addNewAssign(IssueCreator)">
+                    ME
+                    <nb-icon icon="plus-circle-outline"></nb-icon>
+                </button>
                 <button [disabled]="inputOwner.length === 0" class="float-right" outline nbButton status="primary"
                     (click)="addNewAssign(inputOwner)">
+                    ADD OWNER
                     <nb-icon icon="plus-outline"></nb-icon>
                 </button>
             </div>
         </div>
         <br>
         <form [formGroup]="createAssignFormGroup" autocomplete="off" (ngSubmit)="onSubmit()">
-            <nb-accordion #accord multi formArrayName="assignList"
+            <nb-accordion multi formArrayName="assignList"
                 *ngFor="let assignList of listAssign().controls; let i = index">
                 <!-- 
                 * Check permission 
                 - Initiator/Approver can view all assign
                 - Owner only view exactly assign
                 -->
-                <nb-accordion-item 
-                    *ngIf="checkPermissionShow(assignList.value.ownerId)"
+                <nb-accordion-item #item *ngIf="checkPermissionShow(assignList.value.ownerId)"
                     style="border-bottom: 1px solid #ecedef">
                     <nb-accordion-item-header
                         [style.border-left]="assignList.invalid ? '5px solid red' : '5px solid blue'"
@@ -139,7 +143,7 @@
     </nb-card-body>
 </nb-card>
 
-<nb-card accent="danger" >
+<nb-card accent="danger">
     <nb-card-header>
         Cause Analysis
     </nb-card-header>

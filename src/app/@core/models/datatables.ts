@@ -6,4 +6,6 @@ export interface DataTablesResponse {
     pages: number;
     start: number;
     end: number;
+    from: Date;
+    to: Date;
 }

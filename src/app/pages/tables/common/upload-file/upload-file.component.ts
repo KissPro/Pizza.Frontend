@@ -49,12 +49,16 @@ export class UploadFileComponent implements OnInit {
               name: file.name,
               link: file.url,
               type: file.type,
-              icon: this.fileService.IconFile(file.type),
+              icon: this.fileService.IconFile(file.type, file.url),
             }
             this.listAttack.push(newFile);
           }
         });
       })
+  }
+
+  openImageLink(url: string) {
+    window.open(url, "_blank");
   }
 
   uploadFile(): void {

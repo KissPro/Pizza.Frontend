@@ -1,4 +1,4 @@
-import { Input } from '@angular/core';
+import { Input, QueryList, ViewChildren } from '@angular/core';
 import { ChangeDetectorRef, EventEmitter, Output, TemplateRef } from '@angular/core';
 import { Component, OnInit } from '@angular/core';
 import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
@@ -39,6 +39,10 @@ export class CapaComponent implements OnInit {
   inputOwner = '';
   // IssueID = '2D864EC3-3DBC-4C06-BC12-31E50D880B16';
 
+  
+  // list item
+  @ViewChildren('item') item : QueryList<any>;
+  
   constructor(
     private formBuilder: FormBuilder,
     private adwebService: AdwebService,
@@ -52,11 +56,20 @@ export class CapaComponent implements OnInit {
     private ref: ChangeDetectorRef,
   ) { }
 
+  
   ngOnInit(): void {
     this.showListAssign();
   }
 
-
+  ngAfterViewInit(): void {
+    setTimeout(() => {
+      console.log(this.item);
+      this.item.forEach(element => {
+        element.toggle();
+      });
+    },10);
+  }
+  
 
   //#region CHECK PERMISSON
   checkPermissionShow(ownerId: string) {

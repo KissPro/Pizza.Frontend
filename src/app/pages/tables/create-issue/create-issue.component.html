@@ -74,8 +74,7 @@
                         <b>{{ IssueTitleIndex}}</b></button>
                 </div>
                 <div class="col-sm-1 text-center" *ngIf="inputPRN.value >= 50">
-                    <button nbButton outline [status]="inputPRN.value >= 100 ? 'danger' : 'warning'"
-                        (click)="showIssueOpen()">
+                    <button nbButton outline [status]="inputPRN.value >= 100 ? 'danger' : 'warning'">
                         {{inputPRN.value >= 100 ? ' Critical ' : ' Major '}}</button>
                 </div>
             </div>
@@ -243,17 +242,17 @@
                                 class="form-control" formControlName="line">
                         </div>
                     </div>
-                    <div class="col-sm-3">
+                    <div class="col-sm-2">
                         <div class="form-group">
                             <label for="inputShift" class="label">Shift</label>
                             <input type="text" nbInput fullWidth id="inputShift" placeholder="Input Shift"
                                 class="form-control" formControlName="shift">
                         </div>
                     </div>
-                    <div class="col-sm-3">
+                    <div class="col-sm-2">
                         <div class="form-group">
                             <label for="inputPattern" class="label">Pattern</label>
-                            <nb-select class="form-control" id="inputPattern" formControlName="pattern"
+                            <nb-select class="form-control" nbInput fullWidth id="inputPattern" formControlName="pattern"
                                 placeholder="Input Pattern">
                                 <nb-option *ngFor="let drop of listPattern" [value]="drop.value">{{drop.value}}
                                 </nb-option>

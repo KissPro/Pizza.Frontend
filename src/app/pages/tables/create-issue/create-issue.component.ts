@@ -59,8 +59,6 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
 
   IssueIndex: number = 0; // default is 0 - định danh id
   IssueTitleIndex: number = 0; // đã sãy ra bao nhiêu lần. (sym repeat)
-
-
   createdDate: Date = null;
 
   loading = false;
@@ -204,6 +202,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
         stepStatus: issueModel.stepStatus,
         createdDate: issueModel.createdDate,
         createdBy: issueModel.createdBy,
+        createdByName: issueModel.createdByName,
       })
       // Show list notfication
       let emailList = issueModel.notifiedList?.split(';');
@@ -486,6 +485,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
         stepStatus: 'On-going',
         createdDate: new Date(),
         createdBy: this.userService.userId(),
+        createdByName: this.userService.userName(),
       }
       this.issueService.createIssue(issueNew)
         .subscribe(async result => {

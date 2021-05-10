@@ -5,13 +5,13 @@
         </button>
     </nb-card-header>
     <nb-list>
-        <nb-list-item *ngFor="let file of listAttack">
-            <div class="row">
-                <div class="col-sm-2">
-                    <img src="{{file.icon}}" alt="">
+        <nb-list-item *ngFor="let file of listAttack;index as i">
+            <div class="row d-flex">
+                <div class="col-sm-3">
+                    <img #img src="{{file.icon}}" (click)="openImageLink(img.src)" alt="" style="width: 4rem;height: auto;">
                 </div>
-                <div class="col-sm-6" style="width: 10rem;word-wrap: break-word;">
-                    {{file.name}}
+                <div class="col-sm-5" style="width: 10rem;word-wrap: break-word;">
+                    <b>({{(i + 1)}})</b>. {{file.name}}
                 </div>
                 <div class="col-sm-2 float-right">
                     <nb-icon icon="download-outline" (click)="downloadFile(file)"></nb-icon>

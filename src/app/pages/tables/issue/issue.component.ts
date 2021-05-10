@@ -13,6 +13,8 @@ import { Router } from '@angular/router';
 import { GuidService } from 'app/@core/service/guid.service';
 import { AdwebService } from 'app/@core/service/adweb.service';
 import { ToastrComponent } from 'app/pages/modal-overlays/toastr/toastr.component';
+import { mergeMap } from 'rxjs/operators';
+import { formatDate } from '@angular/common';
 
 @Component({
   selector: 'ngx-issue',
@@ -28,9 +30,12 @@ export class IssueComponent implements OnInit {
   indexTable: number;
   @ViewChild(DataTableDirective, { static: false })
   dtElement: DataTableDirective;
-
   alert = new ToastrComponent(this.toastrService);
 
+  dateTo: Date = new Date();
+  dateFrom: Date = new Date(this.dateTo.getDate() - 7);
+  dateRangeValue: string = formatDate(this.dateFrom, "yyyy/MM/dd", 'en-US').toString() + ' - ' + formatDate(this.dateTo, "yyyy/MM/dd", 'en-US').toString();
+  
 
   constructor(private http: HttpClient,
     private issueService: IssueService,
@@ -45,10 +50,22 @@ export class IssueComponent implements OnInit {
 
   ngOnInit(): void {
     this.loadIssueTable();
+
+  }
+
+  searchByDateRange(date: any) {
+    if (date.start && date.end) {
+      this.dateFrom = new Date(date.start);
+      this.dateTo = new Date(date.end);
+      console.log(this.dateTo);
+      this.rerender();
+    }
   }
 
   loadIssueTable() {
     const that = this;
+    var token = JSON.parse(localStorage.getItem('user')).token["access_token"];
+
     this.toggleSidebar();
     this.dtOptions[1] = {
       pagingType: 'full_numbers',
@@ -57,16 +74,22 @@ export class IssueComponent implements OnInit {
       processing: true,
       scrollX: true, // header scroll
       scrollY: '56vh', // hight data
-      order: [1, 'asc'],
+      order: [7, 'desc'],
 
       ajax: (dataTablesParameters: any, callback) => {
+        dataTablesParameters.from = this.dateFrom;
+        dataTablesParameters.to = this.dateTo;
+
         that.issueService.getIssue(dataTablesParameters)
           .subscribe(resp => {
-            that.issueModel = resp?.data;
+            var listIssue = resp?.data;
+            that.issueModel = listIssue;
             that.indexTable = resp?.start;
             callback({
               recordsTotal: resp?.recordsTotal,
               recordsFiltered: resp?.recordsFiltered,
+              from: this.dateFrom,
+              to: this.dateTo,
               data: [],
             });
             // setTimeout(() => this.rerender(), 1); // resize header
@@ -75,7 +98,12 @@ export class IssueComponent implements OnInit {
       columns: [
         // tslint:disable-next-line: max-line-length
         { data: 'index' }, { data: 'issueNo' }, { data: 'title' },
-        { data: 'failureDesc' }, { data: 'issueStatus' }, { data: 'processType' }, { data: 'currentStep' }, { data: 'open' }
+        { data: 'failureDesc' }, { data: 'processType' }, { data: 'currentStep' }, 
+        { data: 'createdByName' }, { data: 'createdDate' },{ data: 'issueStatus' },
+        { data: 'open' },
+      ],
+      columnDefs: [
+        { targets: 'no-sort', orderable: false },
       ],
     };
   }
@@ -89,7 +117,7 @@ export class IssueComponent implements OnInit {
   // For update size columns
   rerender(): void {
     this.dtElement.dtInstance.then((dtInstance: DataTables.Api) => {
-      dtInstance.columns.adjust();
+      dtInstance.ajax.reload();
     });
   }
   toggleSidebar() {
@@ -161,10 +189,6 @@ export class IssueComponent implements OnInit {
         this.reloadIssueTable();
       }
     })
-  }
-
-  testAdweb() {
-    this.adwebService.camOnATung('e08nixwI4LicM21hAqBx82VlJWVKErAC').subscribe(result => console.log(result));
   }
 }
 

@@ -98,11 +98,17 @@ export class UploadService {
   }
 
   // Return icon of file
-  IconFile(type: string) {
+  IconFile(type: string, url: string) {
     if (type === 'application/vnd.ms-excel' || type === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet')
       return `assets\\images\\excel.png`;
-    else if (type.includes("image"))
-      return `assets\\images\\picture.png`;
+    else if (type.includes("image")) {
+      if (url && url.includes('base64'))
+        return url;
+      else if (url)
+        return environment.APIPortalURL + url;
+      else
+        return `assets\\images\\picture.png`;
+    }
     else if (type.includes("presentation"))
       return `assets\\images\\powerpoint.png`;
     else if (type.includes("document"))
