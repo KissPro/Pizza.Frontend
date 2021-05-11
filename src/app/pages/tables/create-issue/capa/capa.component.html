@@ -4,13 +4,16 @@
     </nb-card-header>
     <nb-card-body>
         <div class="row">
-            <div class="col-md-10">
+            <div class="col-md-6 offset-md-6">
                 <input type="text" (keyup.enter)="addNewAssign(inputOwner)" [(ngModel)]="inputOwner" nbInput
-                    class="form-control float-right" shape="semi-round" placeholder="Input Owner's ID or Owner's email">
-            </div>
-            <div class="col-md-2">
+                    class="form-control float-left" placeholder="Input Owner's ID or Owner's email">
+                <button class="float-right ml-3" outline nbButton status="success" (click)="addNewAssign(IssueCreator)">
+                    ME
+                    <nb-icon icon="plus-circle-outline"></nb-icon>
+                </button>
                 <button [disabled]="inputOwner.length === 0" class="float-right" outline nbButton status="primary"
                     (click)="addNewAssign(inputOwner)">
+                    ADD OWNER
                     <nb-icon icon="plus-outline"></nb-icon>
                 </button>
             </div>

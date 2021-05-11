@@ -1,7 +1,7 @@
 <nb-card id="GoToTop">
     <nb-card-body>
-        <nb-stepper orientation="horizontal" [disableStepNavigation]="this.issueFormGroup.value?.currentStep != 'Close'" #step
-            stepper-step-index-border-width="50px">
+        <nb-stepper orientation="horizontal" [disableStepNavigation]="this.issueFormGroup.value?.currentStep != 'Close'"
+            #step stepper-step-index-border-width="50px">
             <nb-step [label]="labelOne">
                 <ng-template #labelOne><span style="padding-top:50px;" (click)="clickStep('openIssue')">OPEN
                         ISSUE</span>
@@ -143,13 +143,17 @@
                     <div class="col-sm-2">
                         <div class="form-group">
                             <label for="inputDefectName" class="label">Defect Name</label>
-                            <nb-select
+                            <!-- <nb-select
                                 [status]="(obaFormGroup.controls.defectName.invalid && (obaFormGroup.controls.defectName.dirty || obaFormGroup.controls.defectName.touched)) ? 'danger' : 'info'"
                                 class="form-control" id="inputDefectName" formControlName="defectName"
                                 (ngModelChange)="updateIssueTitle()" placeholder="Select Name">
                                 <nb-option *ngFor="let drop of listDefectName" [value]="drop.value">{{drop.value}}
                                 </nb-option>
-                            </nb-select>
+                            </nb-select> -->
+                            <input nbInput fullWidth
+                                [status]="(obaFormGroup.controls.defectName.invalid && (obaFormGroup.controls.defectName.dirty || obaFormGroup.controls.defectName.touched)) ? 'danger' : 'info'"
+                                (ngModelChange)="updateIssueTitle()" placeholder="Input Name" id="inputSamplingQty"
+                                class="form-control" formControlName="defectName">
                         </div>
                     </div>
                     <div class="col-sm-2">
@@ -252,8 +256,8 @@
                     <div class="col-sm-2">
                         <div class="form-group">
                             <label for="inputPattern" class="label">Pattern</label>
-                            <nb-select class="form-control" nbInput fullWidth id="inputPattern" formControlName="pattern"
-                                placeholder="Input Pattern">
+                            <nb-select class="form-control" nbInput fullWidth id="inputPattern"
+                                formControlName="pattern" placeholder="Input Pattern">
                                 <nb-option *ngFor="let drop of listPattern" [value]="drop.value">{{drop.value}}
                                 </nb-option>
                             </nb-select>
@@ -266,8 +270,8 @@
         <p>Detail Description - <i>{{issueFormGroup.value.createdDate | date: 'yyyy/MM/dd HH:mm' }}</i></p>
         <div class="row">
             <div class="col-md-9">
-                <ngx-tiny-mce *ngIf="issueFormGroup.value.failureDesc"
-                    [rickText]="issueFormGroup.value.failureDesc" (editorKeyup)="updateRickText($event)"></ngx-tiny-mce>
+                <ngx-tiny-mce *ngIf="issueFormGroup.value.failureDesc" [rickText]="issueFormGroup.value.failureDesc"
+                    (editorKeyup)="updateRickText($event)"></ngx-tiny-mce>
             </div>
             <div class="col-md-3">
                 <ngx-upload-file [issueId]="IssueID" currentStep="OPEN">
@@ -340,34 +344,22 @@
     </nb-card-footer>
 </nb-card>
 <ng-container *ngIf="currentStatus == 'caca'">
-    <ngx-caca 
-        [IssueID]="IssueID" 
-        [IssueCreator]="issueFormGroup.value?.createdBy"
-        [IssueTitle]="issueFormGroup.value?.title" 
-        [ApprovalLv1]="this.currentProcess.approverId_Lv1" 
-        [ApprovalLv2]="this.currentProcess.approverId_Lv2"
-        (nextStatus)="next($event)" (backStatus)="previous($event)">
+    <ngx-caca [IssueID]="IssueID" [IssueCreator]="issueFormGroup.value?.createdBy"
+        [IssueTitle]="issueFormGroup.value?.title" [ApprovalLv1]="this.currentProcess.approverId_Lv1"
+        [ApprovalLv2]="this.currentProcess.approverId_Lv2" (nextStatus)="next($event)" (backStatus)="previous($event)">
     </ngx-caca>
 </ng-container>
 
 <ng-container *ngIf="currentStatus == 'capa'">
-    <ngx-capa 
-        [IssueID]="IssueID" 
-        [IssueCreator]="issueFormGroup.value?.createdBy"
-        [IssueTitle]="issueFormGroup.value?.title"
-        [ApprovalLv1]="this.currentProcess.approverId_Lv1" 
-        [ApprovalLv2]="this.currentProcess.approverId_Lv2"
-        (nextStatus)="next($event)" (backStatus)="previous($event)">
+    <ngx-capa [IssueID]="IssueID" [IssueCreator]="issueFormGroup.value?.createdBy"
+        [IssueTitle]="issueFormGroup.value?.title" [ApprovalLv1]="this.currentProcess.approverId_Lv1"
+        [ApprovalLv2]="this.currentProcess.approverId_Lv2" (nextStatus)="next($event)" (backStatus)="previous($event)">
     </ngx-capa>
 </ng-container>
 
 <ng-container *ngIf="currentStatus == 'close'">
-    <ngx-close 
-        [IssueID]="IssueID"
-        [IssueCreator]="issueFormGroup.value?.createdBy"
-        [IssueTitle]="issueFormGroup.value?.title" 
-        [ApprovalLv1]="this.currentProcess.approverId_Lv1" 
-        [ApprovalLv2]="this.currentProcess.approverId_Lv2"
-        [IssueProcess]="this.currentProcess.processName"
+    <ngx-close [IssueID]="IssueID" [IssueCreator]="issueFormGroup.value?.createdBy"
+        [IssueTitle]="issueFormGroup.value?.title" [ApprovalLv1]="this.currentProcess.approverId_Lv1"
+        [ApprovalLv2]="this.currentProcess.approverId_Lv2" [IssueProcess]="this.currentProcess.processName"
         (backStatus)="previous($event)"></ngx-close>
 </ng-container>

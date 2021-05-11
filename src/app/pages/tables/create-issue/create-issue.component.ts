@@ -202,7 +202,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
         stepStatus: issueModel.stepStatus,
         createdDate: issueModel.createdDate,
         createdBy: issueModel.createdBy,
-        createdByName: issueModel.createdByName,
+        createByName: issueModel.createByName,
       })
       // Show list notfication
       let emailList = issueModel.notifiedList?.split(';');
@@ -258,6 +258,8 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
     } else {
       this.issueFormGroup.patchValue({
         failureDesc: '<p></p>',
+        createdBy: this.userService.userId(),
+        createByName: this.userService.userName(),
       })
     }
   }
@@ -279,6 +281,8 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
     this.productFormGroup.reset();
     this.issueFormGroup.patchValue({
       failureDesc: '<p></p>',
+      createdBy: this.userService.userId(),
+      createByName: this.userService.userName(),
     })
   }
 
@@ -485,7 +489,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
         stepStatus: 'On-going',
         createdDate: new Date(),
         createdBy: this.userService.userId(),
-        createdByName: this.userService.userName(),
+        createByName: this.userService.userName(),
       }
       this.issueService.createIssue(issueNew)
         .subscribe(async result => {
@@ -546,7 +550,8 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
     currentStep: '',
     stepStatus: '',
     createdDate: new Date(),
-    createdBy: '',
+    createdBy: this.userService.userId(),
+    createByName: this.userService.userName(),
   });
 
   // OBA table
