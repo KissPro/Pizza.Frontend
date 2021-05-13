@@ -1,14 +1,11 @@
-import { ViewportScroller } from '@angular/common';
-import { nullSafeIsEquivalent } from '@angular/compiler/src/output/output_ast';
-import { resolveSanitizationFn } from '@angular/compiler/src/render3/view/template';
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, HostListener, OnInit, TemplateRef, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, PatternValidator, Validators } from '@angular/forms';
+import { AfterViewInit, ChangeDetectorRef, Component, OnInit, ViewChild } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { NbDialogService, NbToastrService } from '@nebular/theme';
 import { FileModel } from 'app/@core/models/file-attach';
 import { IssueModel } from 'app/@core/models/issue';
 import { DropListModel } from 'app/@core/models/issue-config';
-import { MailModel, OBAModel, ProcessModel, ProductModel, UploadFileModel } from 'app/@core/models/issue-type';
+import { MailModel, OBAModel, ProcessModel, ProductModel } from 'app/@core/models/issue-type';
 import { Mail } from 'app/@core/models/mail';
 import { AdwebService } from 'app/@core/service/adweb.service';
 import { AuthenticationService } from 'app/@core/service/authentication.service';
@@ -17,13 +14,9 @@ import { ConfigIssueService } from 'app/@core/service/issue-config.service';
 import { IssueService } from 'app/@core/service/issue.service';
 import { MailService } from 'app/@core/service/mail.service';
 import { UploadService } from 'app/@core/service/upload-file.service';
-import { messages } from 'app/pages/extra-components/chat/messages';
-import { DialogUploadFileComponent } from 'app/pages/modal-overlays/dialog/dialog-upload-file/dialog-upload-file.component';
 import { ToastrComponent } from 'app/pages/modal-overlays/toastr/toastr.component';
-import { format, isThisSecond } from 'date-fns';
+import { format } from 'date-fns';
 import { environment } from 'environments/environment';
-import { merge, parseHTML } from 'jquery';
-import { forkJoin, Observable, of } from 'rxjs';
 import { UploadFileComponent } from '../common/upload-file/upload-file.component';
 
 

@@ -3,7 +3,6 @@ import { NbDatepickerModule, NbMenuModule } from '@nebular/theme';
 
 import { ThemeModule } from '../@theme/theme.module';
 import { PagesComponent } from './pages.component';
-import { DashboardModule } from './dashboard/dashboard.module';
 import { PagesRoutingModule } from './pages-routing.module';
 import { MiscellaneousModule } from './miscellaneous/miscellaneous.module';
 import { COOService } from 'app/@core/mock/coo.service';
@@ -19,7 +18,6 @@ import { IssueService } from 'app/@core/service/issue.service';
     PagesRoutingModule,
     ThemeModule,
     NbMenuModule,
-    DashboardModule,
     MiscellaneousModule,
     DataTablesModule,
     NbDatepickerModule,

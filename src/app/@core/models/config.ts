@@ -6,7 +6,7 @@ export interface ConfigModel {
     value: string;
     updatedBy: string;
     updateDate: Date | null;
-    remarkConfig?: string;
+    dropListRemark?: string;
 }
 export abstract class ConfigData {
     abstract getAllConfig(): Observable<ConfigModel[]>;

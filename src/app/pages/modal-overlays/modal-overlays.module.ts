@@ -24,15 +24,12 @@ import { ModalOverlaysComponent } from './modal-overlays.component';
 import { DialogComponent } from './dialog/dialog.component';
 import { ShowcaseDialogComponent } from './dialog/showcase-dialog/showcase-dialog.component';
 import { DialogNamePromptComponent } from './dialog/dialog-name-prompt/dialog-name-prompt.component';
-import { WindowComponent } from './window/window.component';
-import { WindowFormComponent } from './window/window-form/window-form.component';
 import { ToastrComponent } from './toastr/toastr.component';
 import { PopoversComponent } from './popovers/popovers.component';
 import {
   NgxPopoverCardComponent, NgxPopoverFormComponent,
   NgxPopoverTabsComponent,
 } from './popovers/popover-examples.component';
-import { TooltipComponent } from './tooltip/tooltip.component';
 import { DialogConfirmComponent } from './dialog/dialog-confirm/dialog-confirm.component';
 import { DialogUploadFileComponent } from './dialog/dialog-upload-file/dialog-upload-file.component';
 import { UploadService } from 'app/@core/service/upload-file.service';
@@ -48,20 +45,16 @@ const COMPONENTS = [
   DialogConfirmComponent,
   DialogApprovalComponent,
   DialogUploadFileComponent,
-  WindowComponent,
-  WindowFormComponent,
   PopoversComponent,
   NgxPopoverCardComponent,
   NgxPopoverFormComponent,
   NgxPopoverTabsComponent,
-  TooltipComponent,
 ];
 
 const ENTRY_COMPONENTS = [
   ShowcaseDialogComponent,
   DialogNamePromptComponent,
   DialogConfirmComponent,
-  WindowFormComponent,
   NgxPopoverCardComponent,
   NgxPopoverFormComponent,
   NgxPopoverTabsComponent,

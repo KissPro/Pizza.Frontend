@@ -59,7 +59,7 @@ export class ConfigComponent {
           component: CustomInputEditorComponent,
         },
       },
-      remarkconfig: {
+      dropListRemark: {
         title: 'Remark',
         type: 'string',
       },
@@ -94,7 +94,7 @@ export class ConfigComponent {
       'value': event.newData.value,
       'updatedBy': this.authen.userName(),
       'updatedDate': new Date(),
-      'remarkConfig': event.newData.remarkConfig,
+      'dropListRemark': event.newData.dropListRemark,
     };
 
     console.log(config);
@@ -123,7 +123,7 @@ export class ConfigComponent {
       'value': event.newData.value,
       'updatedBy': this.authen.userName(),
       'updatedDate': new Date(),
-      'remarkConfig': event.newData.remarkConfig,
+      'dropListRemark': event.newData.dropListRemark,
     };
     const id = event.newData.id;
     this.serviceConfig.createOrUpdateConfig(config)
@@ -167,6 +167,16 @@ export class ConfigComponent {
         }
       });
   }
+  // upload file
+  // uploadFile(): void {
+  //   this.dialogService.open(DialogUploadFileComponent, {
+  //     context: {
+  //       type: 'Plant',
+  //       templateName: 'Plant_Template.xlsx',
+  //       urlUpload: '/api/plant/import-excel',
+  //     },
+  //   }).onClose.subscribe(result => (result === 'success') ? this.LoadTable() : null);
+  // }
 }
 
 // Custome input

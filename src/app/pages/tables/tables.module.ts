@@ -11,7 +11,6 @@ import { Ng2SmartTableModule } from 'ng2-smart-table';
 
 import { ThemeModule } from '../../@theme/theme.module';
 import { TablesRoutingModule, routedComponents } from './tables-routing.module';
-import { FsIconComponent } from './tree-grid/tree-grid.component';
 import { DataTablesModule } from 'angular-datatables';
 import { COOService } from 'app/@core/mock/coo.service';
 import { BoomEcusService } from 'app/@core/service/boom-ecus.service';
@@ -22,11 +21,9 @@ import { ModalOverlaysModule } from '../modal-overlays/modal-overlays.module';
 import { PlantService } from 'app/@core/service/plant.service';
 import { ConfigService } from 'app/@core/service/config.service';
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
-import { DNMComponent } from './dn/dnm.component';
 import { IssueService } from 'app/@core/service/issue.service';
 import { ConfigIssueService } from 'app/@core/service/issue-config.service';
 import { AssginService } from 'app/@core/service/assign.service';
-import { UploadFileComponent } from './common/upload-file/upload-file.component';
 import { MailService } from 'app/@core/service/mail.service';
 import { AdwebService } from 'app/@core/service/adweb.service';
 import { ApprovalService } from 'app/@core/service/issue-approval.service';
@@ -35,7 +32,6 @@ import { OBAService } from 'app/@core/service/oba.service';
 @NgModule({
   imports: [
     NbCardModule,
-    NbTreeGridModule,
     NbTabsetModule,
     NbWindowModule,
     NbProgressBarModule,
@@ -60,7 +56,6 @@ import { OBAService } from 'app/@core/service/oba.service';
   ],
   declarations: [
     ...routedComponents,
-    FsIconComponent,
   ],
   providers: [COOService, BoomEcusService, DNService, 
               CountryShipService, GuidService, PlantService, 
