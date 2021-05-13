@@ -3,13 +3,15 @@ export interface Employee {
     ad_user_sn: string;
     id: number;
     name: string;
+    username: string;
     display_name: string;
     sAMAccountName: string;
     employee_id: string;
+    employee_type: string;
     work_email: string;
+    email: string;
     access_token: string;
     department: any[];
-    departmentName: string;
 }
 
 export interface EmployeeDetail {
@@ -29,7 +31,14 @@ export interface EmployeeRole {
     token: string;
 }
 
-export interface EmployeeModel {
-   employee: Employee[];
-   token: string;
+export class EmployeeModel {
+   employee: any;
+   token: Token;
+}
+
+export class Token {
+    refresh_token : any;
+    expires_in : any;
+    token_type : any;
+    access_token : any;
 }

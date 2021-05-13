@@ -62,8 +62,13 @@ const routes: Routes = [{
       path: 'issue',
       component: IssueComponent,
     },
+    // create issue route
     {
       path: 'create-issue',
+      component: CreateIssueComponent,
+    },
+    {
+      path: 'create-issue/:issueId/:type/:step',
       component: CreateIssueComponent,
     },
   ],

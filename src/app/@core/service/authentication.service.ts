@@ -1,7 +1,8 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
 import { environment } from 'environments/environment';
-import { EmployeeModel } from '../models/Employee';
+import { Employee, EmployeeModel } from '../models/Employee';
+import { TheadTitlesRowComponent } from 'ng2-smart-table/lib/components/thead/rows/thead-titles-row.component';
 
 @Injectable({ providedIn: 'root' })
 export class AuthenticationService {
@@ -21,24 +22,27 @@ export class AuthenticationService {
         return this.userSubject.value;
     }
 
+    UserInfor() : Employee{
+        return <Employee>(JSON.parse(localStorage.getItem('user')).employee.employee);
+    }
+
     // Get user infor
     userId() {
-        return JSON.parse(localStorage.getItem('user')).employee.employee["employee_id"];
+        return this.UserInfor().employee_id;
     }
     userName() {
-        return JSON.parse(localStorage.getItem('user')).employee.employee["display_name"];
+        return this.UserInfor().display_name;
     }
     team() {
-        return JSON.parse(localStorage.getItem('user')).employee.employee["department"][1];
+        return this.UserInfor().department[1];
     }
     email() {
-        return JSON.parse(localStorage.getItem('user')).employee.employee["email"];
+        return this.UserInfor().email;
     }
 
     token() {
         return JSON.parse(localStorage.getItem('user')).token["access_token"];
     }
-
     listRole() {
         return JSON.parse(localStorage.getItem('role')).listRole;
     }
@@ -49,6 +53,14 @@ export class AuthenticationService {
         this.userSubject.next(null);
         // redirect logout session adweb
         window.location.href = this.logout_uri;
+    }
+
+    reLogin() {
+        localStorage.removeItem('user');
+        localStorage.removeItem('role');
+        this.userSubject.next(null);
+        // redirect re login session adweb
+        window.location.href = this.login_uri;
     }
     
 }

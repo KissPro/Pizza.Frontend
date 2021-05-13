@@ -63,7 +63,6 @@ export class CapaComponent implements OnInit {
 
   ngAfterViewInit(): void {
     setTimeout(() => {
-      console.log(this.item);
       this.item.forEach(element => {
         element.toggle();
       });
@@ -358,7 +357,6 @@ export class CapaComponent implements OnInit {
       'updatedBy': this.userService.userId(),
       'updatedDate': new Date(),
     }
-    console.log(assignNew);
     this.assignService.createAssign(assignNew).subscribe(
       async result => {
         if (result == true)

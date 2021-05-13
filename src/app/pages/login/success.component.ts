@@ -6,7 +6,7 @@ import { AdwebService } from 'app/@core/service/adweb.service';
 import { AuthorizationService } from 'app/@core/service/authorization.service.';
 import { EmployeeModel, EmployeeRole } from 'app/@core/models/Employee';
 
-@Component({ templateUrl: 'success.component.html' })
+@Component({ template: '' })
 export class SuccessComponent implements OnInit {
     code: string;
     token: any;
@@ -20,8 +20,8 @@ export class SuccessComponent implements OnInit {
     }
     ngOnInit() {
         this.activeRoute.queryParams.subscribe(params => {
+            
             this.code = params['code'];
-            console.log('Day la code' + this.code);
             if (this.code != undefined) {
                 this.adwebService.getAccessToken(this.code)
                     .pipe(

@@ -15,6 +15,8 @@ import { AdwebService } from 'app/@core/service/adweb.service';
 import { ToastrComponent } from 'app/pages/modal-overlays/toastr/toastr.component';
 import { mergeMap } from 'rxjs/operators';
 import { formatDate } from '@angular/common';
+import { AuthenticationService } from 'app/@core/service/authentication.service';
+import { OBAService } from 'app/@core/service/oba.service';
 
 @Component({
   selector: 'ngx-issue',
@@ -33,8 +35,9 @@ export class IssueComponent implements OnInit {
   alert = new ToastrComponent(this.toastrService);
 
   dateTo: Date = new Date();
-  dateFrom: Date = new Date(this.dateTo.getDate() - 7);
-  dateRangeValue: string = formatDate(this.dateFrom, "yyyy/MM/dd", 'en-US').toString() + ' - ' + formatDate(this.dateTo, "yyyy/MM/dd", 'en-US').toString();
+  dateFrom: Date = new Date();
+  dateRangeValue: any;
+  newIssueId: string  = '';
   
 
   constructor(private http: HttpClient,
@@ -45,16 +48,33 @@ export class IssueComponent implements OnInit {
     private layoutService: LayoutService,
     private toastrService: NbToastrService,
     private adwebService: AdwebService,
+    private userService: AuthenticationService,
     private router: Router,
+    private obaService: OBAService,
   ) { }
 
   ngOnInit(): void {
     this.loadIssueTable();
+    this.newIssueId = this.guidService.getGuid();
 
+    // check adweb service
+    this.adwebService.getUserDetailByID(this.userService.token(),this.userService.userId()).toPromise();
+    
+    // set daterange default
+    this.dateFrom.setDate(this.dateTo.getDate() - 14);
+    this.dateRangeValue = 
+    {
+      'start' : this.dateFrom,
+      'end' : this.dateTo,
+    }
+
+    this.obaService.getListOBA().subscribe(res => {
+      console.log(res);
+    })
   }
 
   searchByDateRange(date: any) {
-    if (date.start && date.end) {
+    if (date?.start && date?.end) {
       this.dateFrom = new Date(date.start);
       this.dateTo = new Date(date.end);
       console.log(this.dateTo);
@@ -177,10 +197,10 @@ export class IssueComponent implements OnInit {
   // Action
   openIssue(issueId: string) {
     console.log(issueId);
-    this.router.navigate(['/pages/tables/create-issue', { 'issueId': issueId, 'type': 'open', 'step': 'openIssue' }]);
+    this.router.navigate(['/pages/tables/create-issue', { 'issueId': issueId, 'type': 'open', 'step': 'openIssue', skipLocationChange: true }]);
   }
   newIssue() {
-    this.router.navigate(['/pages/tables/create-issue', { 'issueId': this.guidService.getGuid(), 'type': 'new', 'step': 'openIssue' }]);
+    this.router.navigate(['/pages/tables/create-issue', { 'issueId': this.guidService.getGuid(), 'type': 'new', 'step': 'openIssue', skipLocationChange: true }]);
   }
   removeIssue(issueId: string, type: string) {
     this.issueService.removeIssue(issueId, type).subscribe(result => {

@@ -48,8 +48,8 @@ export class CacaComponent implements OnInit, AfterViewInit {
   @Input() IssueID: any;
   @Input() IssueTitle: any;
   @Input() IssueCreator: any;
-  @Input() ApprovalLv1: any;
-  @Input() ApprovalLv2: any;
+  @Input() ApprovalLv1: any = null;
+  @Input() ApprovalLv2: any = null;
 
   @Output() nextStatus = new EventEmitter<any>();
   @Output() backStatus = new EventEmitter<any>();
@@ -63,7 +63,6 @@ export class CacaComponent implements OnInit, AfterViewInit {
   }
   ngAfterViewInit(): void {
     setTimeout(() => {
-      console.log(this.item);
       this.item.forEach(element => {
         element.toggle();
       });

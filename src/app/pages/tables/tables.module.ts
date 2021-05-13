@@ -30,6 +30,7 @@ import { UploadFileComponent } from './common/upload-file/upload-file.component'
 import { MailService } from 'app/@core/service/mail.service';
 import { AdwebService } from 'app/@core/service/adweb.service';
 import { ApprovalService } from 'app/@core/service/issue-approval.service';
+import { OBAService } from 'app/@core/service/oba.service';
 
 @NgModule({
   imports: [
@@ -66,6 +67,7 @@ import { ApprovalService } from 'app/@core/service/issue-approval.service';
               ConfigIssueService,
               AssginService, MailService,
               AdwebService, ApprovalService,
+              OBAService,
               ConfigService, IssueService],
 })
 export class TablesModule { }

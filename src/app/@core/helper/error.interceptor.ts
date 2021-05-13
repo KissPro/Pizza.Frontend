@@ -25,12 +25,10 @@ export class ErrorInterceptor implements HttpInterceptor {
             console.log(err);
             if (error == 'OK') // send mail not return error
                 return;
-            // if (err.status === 401) {
-            //     if (this.tokenExpired()) {
-            //         this.authenticationService.logout();
-            //     }
-            // }
-            if (err.status === 403) {
+            if (err.status === 401) {
+                    this.authenticationService.reLogin();
+            }
+            else if (err.status === 403) {
                 this.router.navigate(['/permission-denied']);
             }
             else {
@@ -49,9 +47,10 @@ export class ErrorInterceptor implements HttpInterceptor {
             return throwError(error);
         }));
     }
-    // Check token expired
-    private tokenExpired() {
-        const expiry = JSON.parse(localStorage.getItem('role')).token.expiration;
-        return new Date >= new Date(expiry);
-    }
+
+    // Check token expired -> only check for token server.
+    // private tokenExpired() {
+    //     const expiry = JSON.parse(localStorage.getItem('role')).token.expiration;
+    //     return new Date >= new Date(expiry);
+    // }
 }

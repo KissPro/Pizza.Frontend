@@ -345,21 +345,21 @@
 </nb-card>
 <ng-container *ngIf="currentStatus == 'caca'">
     <ngx-caca [IssueID]="IssueID" [IssueCreator]="issueFormGroup.value?.createdBy"
-        [IssueTitle]="issueFormGroup.value?.title" [ApprovalLv1]="this.currentProcess.approverId_Lv1"
-        [ApprovalLv2]="this.currentProcess.approverId_Lv2" (nextStatus)="next($event)" (backStatus)="previous($event)">
+        [IssueTitle]="issueFormGroup.value?.title" [ApprovalLv1]="this.currentProcess?.approverId_Lv1"
+        [ApprovalLv2]="this.currentProcess?.approverId_Lv2" (nextStatus)="next($event)" (backStatus)="previous($event)">
     </ngx-caca>
 </ng-container>
 
 <ng-container *ngIf="currentStatus == 'capa'">
     <ngx-capa [IssueID]="IssueID" [IssueCreator]="issueFormGroup.value?.createdBy"
-        [IssueTitle]="issueFormGroup.value?.title" [ApprovalLv1]="this.currentProcess.approverId_Lv1"
-        [ApprovalLv2]="this.currentProcess.approverId_Lv2" (nextStatus)="next($event)" (backStatus)="previous($event)">
+        [IssueTitle]="issueFormGroup.value?.title" [ApprovalLv1]="this.currentProcess?.approverId_Lv1"
+        [ApprovalLv2]="this.currentProcess?.approverId_Lv2" (nextStatus)="next($event)" (backStatus)="previous($event)">
     </ngx-capa>
 </ng-container>
 
 <ng-container *ngIf="currentStatus == 'close'">
     <ngx-close [IssueID]="IssueID" [IssueCreator]="issueFormGroup.value?.createdBy"
-        [IssueTitle]="issueFormGroup.value?.title" [ApprovalLv1]="this.currentProcess.approverId_Lv1"
-        [ApprovalLv2]="this.currentProcess.approverId_Lv2" [IssueProcess]="this.currentProcess.processName"
+        [IssueTitle]="issueFormGroup.value?.title" [ApprovalLv1]="this.currentProcess?.approverId_Lv1"
+        [ApprovalLv2]="this.currentProcess?.approverId_Lv2" [IssueProcess]="this.currentProcess?.processName"
         (backStatus)="previous($event)"></ngx-close>
 </ng-container>

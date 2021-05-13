@@ -36,7 +36,8 @@ export class HeaderComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit() {
-    this.userAd = JSON.parse(localStorage.getItem('user')).employee.employee["display_name"];
+
+    this.userAd = this.authenService.userName();
 
     this.userService.getUsers()
       .pipe(takeUntil(this.destroy$))

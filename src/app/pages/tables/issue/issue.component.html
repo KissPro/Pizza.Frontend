@@ -18,7 +18,6 @@
       <input id="dateRange" autocomplete="off" [(ngModel)]="dateRangeValue" nbInput placeholder="Select date range..." [nbDatepicker]="formpicker" (ngModelChange)="searchByDateRange($event)">
       <nb-rangepicker #formpicker ></nb-rangepicker>
     </div>
-
     <!-- Show table -->
     <table datatable [dtOptions]="dtOptions[1]" [dtTrigger]="dtTrigger" class="display row-border hover cell-border"
       style="width:100%">
@@ -67,9 +66,9 @@
             </nb-progress-bar>
           </td>
           <td class="text-center">
-            <button size="small" (click)="openIssue(issue.id)" nbButton outline status="info">
+            <a size="small" [routerLink]="['/pages/tables/create-issue', issue.id,'open', 'openIssue']" nbButton outline status="info">
               <nb-icon icon="book-open-outline"></nb-icon>
-            </button>
+            </a>
             <button size="small" (click)="removeIssue(issue.id, issue.processType)" class="float-right" nbButton outline
               status="danger">
               <nb-icon icon="close-outline"></nb-icon>

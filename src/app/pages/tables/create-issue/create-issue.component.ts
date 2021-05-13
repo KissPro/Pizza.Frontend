@@ -87,8 +87,6 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
 
   alert = new ToastrComponent(this.toastrService);
 
-
-
   ngOnInit() {
     this.route.params.subscribe(params => {
       console.log(params['step']);
