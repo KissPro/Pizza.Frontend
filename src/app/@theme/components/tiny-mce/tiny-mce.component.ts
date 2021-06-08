@@ -87,7 +87,7 @@ export class TinyMCEComponent implements OnDestroy, AfterViewInit {
           }
         });
       },
-      height: '150',
+      height: '250',
     });
   }
 

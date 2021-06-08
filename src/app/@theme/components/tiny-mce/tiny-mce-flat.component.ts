@@ -37,6 +37,7 @@ export class TinyMCEComponentFlat implements OnDestroy, AfterViewInit {
       },
     });
     tinymce.activeEditor.dom.setAttribs(tinymce.activeEditor.dom.select('img'), {'width': 80, 'height': 'auto'});
+    tinymce.activeEditor.dom.addClass(tinymce.activeEditor.dom.select('table'),'table-striped table-sm table-bordered');
     // tinymce.activeEditor.dom.setStyle(tinymce.activeEditor.dom.select('table'), {'display':'none'});
   }
   ngOnDestroy() {

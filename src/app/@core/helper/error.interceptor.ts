@@ -26,7 +26,8 @@ export class ErrorInterceptor implements HttpInterceptor {
             if (error == 'OK') // send mail not return error
                 return;
             if (err.status === 401) {
-                    this.authenticationService.reLogin();
+                console.log(err.status)
+                this.authenticationService.reLogin();
             }
             else if (err.status === 403) {
                 this.router.navigate(['/permission-denied']);

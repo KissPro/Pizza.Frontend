@@ -226,7 +226,7 @@ export class CapaComponent implements OnInit {
               "Dear Mr/Ms. " + assign.name + ",</br></br>" +
               "You have received a Cancel Assignment Notification in Pizza system.</br>" +
               "you would not need to fulfill data for this request anymore</br>" +
-              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=openIssue" + "'>Pizza - Open Issue</a></br></br>" +
+              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=capa" + "'>Pizza - Open Issue</a></br></br>" +
               "Best regards," +
               "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
           }
@@ -308,7 +308,7 @@ export class CapaComponent implements OnInit {
               "Deadline: " + format(deadLine, 'yyyy/MM/dd HH:mm') + "</br>" +
               "Current step: Corrective & Preventive Actions</br>" +
               "Request Content: " + assignForm.requestContent + "</br>" +
-              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=openIssue" + "'>Pizza - Open Issue</a></br></br>" +
+              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=capa" + "'>Pizza - Open Issue</a></br></br>" +
               "Best regards," +
               "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
           }
@@ -375,7 +375,7 @@ export class CapaComponent implements OnInit {
               "Deadline: " + format(deadLine, 'yyyy/MM/dd HH:mm') + "</br>" +
               "Current step: Corrective & Preventive Actions</br>" +
               "Request Content: " + assignForm.requestContent + "</br>" +
-              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=openIssue" + "'>Pizza - Open Issue</a></br></br>" +
+              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=capa" + "'>Pizza - Open Issue</a></br></br>" +
               "Best regards," +
               "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
           }
@@ -395,7 +395,7 @@ export class CapaComponent implements OnInit {
               "You have received a Submission Notification from " + this.userService.userName() + " in Pizza system.</br>" +
               "Current step : Corrective & Preventive Actions</br>" +
               "Action Content: " + assignForm.actionContent + "</br>" +
-              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=openIssue" + "'>Pizza - Open Issue</a></br></br>" +
+              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=capa" + "'>Pizza - Open Issue</a></br></br>" +
               "Best regards," +
               "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
           }
@@ -483,7 +483,7 @@ export class CapaComponent implements OnInit {
           "Current deadline : " + format(this.listDeadline.slice(-1)[0].currentDeadLine, "yyyy/MM/dd HH:mm") + "</br>" +
           "Request deadline : " + format(this.listDeadline.slice(-1)[0].requestDeadLine, "yyyy/MM/dd HH:mm") + "</br>" +
           "Reason: " + this.listDeadline.slice(-1)[0].reason + "</br>" +
-          "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=openIssue" + "'>Pizza - Open Issue</a></br></br>" +
+          "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=capa" + "'>Pizza - Open Issue</a></br></br>" +
           "Best regards," +
           "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
       }
@@ -513,7 +513,7 @@ export class CapaComponent implements OnInit {
             "You have received a New Deadline Notification from " + this.userService.userName() + " in Pizza system.</br>" +
             "Result : Approved</br>" +
             "Remark: " + content + "</br>" +
-            "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=openIssue" + "'>Pizza - Open Issue</a></br></br>" +
+            "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=capa" + "'>Pizza - Open Issue</a></br></br>" +
             "Best regards," +
             "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
         }
@@ -551,7 +551,7 @@ export class CapaComponent implements OnInit {
               "You have received a New Deadline Notification from " + this.userService.userName() + " in Pizza system.</br>" +
               "Result : Rejected</br>" +
               "Reason: " + content + "</br>" +
-              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=openIssue" + "'>Pizza - Open Issue</a></br></br>" +
+              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=capa" + "'>Pizza - Open Issue</a></br></br>" +
               "Best regards," +
               "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
           }

@@ -2,7 +2,6 @@ import { NgModule } from '@angular/core';
 import { Routes, RouterModule } from '@angular/router';
 
 import { TablesComponent } from './tables.component';
-import { SmartTableComponent } from './smart-table/smart-table.component';
 import { DataTablesComponent} from './datatables-js/datatables.component';
 import { ConfigComponent } from './config/config.component';
 import { IssueComponent } from './issue/issue.component';
@@ -11,15 +10,13 @@ import { CacaComponent } from './create-issue/caca/caca.component';
 import { UploadFileComponent } from './common/upload-file/upload-file.component';
 import { CapaComponent } from './create-issue/capa/capa.component';
 import { CloseComponent } from './create-issue/close/close.component';
+import { ReportComponent } from './report/report.component';
+// import { OBAComponent } from './report copy/oba.component';
 
 const routes: Routes = [{
   path: '',
   component: TablesComponent,
   children: [
-    {
-      path: 'smart-table',
-      component: SmartTableComponent,
-    },
     {
       path: 'datatables',
       component: DataTablesComponent,
@@ -32,6 +29,14 @@ const routes: Routes = [{
       path: 'issue',
       component: IssueComponent,
     },
+    {
+      path: 'report',
+      component: ReportComponent,
+    },
+    // {
+    //   path: 'oba',
+    //   component: OBAComponent,
+    // },
     // create issue route
     {
       path: 'create-issue',
@@ -52,10 +57,11 @@ export class TablesRoutingModule { }
 
 export const routedComponents = [
   TablesComponent,
-  SmartTableComponent,
   DataTablesComponent,
   ConfigComponent,
   IssueComponent,
+  // OBAComponent,
+  ReportComponent,
   CreateIssueComponent,
   CacaComponent,
   CapaComponent,

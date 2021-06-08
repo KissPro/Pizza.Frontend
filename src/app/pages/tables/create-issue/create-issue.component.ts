@@ -340,6 +340,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
       return customer.toUpperCase();
   }
   getInforByIMEI(imei: string) {
+    console.log(imei);
     this.loading = true;
     this.issueService.getIMEIInformation(imei).subscribe(
       result => {

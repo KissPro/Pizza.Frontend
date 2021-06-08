@@ -184,9 +184,9 @@
                             <nb-form-field>
                                 <input #imei
                                     [status]="(productFormGroup.controls.imei.invalid && (productFormGroup.controls.imei.dirty || productFormGroup.controls.imei.touched)) ? 'danger' : 'info'"
-                                    type="text" nbInput fullWidth id="inputIMEI" placeholder="Input/Scan IMEI"
+                                    type="text" nbInput fullWidth id="inputIMEI" placeholder="Input/Scan IMEI or PSN"
                                     class="form-control" formControlName="imei">
-                                <button *ngIf="imei.value.length === 15" nbSuffix nbButton ghost
+                                <button nbSuffix nbButton ghost
                                     (click)="getInforByIMEI(imei.value)">
                                     <nb-icon icon="flash-outline" pack="eva">
                                     </nb-icon>

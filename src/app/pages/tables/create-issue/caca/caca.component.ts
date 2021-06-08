@@ -28,11 +28,11 @@ export class CacaComponent implements OnInit, AfterViewInit {
     private adwebService: AdwebService,
     private mailService: MailService,
     private toastrService: NbToastrService,
-    private userService: AuthenticationService,
+    public userService: AuthenticationService,
     private dialogService: NbDialogService,
     private assignService: AssginService,
     private guidService: GuidService,
-    private issueService: IssueService,
+    public issueService: IssueService,
     private ref: ChangeDetectorRef,
   ) { }
 
@@ -55,7 +55,7 @@ export class CacaComponent implements OnInit, AfterViewInit {
   @Output() backStatus = new EventEmitter<any>();
 
   // list item
-  @ViewChildren('item') item : QueryList<any>;
+  @ViewChildren('item') item: QueryList<any>;
 
   ngOnInit(): void {
     this.showListAssign();
@@ -66,7 +66,7 @@ export class CacaComponent implements OnInit, AfterViewInit {
       this.item.forEach(element => {
         element.toggle();
       });
-    },10);
+    }, 10);
   }
   //#region CHECK PERMISSON
   checkPermissionShow(ownerId: string) {
@@ -168,6 +168,7 @@ export class CacaComponent implements OnInit, AfterViewInit {
   listAssign(): FormArray {
     return this.createAssignFormGroup.get("assignList") as FormArray;
   }
+
   checkAssignDone() {
     for (let assignList of this.listAssign().controls) {
       const result = assignList.value.status;
@@ -361,6 +362,37 @@ export class CacaComponent implements OnInit, AfterViewInit {
       }
     )
 
+  }
+
+  seftSubmit(assignForm: any, type: string) {
+    const assignNew: AssignModel = {
+      'id': assignForm.id ? assignForm.id : this.guidService.getGuid(),
+      'issueNo': this.IssueID,
+      'currentStep': 'containment action',
+      'team': assignForm.team,
+      'ownerId': assignForm.ownerId,
+      'name': assignForm.name,
+      'email': assignForm.email,
+      'requestContent': 'seft submit',
+      'actionResult': assignForm.actionResult,
+      'actionContent': (type == 'submit' || type == 'submit-draft') ? assignForm.actionContent : '',
+      'actionDate': ((type == 'submit' || type == 'submit-draft') && assignForm.actionContent?.length > 0 && assignForm.actionDate == null) ? new Date() : assignForm.actionDate,
+      'assignedDate': assignForm.assignedDate,
+      'deadLine': new Date(),
+      'deadLevel': 0,
+      'status': this.checkAssignStatus(type, new Date(), assignForm.actionContent),
+      'remark': '',
+      'scheduleDeadLine': null,
+      'updatedBy': this.userService.userId(),
+      'updatedDate': new Date(),
+    }
+    this.assignService.createAssign(assignNew).subscribe(result => {
+      if (result == true) {
+        this.alert.showToast('success', 'Success', 'Create/Update assign successfully!');
+        // Reset list assign
+        this.showListAssign();
+      }
+    });
   }
   assignSubmit(assignForm: any, type: string) {
     // check permission
@@ -572,7 +604,7 @@ export class CacaComponent implements OnInit, AfterViewInit {
               "You have received a New Deadline Notification from " + this.userService.userName() + " in Pizza system.</br>" +
               "Result : Rejected</br>" +
               "Reason: " + content + "</br>" +
-              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=openIssue" + "'>Pizza - Open Issue</a></br></br>" +
+              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=caca" + "'>Pizza - Open Issue</a></br></br>" +
               "Best regards," +
               "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
           }
@@ -692,7 +724,7 @@ export class CacaComponent implements OnInit, AfterViewInit {
                 "Deadline: " + format(deadLine, 'yyyy/MM/dd HH:mm') + "</br>" +
                 "Current step: Cause Analysis</br>" +
                 "Request Content: " + this.analysisFormGroup.value.requestContent + "</br>" +
-                "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=openIssue" + "'>Pizza - Open Issue</a></br></br>" +
+                "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=caca" + "'>Pizza - Open Issue</a></br></br>" +
                 "Best regards," +
                 "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
             }
@@ -771,7 +803,7 @@ export class CacaComponent implements OnInit, AfterViewInit {
               "Dear Mr/Ms. " + assignInfor.name + ",</br></br>" +
               "You have received a Cancel Assignment Notification in Pizza system.</br>" +
               "you would not need to fulfill data for this request anymore</br>" +
-              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=openIssue" + "'>Pizza - Open Issue</a></br></br>" +
+              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=caca" + "'>Pizza - Open Issue</a></br></br>" +
               "Best regards," +
               "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
           }

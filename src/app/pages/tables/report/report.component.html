@@ -1,0 +1,78 @@
+<nb-card accent='success'>
+  <nb-card-body>
+    <b>Issue Information</b>
+    <hr>
+    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ad eum nesciunt eveniet libero ullam quisquam porro
+    veritatis qui! Earum omnis ad animi iure autem qui fugit veritatis, obcaecati sapiente! Ex!
+    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ad eum nesciunt eveniet libero ullam quisquam porro
+    veritatis qui! Earum omnis ad animi iure autem qui fugit veritatis, obcaecati sapiente! Ex!
+    Lorem ipsum, dolor sit amet consectetur adipisicing elit. Ad eum nesciunt eveniet libero ullam quisquam porro
+    veritatis qui! Earum omnis ad animi iure autem qui fugit veritatis, obcaecati sapiente! Ex!
+
+  </nb-card-body>
+
+  <nb-card-body>
+
+    <b>Problem Description</b>
+    <hr>
+    <!-- Show detail product -->
+    <br>
+    <div class="row">
+      <div class="col-sm-4">
+        <ul>
+          <li><b>1. Issue:</b><br>Navigation key up of keypad doesn't working (Hard when pressed)</li>
+          <li><b>2. Product:</b> Queen 2 /Line: A05</li>
+          <li><b>3. Time detected:</b> 10h34, 25-Mar-2021</li>
+          <li><b>4. Failure quantity:</b> 01 pc (941A002LU);</li>
+          <li><b>5. Detect</b>: by OBA at phone 3rd / 8pcs</li>
+          <li><b>6. PON:</b> 20215257</li>
+          <li><b>7. PON size:</b> 1008pcs. (produce 324 pcs before OBA detect)</li>
+        </ul>
+      </div>
+      <div class="col-sm-4">
+        <li><b>8. Line/product impact:</b> 2 lines Queen 2 product</li>
+        <li><b>9. How to detect it?</b><br>
+          OBA insert SIM, Battery > Power on > Boot up to main screen > Function check keypad > Detected issue.</li>
+        <li><b>10. RPN:</b><br>
+          RPN = S*O*D = 8*8*1 = 64 <br>
+          Severity: high = 8<br>
+          Occurrence: Rare = 1/27.910 = 36DPPM. Point = 1<br>
+          Detectability: 8<br>
+          Total 48 case in 2020. No issue belong QEN product</li>
+        <li><b>11. Failure validation:</b><br>
+          It is true fail, it not elastic when press</li>
+      </div>
+      <div class="col-sm-4">
+        <img width="100%"
+          src="http://api-portal-dev.fushan.fihnbb.com/UploadedFile/Files/PIZZA/ISSUE/FIGHTING%20C_Uploaded_0239_13052021.png"
+          alt="">
+      </div>
+    </div>
+  </nb-card-body>
+  <nb-card-body>
+    <b>Containment Action</b>
+    <hr>
+    <ngx-tiny-mce-flat [rickText]="template">
+    </ngx-tiny-mce-flat>
+  </nb-card-body>
+  <nb-card-body>
+    <b>Cause Analysis</b>
+    <hr>
+    <ngx-tiny-mce-flat [rickText]="template">
+    </ngx-tiny-mce-flat>
+  </nb-card-body>
+  <nb-card-body>
+    <b>Corrective & Preventive Action</b>
+    <hr>
+    <ngx-tiny-mce-flat [rickText]="template">
+    </ngx-tiny-mce-flat>
+
+  </nb-card-body>
+  <nb-card-body>
+    <b>Action Implementation & Validation</b>
+    <hr>
+    <ngx-tiny-mce-flat [rickText]="template">
+    </ngx-tiny-mce-flat>
+
+  </nb-card-body>
+</nb-card>
