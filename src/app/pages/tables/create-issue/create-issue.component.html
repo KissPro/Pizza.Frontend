@@ -49,14 +49,6 @@
                         </nb-option>
                     </nb-select>
                 </div>
-                <div class="col-sm-1">
-                    <div class="form-group">
-                        <input
-                            [status]="(issueFormGroup.controls.rpn.invalid && (issueFormGroup.controls.rpn.dirty || issueFormGroup.controls.rpn.touched)) ? 'danger' : 'info'"
-                            #inputPRN min="50" type="number" nbInput fullWidth id="inputFirstName" formControlName="rpn"
-                            placeholder="RPN">
-                    </div>
-                </div>
                 <div class="col-sm-2">
                     <div class="form-group">
                         <input type="text" nbInput fullWidth id="inputFirstName" formControlName="issueNo"
@@ -72,10 +64,6 @@
                 <div class="col-sm-2 text-center" *ngIf="IssueTitleIndex > 0">
                     <button nbButton outline status="info">Repeated Symptom: &nbsp;
                         <b>{{ IssueTitleIndex}}</b></button>
-                </div>
-                <div class="col-sm-1 text-center" *ngIf="inputPRN.value >= 50">
-                    <button nbButton outline [status]="inputPRN.value >= 100 ? 'danger' : 'warning'">
-                        {{inputPRN.value >= 100 ? ' Critical ' : ' Major '}}</button>
                 </div>
             </div>
         </form>
@@ -130,11 +118,11 @@
                     </div>
                     <div class="col-sm-2">
                         <div class="form-group">
-                            <label for="inputDefectPart" class="label">Defect Part</label>
+                            <label for="inputDefectPart" class="label">Fail Component</label>
                             <nb-select
                                 [status]="(obaFormGroup.controls.defectPart.invalid && (obaFormGroup.controls.defectPart.dirty || obaFormGroup.controls.defectPart.touched)) ? 'danger' : 'info'"
                                 class="form-control" id="inputDefectPart" formControlName="defectPart"
-                                (ngModelChange)="updateIssueTitle()" placeholder="Select Part">
+                                (ngModelChange)="updateIssueTitle()" placeholder="Fail Component">
                                 <nb-option *ngFor="let drop of listDefectPart" [value]="drop.value">{{drop.value}}
                                 </nb-option>
                             </nb-select>
@@ -142,27 +130,20 @@
                     </div>
                     <div class="col-sm-2">
                         <div class="form-group">
-                            <label for="inputDefectName" class="label">Defect Name</label>
-                            <!-- <nb-select
-                                [status]="(obaFormGroup.controls.defectName.invalid && (obaFormGroup.controls.defectName.dirty || obaFormGroup.controls.defectName.touched)) ? 'danger' : 'info'"
-                                class="form-control" id="inputDefectName" formControlName="defectName"
-                                (ngModelChange)="updateIssueTitle()" placeholder="Select Name">
-                                <nb-option *ngFor="let drop of listDefectName" [value]="drop.value">{{drop.value}}
-                                </nb-option>
-                            </nb-select> -->
+                            <label for="inputDefectName" class="label">Fail Classification</label>
                             <input nbInput fullWidth
                                 [status]="(obaFormGroup.controls.defectName.invalid && (obaFormGroup.controls.defectName.dirty || obaFormGroup.controls.defectName.touched)) ? 'danger' : 'info'"
-                                (ngModelChange)="updateIssueTitle()" placeholder="Input Name" id="inputSamplingQty"
+                                (ngModelChange)="updateIssueTitle()" placeholder="Fail Classification" id="inputSamplingQty"
                                 class="form-control" formControlName="defectName">
                         </div>
                     </div>
                     <div class="col-sm-2">
                         <div class="form-group">
-                            <label for="inputDefectType" class="label">Defect Type</label>
+                            <label for="inputDefectType" class="label">Fail Mode</label>
                             <nb-select
                                 [status]="(obaFormGroup.controls.defectType.invalid && (obaFormGroup.controls.defectType.dirty || obaFormGroup.controls.defectType.touched)) ? 'danger' : 'info'"
                                 class="form-control" id="inputDefectType" formControlName="defectType"
-                                (ngModelChange)="updateIssueTitle()" placeholder="Select Type">
+                                (ngModelChange)="updateIssueTitle()" placeholder="Fail Mode">
                                 <nb-option *ngFor="let drop of listDefectType" [value]="drop.value">{{drop.value}}
                                 </nb-option>
                             </nb-select>
@@ -196,29 +177,21 @@
                     </div>
                     <div class="col-sm-2">
                         <div class="form-group">
-                            <label for="inputCustomer" class="label">Customer</label>
-                            <input type="text" (ngModelChange)="updateIssueNo();updateIssueTitle()" nbInput fullWidth
-                                id="inputCustomer" placeholder="Input Customer" class="form-control"
-                                formControlName="customer">
-                        </div>
-                    </div>
-                    <div class="col-sm-2">
-                        <div class="form-group">
-                            <label for="inputProduct" class="label">Product</label>
-                            <input type="text" nbInput fullWidth id="inputProduct" placeholder="Input Product"
+                            <label for="inputProduct" class="label">Family</label>
+                            <input type="text" nbInput fullWidth id="inputProduct" placeholder="Input Family"
                                 class="form-control" formControlName="product">
                         </div>
                     </div>
                     <div class="col-sm-2">
                         <div class="form-group">
-                            <label for="inputPon" class="label">Pon</label>
-                            <input type="text" nbInput fullWidth id="inputPon" placeholder="Input Pon"
+                            <label for="inputPon" class="label">Work Order</label>
+                            <input type="text" nbInput fullWidth id="inputPon" placeholder="Work Order"
                                 class="form-control" formControlName="ponno">
                         </div>
                     </div>
                     <div class="col-sm-2">
                         <div class="form-group">
-                            <label for="inputPonSize" class="label">Pon Size</label>
+                            <label for="inputPonSize" class="label">PON Size</label>
                             <input type="text" nbInput fullWidth id="inputPonSize" placeholder="Input Pon Size"
                                 class="form-control" formControlName="ponsize">
                         </div>

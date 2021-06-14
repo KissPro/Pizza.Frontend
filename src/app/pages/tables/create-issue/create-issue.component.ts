@@ -182,7 +182,6 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
         processType: issueModel.processType,
         issueNo: issueModel.issueNo,
         title: issueModel.title,
-        rpn: issueModel.rpn,
         severity: issueModel.severity,
         repeateddSymptom: issueModel.repeateddSymptom,
         failureDesc: issueModel.failureDesc ? issueModel.failureDesc : '<p></p>',
@@ -326,19 +325,19 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
   // - BLU : BT1
   // - FLC : KE11, KE13, KE15, KE16
 
-  getCustomerName(customer: string) {
-    const listNBB = ['DOHA', 'PCM', 'QUE', 'KIG', 'NEB', 'KIG', 'RETRO', 'QEN', 'NEB', 'NEB', 'LIO', 'SPARKLER', 'GMN', 'SUEZ', 'DUBA', 'GMN', 'NKL', 'KIG', 'CNT', 'NEO', 'QEN', 'OTR', 'KESA', 'BTS', 'PIS']
-    const listBLU = ['BT1']
-    const listFLC = ['KE11', 'KE13', 'KE15', 'KE16']
-    if (listBLU.includes(customer))
-      return 'BLU'
-    else if (listNBB.includes(customer))
-      return 'NBB'
-    else if (listFLC.includes(customer))
-      return 'FLC'
-    else
-      return customer.toUpperCase();
-  }
+  // getCustomerName(customer: string) {
+  //   const listNBB = ['DOHA', 'PCM', 'QUE', 'KIG', 'NEB', 'KIG', 'RETRO', 'QEN', 'NEB', 'NEB', 'LIO', 'SPARKLER', 'GMN', 'SUEZ', 'DUBA', 'GMN', 'NKL', 'KIG', 'CNT', 'NEO', 'QEN', 'OTR', 'KESA', 'BTS', 'PIS']
+  //   const listBLU = ['BT1']
+  //   const listFLC = ['KE11', 'KE13', 'KE15', 'KE16']
+  //   if (listBLU.includes(customer))
+  //     return 'BLU'
+  //   else if (listNBB.includes(customer))
+  //     return 'NBB'
+  //   else if (listFLC.includes(customer))
+  //     return 'FLC'
+  //   else
+  //     return customer.toUpperCase();
+  // }
   getInforByIMEI(imei: string) {
     console.log(imei);
     this.loading = true;
@@ -347,7 +346,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
         if (result.length > 0) {
           this.productFormGroup.patchValue({
             imei: result[0].imei,
-            customer: this.getCustomerName(result[0].product.toUpperCase()),
+            customer: '',
             product: result[0].product,
             psn: result[0].psn,
             ponno: result[0].ponno,
@@ -371,7 +370,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
 
   initIssueNo() {
     let issueNo = '';
-    issueNo += this.productFormGroup.value?.customer ? (this.productFormGroup.value?.customer + '-') : '';
+    issueNo += this.productFormGroup.value?.product ? (this.productFormGroup.value?.product + '-') : '';
     issueNo += this.currentProcess.processName ? this.currentProcess.processName : '';
     issueNo += '-' + (this.createdDate ? format(new Date(this.createdDate), "yyyyMMdd").toString() : format(new Date(), "yyyyMMdd").toString());
     issueNo += '-' + this.IssueIndex;
@@ -379,7 +378,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
   }
   initIssueTitle() {
     let issueTitle = '';
-    issueTitle += this.productFormGroup.value?.customer ? (this.productFormGroup.value?.customer + '-') : '';
+    issueTitle += this.productFormGroup.value?.product ? (this.productFormGroup.value?.product + '-') : '';
     issueTitle += this.currentProcess.processName ? this.currentProcess.processName : '';
     issueTitle += this.obaFormGroup.value?.defectPart ? '-' + this.obaFormGroup.value.defectPart : '';
     issueTitle += this.obaFormGroup.value?.defectName ? '-' + this.obaFormGroup.value.defectName : '';
@@ -470,8 +469,8 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
         processType: this.currentProcess.processName,
         issueNo: this.initIssueNo(),
         title: this.initIssueTitle(),
-        rpn: this.issueFormGroup.value?.rpn,
-        severity: this.issueFormGroup.value?.rpn < 100 ? 'Major' : 'Critical',
+        rpn: 0,
+        severity: 'Critical',
         repeateddSymptom: this.IssueTitleIndex,
         failureDesc: this.issueFormGroup.value?.failureDesc,
         fileAttack: this.issueFormGroup.value?.fileAttack,
@@ -532,7 +531,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
     processType: null,
     issueNo: '',
     title: '',
-    rpn: [null, [Validators.required]],
+    rpn: 0,
     severity: '',
     repeateddSymptom: '',
     failureDesc: '<p></p>',
