@@ -10,7 +10,7 @@ export class OBAService {
     getListOBA() {
         var params = {
             'factory' : 'NBB',
-            'date': new Date(),
+            'date': new Date('2021-06-01'),
             'npi': false
         };
         return this.http.get(this.adwebUrl + 'lists?queryJson=' + JSON.stringify(params));
