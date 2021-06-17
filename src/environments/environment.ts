@@ -23,4 +23,4 @@ export const environment = {
   // APIPortalURL : 'http://localhost:5100',
   APIPortalURL : 'http://api-portal-dev.fushan.fihnbb.com',
   ProjectName: 'PIZZA',
-};
+};1

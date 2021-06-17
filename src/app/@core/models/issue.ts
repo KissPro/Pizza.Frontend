@@ -6,10 +6,11 @@ export interface IssueModel {
 	processType: string;
 	issueNo: string;
 	title: string;
-	rpn: number;
-	severity: string;
-	repeateddSymptom?: any;
-	failureDesc?: any;
+	carNo?: string;
+	severity?: string;
+	repeatedSymptom?: string;
+	repeatedCause?: string;
+	failureDesc?: string;
 	fileAttack?: any;
 	notifiedList?: any;
 	issueStatus: string;

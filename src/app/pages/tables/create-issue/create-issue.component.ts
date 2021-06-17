@@ -182,8 +182,10 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
         processType: issueModel.processType,
         issueNo: issueModel.issueNo,
         title: issueModel.title,
+        carNo: issueModel.carNo,
         severity: issueModel.severity,
-        repeateddSymptom: issueModel.repeateddSymptom,
+        repeatedCause: issueModel.repeatedCause,
+        repeatedSymptom: issueModel.repeatedSymptom,
         failureDesc: issueModel.failureDesc ? issueModel.failureDesc : '<p></p>',
         fileAttack: null,
         notifiedList: issueModel.notifiedList,
@@ -200,8 +202,6 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
         this.emailNoti = email;
         this.checkMailInformation();
       });
-
-
 
       if (issueModel.processType === 'OBA') {
         // Select process type
@@ -220,6 +220,10 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
             defectType: result.defectType,
             samplingQty: result.samplingQty,
             ngphoneOrdinal: result.ngphoneOrdinal,
+            detectBy: result.detectBy,
+            howToDetect: result.howToDetect,
+            failureValidate: result.failureValidate,
+            auditor: result.auditor,
           })
         })
         // Show Product
@@ -238,7 +242,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
             shift: result.shift,
           })
         }).then(() => {
-          // this.IssueTitleIndex = issueModel.repeateddSymptom ? Number(issueModel.repeateddSymptom) : 0;
+          // this.IssueTitleIndex = issueModel.repeatedSymptom ? Number(issueModel.repeatedSymptom) : 0;
 
           // Load issue no and title after load full data
           this.updateIssueNo();
@@ -258,19 +262,26 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
     this.issueFormGroup.patchValue({ failureDesc: value })
   }
 
+  // ACTION WHEN CHANGE PROCESS TYPE
   changeProcess(event: any) {
     this.currentProcess = event;
 
-    // Update issue no
+    // Update issue title
     this.updateIssueNo();
     this.updateIssueTitle();
 
-    //console.log(this.currentProcess);
+    // clear form
     this.issueFormGroup.reset();
     this.obaFormGroup.reset();
     this.productFormGroup.reset();
+
+    // patch default value
     this.issueFormGroup.patchValue({
       failureDesc: '<p></p>',
+      carNo: 'N/A',
+      severity: 'Major',
+      repeatedSymptom: 'TBD',
+      repeatedCause: 'TBD',
       createdBy: this.userService.userId(),
       createByName: this.userService.userName(),
     })
@@ -321,6 +332,8 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
     this.listNotify = this.listNotify.filter(x => x.email !== mail);
   }
   //#endregion
+
+
   // - NBB : DOHA, PCM, QUE, KIG, NEB, KIG, RETRO, QEN, NEB, NEB, LIO, SPARKLER, GMN, SUEZ, DUBA, GMN, NKL, KIG, CNT, NEO, QEN, OTR, KESA, BTS, PIS
   // - BLU : BT1
   // - FLC : KE11, KE13, KE15, KE16
@@ -338,6 +351,8 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
   //   else
   //     return customer.toUpperCase();
   // }
+
+  // GET DATA FROM iFUSE BY IMEI OR PSN
   getInforByIMEI(imei: string) {
     console.log(imei);
     this.loading = true;
@@ -413,9 +428,10 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
         })
       })
     else
-      this.IssueTitleIndex = this.issueFormGroup.value?.repeateddSymptom;
+      this.IssueTitleIndex = this.issueFormGroup.value?.repeatedSymptom;
   }
   //#endregion
+ 
   async submitForm() {
     let result = await this.saveIssueInformation('Open');
     console.log(result);
@@ -463,15 +479,17 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
       this.alert.showToast('warning', 'Warning', errorMessage);
       return false;
     }
+
     else {
       const issueNew: IssueModel = {
         id: this.IssueID,
         processType: this.currentProcess.processName,
         issueNo: this.initIssueNo(),
         title: this.initIssueTitle(),
-        rpn: 0,
-        severity: 'Critical',
-        repeateddSymptom: this.IssueTitleIndex,
+        carNo: this.issueFormGroup.value?.carNo,
+        severity: this.issueFormGroup.value?.severity,
+        repeatedSymptom: this.issueFormGroup.value?.repeatedSymptom,
+        repeatedCause: this.issueFormGroup.value?.repeatedCause,
         failureDesc: this.issueFormGroup.value?.failureDesc,
         fileAttack: this.issueFormGroup.value?.fileAttack,
         notifiedList: this.listNotify.map(x => x.email).join(";"),
@@ -497,6 +515,10 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
                 'defectType': this.obaFormGroup.value?.defectType,
                 'samplingQty': this.obaFormGroup.value?.samplingQty,
                 'ngphoneOrdinal': this.obaFormGroup.value?.ngphoneOrdinal,
+                'detectBy': this.obaFormGroup.value?.detectBy,
+                'howToDetect': this.obaFormGroup.value?.howToDetect,
+                'failureValidate': this.obaFormGroup.value?.failureValidate,
+                'auditor': this.obaFormGroup.value?.auditor,
               };
               finalResult = await this.issueService.createOBA(obaNew).toPromise();
               const productNew: ProductModel = {
@@ -524,16 +546,16 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
     }
   }
 
-
   //#region Form Definition
   // Issue information general
   issueFormGroup: FormGroup = this.formBuilder.group({
     processType: null,
     issueNo: '',
     title: '',
-    rpn: 0,
-    severity: '',
-    repeateddSymptom: '',
+    carNo: 'N/A',
+    severity: 'Major',
+    repeatedSymptom: '',
+    repeatedCause: '',
     failureDesc: '<p></p>',
     fileAttack: null,
     notifiedList: '',
@@ -555,6 +577,10 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
     defectType: ['', [Validators.required]],
     samplingQty: '',
     ngphoneOrdinal: '',
+    detectBy: '',
+    howToDetect: '',
+    failureValidate: '',
+    auditor: '',
   });
 
   // Product table

@@ -7,6 +7,13 @@ export interface OBAModel {
 	defectType: string;
 	samplingQty?: number;
 	ngphoneOrdinal: string;
+	supervisor?: string;
+	auditor?: string;
+	detectBy?: string;
+	howToDetect?: string;
+	failureValidate?: string;
+	createDate?: Date;
+	updatedDate?: Date;
 }
 
 export interface IMEIModel {
