@@ -10,8 +10,8 @@
 
 export const environment = {
   production: false,
-  // apiUrl: 'http://localhost:5000',
-  apiUrl: 'http://505a17f8e365.ngrok.io',
+  apiUrl: 'http://localhost:5000',
+  // apiUrl: 'http://505a17f8e365.ngrok.io',
   clientUrl: 'http://localhost:55500',
   // apiUrl: 'http://coo-dev.fushan.fihnbb.com/api',
   // apiUrl: 'http://coo-dev.fushan.fihnbb.com',

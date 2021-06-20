@@ -44,7 +44,7 @@
                     <nb-accordion-item-body>
                         <div [formGroupName]="i">
                             <!-- Request Information -->
-                            <div class="row">
+                            <div class="row" *ngIf="assignList.value.ownerId !== IssueCreator">
                                 <div class="col-sm-6">
                                     <div class="form-group">
                                         <label for="inputRequestContent" class="label">Request Content -
@@ -85,8 +85,9 @@
                                 </div>
                             </div>
                             <!-- Return information -->
-                            <div class="row"
-                                *ngIf="assignList.value.status != 'Draft' || (assignList.value.actionContent.length > 0)">
+                            <div class="row" *ngIf="assignList.value.ownerId == IssueCreator 
+                                        ||assignList.value.status != 'Draft' 
+                                        || (assignList.value.actionContent.length > 0)">
                                 <div class="col-md-9">
                                     <label for="actionDetail" class="label">Corrective & Preventive Detail -
                                         <i>{{assignList.value.actionDate | date: 'yyyy/MM/dd HH:mm' }}</i></label>
@@ -101,37 +102,50 @@
                                 </div>
                             </div>
                             <br>
-                            <div *ngIf="assignList.value.status != 'Reassigned'" class="d-flex float-right">
-                                <!-- Save for assign -->
-                                <button *ngIf="assignList.value.status == 'Draft'"
-                                    (click)="assignSubmit(assignList.value,'draft')" class="mr-2" nbButton outline
-                                    status="danger">
-                                    Save
-                                </button>
-
-                                <!-- Assign rồi thì -> reassign -->
-                                <button *ngIf="assignList.value.status == 'Draft'"
-                                    (click)="assignSubmit(assignList.value,'assign')" nbButton status="danger">
-                                    Assign
-                                    <nb-icon icon="navigation-2-outline"></nb-icon>
-                                </button>
-                                <button *ngIf="assignList.value.status == 'Done'"
-                                    (click)="reassignSubmit(assignList.value,'assign')" nbButton status="danger">
-                                    Reassing
-                                    <nb-icon icon="navigation-2-outline"></nb-icon>
-                                </button>
-
-                                <!-- Save for submit -->
-                                <button *ngIf="assignList.value.status != 'Done' && assignList.value.status != 'Draft'"
-                                    (click)="assignSubmit(assignList.value,'submit-draft')" class="ml-2" nbButton
-                                    outline status="info">
-                                    Save
-                                </button>
-                                <button *ngIf="assignList.value.status != 'Done' && assignList.value.status != 'Draft'"
-                                    (click)="assignSubmit(assignList.value,'submit')" class="ml-2" nbButton
-                                    status="primary">
-                                    Submit
-                                </button>
+                            <div class="d-flex float-right">
+                                <div *ngIf="userService.userId() != IssueCreator && assignList.value.status != 'Reassigned'">
+                                    <!-- Save for assign -->
+                                    <button *ngIf="assignList.value.status == 'Draft'"
+                                        (click)="assignSubmit(assignList.value,'draft')" class="mr-2" nbButton outline
+                                        status="danger">
+                                        Save
+                                    </button>
+                                    <!-- Assign rồi thì -> reassign -->
+                                    <button *ngIf="assignList.value.status == 'Draft'"
+                                        (click)="assignSubmit(assignList.value,'assign')" nbButton status="danger">
+                                        Assign
+                                        <nb-icon icon="navigation-2-outline"></nb-icon>
+                                    </button>
+                                    <button *ngIf="assignList.value.status == 'Done'"
+                                        (click)="reassignSubmit(assignList.value,'assign')" nbButton status="danger">
+                                        Reassing
+                                        <nb-icon icon="navigation-2-outline"></nb-icon>
+                                    </button>
+                                    <!-- Save for submit -->
+                                    <button
+                                        *ngIf="assignList.value.status != 'Done' && assignList.value.status != 'Draft'"
+                                        (click)="assignSubmit(assignList.value,'submit-draft')" class="ml-2" nbButton
+                                        outline status="info">
+                                        Save
+                                    </button>
+                                    <button
+                                        *ngIf="assignList.value.status != 'Done' && assignList.value.status != 'Draft'"
+                                        (click)="assignSubmit(assignList.value,'submit')" class="ml-2" nbButton
+                                        status="primary">
+                                        Submit
+                                    </button>
+                                </div>
+                                <!-- For seft submit -->
+                                <div *ngIf="userService.userId() == IssueCreator">
+                                    <button (click)="seftSubmit(assignList.value,'submit-draft')" class="ml-2"
+                                        nbButton outline status="info">
+                                        Save
+                                    </button>
+                                    <button (click)="seftSubmit(assignList.value,'submit')" class="ml-2" nbButton
+                                        status="primary">
+                                        Submit
+                                    </button>
+                                </div>
                             </div>
                         </div>
                     </nb-accordion-item-body>

@@ -329,6 +329,36 @@ export class CapaComponent implements OnInit {
 
   }
 
+  seftSubmit(assignForm: any, type: string) {
+    const assignNew: AssignModel = {
+      'id': assignForm.id ? assignForm.id : this.guidService.getGuid(),
+      'issueNo': this.IssueID,
+      'currentStep': 'capa',
+      'team': assignForm.team,
+      'ownerId': assignForm.ownerId,
+      'name': assignForm.name,
+      'email': assignForm.email,
+      'requestContent': 'seft submit',
+      'actionResult': assignForm.actionResult,
+      'actionContent': (type == 'submit' || type == 'submit-draft') ? assignForm.actionContent : '',
+      'actionDate': ((type == 'submit' || type == 'submit-draft') && assignForm.actionContent?.length > 0 && assignForm.actionDate == null) ? new Date() : assignForm.actionDate,
+      'assignedDate': assignForm.assignedDate,
+      'deadLine': new Date(),
+      'deadLevel': 0,
+      'status': this.checkAssignStatus(type, new Date(), assignForm.actionContent),
+      'remark': '',
+      'scheduleDeadLine': null,
+      'updatedBy': this.userService.userId(),
+      'updatedDate': new Date(),
+    }
+    this.assignService.createAssign(assignNew).subscribe(result => {
+      if (result == true) {
+        this.alert.showToast('success', 'Success', 'Create/Update assign successfully!');
+        // Reset list assign
+        this.showListAssign();
+      }
+    });
+  }
 
   assignSubmit(assignForm: any, type: string) {
     // check permission

@@ -48,6 +48,7 @@ export class TinyMCEComponent implements OnDestroy, AfterViewInit {
       plugins: ['link', 'paste', 'table'],
       skin_url: `${this.locationStrategy.getBaseHref()}assets/skins/lightgray`,
       toolbar: "insertfile undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | bullist numlist outdent indent | link image imageupload",
+      paste_data_images: true,
       // inline: true,
       // menubar: false,
       // toolbar: false,

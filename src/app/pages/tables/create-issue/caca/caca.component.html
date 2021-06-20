@@ -94,12 +94,17 @@
                             <div class="row" *ngIf="assignList.value.ownerId == IssueCreator 
                                         ||assignList.value.status != 'Draft' 
                                         || (assignList.value.actionContent.length > 0)">
-                                <div class="col-md-12">
+                                <div class="col-md-9">
                                     <label for="actionDetail" class="label">Action Detail -
                                         <i>{{assignList.value.actionDate | date: 'yyyy/MM/dd HH:mm' }}</i></label>
                                     <ngx-tiny-mce [rickText]="assignList.value.actionContent"
                                         (editorKeyup)="updateRickText(i,$event)">
                                     </ngx-tiny-mce>
+                                </div>
+                                <div class="col-sm-3">
+                                    <label class="label">List File Uploaded</label>
+                                    <ngx-upload-file [issueId]="IssueID" currentStep="CA{{i}}">
+                                    </ngx-upload-file>
                                 </div>
                             </div>
                             <br>
