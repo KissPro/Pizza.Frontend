@@ -5,8 +5,8 @@ export interface OBAModel {
 	defectPart: string;
 	defectName: string;
 	defectType: string;
-	samplingQty?: number;
-	ngphoneOrdinal: string;
+	samplingQty?: number; 
+	ngphoneOrdinal: string; // failure quantity
 	supervisor?: string;
 	auditor?: string;
 	detectBy?: string;
@@ -58,6 +58,14 @@ export interface ProductModel {
 	line: string;
 	pattern: string;
 	shift: string;
+}
+
+export interface TeamFormationModel {
+	empId: string;
+	name: string;
+	email: string;
+	team: string;
+	position: string;
 }
 
 export interface ProcessModel {

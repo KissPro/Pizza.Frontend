@@ -177,7 +177,7 @@
                             <input nbInput fullWidth
                                 [status]="(obaFormGroup.controls.defectName.invalid && (obaFormGroup.controls.defectName.dirty || obaFormGroup.controls.defectName.touched)) ? 'danger' : 'info'"
                                 (ngModelChange)="updateIssueTitle()" placeholder="Fail Classification"
-                                id="inputSamplingQty" class="form-control" formControlName="defectName">
+                                id="inputDefectName" class="form-control" formControlName="defectName">
                         </div>
                     </div>
                     <div class="col-sm-4">
@@ -187,21 +187,20 @@
                                 class="form-control" formControlName="failureValidate">
                         </div>
                     </div>
-                    <div class="col-sm-1">
+                    <!-- <div class="col-sm-1">
                         <div class="form-group">
-                            <label for="inputSamplingQty" class="label">Sampling Qty</label>
+                            <label for="inputSamplingQty" class="label">Failure Qty</label>
                             <input type="number" min="0" nbInput fullWidth id="inputSamplingQty" class="form-control" placeholder="Qty"
                                 formControlName="samplingQty">
                         </div>
-                    </div>
+                    </div> -->
                     <div class="col-sm-1">
                         <div class="form-group">
-                            <label for="inputNGOrdinal" class="label">NG Ordinal</label>
+                            <label for="inputNGOrdinal" class="label">Failure Qty</label>
                             <input type="text" nbInput fullWidth id="inputNGOrdinal" placeholder="NG"
                                 class="form-control" formControlName="ngphoneOrdinal">
                         </div>
                     </div>
-
                 </div>
             </form>
             <hr>
@@ -369,20 +368,79 @@
     </nb-card-footer>
 </nb-card>
 
-<!-- CHANGE STATUS -->
-<ng-container *ngIf="currentStatus == 'caca'">
-    <ngx-caca [IssueID]="IssueID" [IssueCreator]="issueFormGroup.value?.createdBy"
-        [IssueTitle]="issueFormGroup.value?.title" [ApprovalLv1]="this.currentProcess?.approverId_Lv1"
-        [ApprovalLv2]="this.currentProcess?.approverId_Lv2" (nextStatus)="next($event)" (backStatus)="previous($event)">
-    </ngx-caca>
-</ng-container>
 
-<ng-container *ngIf="currentStatus == 'capa'">
-    <ngx-capa [IssueID]="IssueID" [IssueCreator]="issueFormGroup.value?.createdBy"
-        [IssueTitle]="issueFormGroup.value?.title" [ApprovalLv1]="this.currentProcess?.approverId_Lv1"
-        [ApprovalLv2]="this.currentProcess?.approverId_Lv2" (nextStatus)="next($event)" (backStatus)="previous($event)">
+
+<!-- CHANGE STATUS -->
+<!-- CONTAINMENT ACTION -->
+<ng-container *ngIf="currentStatus == 'caca'">
+    <ngx-capa 
+        Hearder="Containment Action"
+        CurrentStep="caca"
+        Next="capa"
+        Back="openIssue"
+
+        [IssueID]="IssueID" 
+        [IssueCreator]="issueFormGroup.value?.createdBy"
+        [IssueTitle]="issueFormGroup.value?.title" 
+        [ApprovalLv1]="this.currentProcess?.approverId_Lv1"
+        [ApprovalLv2]="this.currentProcess?.approverId_Lv2" 
+        (nextStatus)="next($event)"
+        (backStatus)="previous($event)">
     </ngx-capa>
 </ng-container>
+<!-- CAUSE ANALYSIS -->
+<ng-container *ngIf="currentStatus == 'caca'">
+    <ngx-capa 
+        Hearder="Cause Analysis"
+        CurrentStep="caca1"
+        Next="capa"
+        Back="openIssue"
+
+        [IssueID]="IssueID" 
+        [IssueCreator]="issueFormGroup.value?.createdBy"
+        [IssueTitle]="issueFormGroup.value?.title" 
+        [ApprovalLv1]="this.currentProcess?.approverId_Lv1"
+        [ApprovalLv2]="this.currentProcess?.approverId_Lv2" 
+        (nextStatus)="next($event)"
+        (backStatus)="previous($event)">
+    </ngx-capa>
+</ng-container>
+<!-- CAPA -->
+<ng-container *ngIf="currentStatus == 'capa'">
+    <ngx-capa 
+        Hearder="Corrective & Preventive Actions"
+        CurrentStep="capa"
+        Next="close"
+        Back="caca"
+
+        [IssueID]="IssueID" 
+        [IssueCreator]="issueFormGroup.value?.createdBy"
+        [IssueTitle]="issueFormGroup.value?.title" 
+        [ApprovalLv1]="this.currentProcess?.approverId_Lv1"
+        [ApprovalLv2]="this.currentProcess?.approverId_Lv2" 
+        (nextStatus)="next($event)"
+        (backStatus)="previous($event)">
+    </ngx-capa>
+</ng-container>
+
+<!-- VERIFI COMMENT -->
+<ng-container *ngIf="currentStatus == 'close'">
+    <ngx-capa 
+        Hearder="Verification"
+        CurrentStep="close"
+        Next="end"
+        Back="capa"
+
+        [IssueID]="IssueID" 
+        [IssueCreator]="issueFormGroup.value?.createdBy"
+        [IssueTitle]="issueFormGroup.value?.title" 
+        [ApprovalLv1]="this.currentProcess?.approverId_Lv1"
+        [ApprovalLv2]="this.currentProcess?.approverId_Lv2" 
+        (nextStatus)="next($event)"
+        (backStatus)="previous($event)">
+    </ngx-capa>
+</ng-container>
+
 
 <ng-container *ngIf="currentStatus == 'close'">
     <ngx-close [IssueID]="IssueID" [IssueCreator]="issueFormGroup.value?.createdBy"

@@ -2,12 +2,10 @@ table {
   table-layout: fixed;
   width: 100%;
 }
-table,
-td,
-th {
-  padding: 0;
-}
 li{
   list-style: none;
   margin-top: 0.7rem;
+}
+.col-sm-8 > nb-card{
+  background: rgb(240, 246, 250);
 }

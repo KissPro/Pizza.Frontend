@@ -12,6 +12,7 @@ import { environment } from 'environments/environment';
 export class TinyMCEComponentFlat implements OnDestroy, AfterViewInit {
 
   @Input() rickText: any;
+  @Input() imageSize: any;
   editor: any;
 
   constructor(
@@ -26,8 +27,8 @@ export class TinyMCEComponentFlat implements OnDestroy, AfterViewInit {
       inline: true,
       menubar: false,
       toolbar: false,
-      readonly : 1,
-      
+      readonly: 1,
+
       setup: editor => {
         this.editor = editor;
         // set content
@@ -36,8 +37,9 @@ export class TinyMCEComponentFlat implements OnDestroy, AfterViewInit {
         });
       },
     });
-    tinymce.activeEditor.dom.setAttribs(tinymce.activeEditor.dom.select('img'), {'width': 80, 'height': 'auto'});
-    tinymce.activeEditor.dom.addClass(tinymce.activeEditor.dom.select('table'),'table-striped table-sm table-bordered');
+    if (!this.imageSize)
+      tinymce.activeEditor.dom.setAttribs(tinymce.activeEditor.dom.select('img'), { 'width': 50, 'height': 'auto' });
+    tinymce.activeEditor.dom.addClass(tinymce.activeEditor.dom.select('table'), 'table-striped table-sm table-bordered');
     // tinymce.activeEditor.dom.setStyle(tinymce.activeEditor.dom.select('table'), {'display':'none'});
   }
   ngOnDestroy() {

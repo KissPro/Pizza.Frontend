@@ -10,11 +10,11 @@ import { DialogUploadFileComponent } from 'app/pages/modal-overlays/dialog/dialo
 import { ToastrComponent } from 'app/pages/modal-overlays/toastr/toastr.component';
 
 @Component({
-  selector: 'ngx-upload-file',
-  templateUrl: './upload-file.component.html',
-  styleUrls: ['./upload-file.component.scss']
+  selector: 'ngx-upload-file-show',
+  templateUrl: './upload-file-show.component.html',
+  styleUrls: ['./upload-file-show.component.scss']
 })
-export class UploadFileComponent implements OnInit {
+export class UploadFileShowComponent implements OnInit {
 
   constructor(
     private dialogService: NbDialogService,
@@ -33,7 +33,6 @@ export class UploadFileComponent implements OnInit {
   listAttack: FileModel[] = [];
   @Input() issueId;
   @Input() currentStep;
-  @Input() show;
 
   @Output() insertResult = new EventEmitter<any>();
   alert = new ToastrComponent(this.toastrService);

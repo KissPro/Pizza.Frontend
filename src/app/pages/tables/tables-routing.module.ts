@@ -11,6 +11,7 @@ import { UploadFileComponent } from './common/upload-file/upload-file.component'
 import { CapaComponent } from './create-issue/capa/capa.component';
 import { CloseComponent } from './create-issue/close/close.component';
 import { ReportComponent } from './report/report.component';
+import { UploadFileShowComponent } from './common/upload-file-show/upload-file-show.component';
 // import { OBAComponent } from './report copy/oba.component';
 
 const routes: Routes = [{
@@ -67,4 +68,5 @@ export const routedComponents = [
   CapaComponent,
   CloseComponent,
   UploadFileComponent,
+  UploadFileShowComponent
 ];

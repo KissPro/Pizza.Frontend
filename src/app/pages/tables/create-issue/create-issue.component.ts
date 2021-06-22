@@ -112,8 +112,8 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
   clickStep(step: string) {
     // check this step with current status
     // when review to submit -> view all
-    if (this.issueFormGroup.value?.currentStep == 'Close')
-      this.currentStatus = step;
+    // if (this.issueFormGroup.value?.currentStep == 'Close')
+    this.currentStatus = step;
   }
 
   ngAfterViewInit(): void {
@@ -431,7 +431,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
       this.IssueTitleIndex = this.issueFormGroup.value?.repeatedSymptom;
   }
   //#endregion
- 
+
   async submitForm() {
     let result = await this.saveIssueInformation('Open');
     console.log(result);

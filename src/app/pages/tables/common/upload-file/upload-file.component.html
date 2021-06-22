@@ -1,4 +1,4 @@
-<nb-card class="list-card">
+<nb-card class="list-card" *ngIf="show != 'true'">
     <nb-card-header>File Uploaded
         <button size="small" class="mr-2 float-right" outline nbButton status="primary" (click)="uploadFile()">
             <nb-icon icon="plus-outline"></nb-icon>
@@ -8,7 +8,8 @@
         <nb-list-item *ngFor="let file of listAttack;index as i">
             <div class="row d-flex">
                 <div class="col-sm-3">
-                    <img #img src="{{file.icon}}" (click)="openImageLink(img.src)" alt="" style="width: 4rem;height: auto;">
+                    <img #img src="{{file.icon}}" (click)="openImageLink(img.src)" alt=""
+                        style="width: 4rem;height: auto;">
                 </div>
                 <div class="col-sm-5" style="width: 10rem;word-wrap: break-word;">
                     <b>({{(i + 1)}})</b>. {{file.name}}
@@ -18,6 +19,32 @@
                 </div>
                 <div class="col-sm-2 float-right">
                     <nb-icon icon="trash-outline" (click)="deleteFile(file.id,file.link)"></nb-icon>
+                </div>
+            </div>
+        </nb-list-item>
+    </nb-list>
+</nb-card>
+
+<nb-card *ngIf="listAttack.length > 0 && show == 'true'">
+    <nb-list>
+        <nb-list-item *ngFor="let file of listAttack;index as i">
+            <div *ngIf="file.type.includes('image')">
+                <div class="row"><img #img src="{{file.icon}}" (click)="openImageLink(img.src)" alt=""
+                        style="width: 100%;height: auto;"></div>
+                <div class="row d-flex justify-content-center">{{file.name}}</div>
+            </div>
+            <div *ngIf="!file.type.includes('image')" style="width:100%">
+                <div class="row">
+                    <div class="col-sm-3">
+                        <img #img src="{{file.icon}}" (click)="openImageLink(img.src)" alt=""
+                            style="width: 3rem;height: auto;">
+                    </div>
+                    <div class="col-sm-7" style="word-wrap: break-word;">
+                        <b>({{(i + 1)}})</b>. {{file.name}}
+                    </div>
+                    <div class="col-sm-2 float-right">
+                        <nb-icon icon="download-outline" (click)="downloadFile(file)"></nb-icon>
+                    </div>
                 </div>
             </div>
         </nb-list-item>

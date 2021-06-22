@@ -1,6 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { NbToastrService } from '@nebular/theme';
+import { IssueService } from 'app/@core/service/issue.service';
+import { AssginService } from 'app/@core/service/assign.service';
+import { IssueModel } from 'app/@core/models/issue';
+import { OBAModel, ProductModel, TeamFormationModel } from 'app/@core/models/issue-type';
+import { AssignModel } from 'app/@core/models/assign';
+import { V } from '@angular/cdk/keycodes';
 
 @Component({
   selector: 'ngx-report',
@@ -11,57 +17,75 @@ export class ReportComponent implements OnInit {
 
   constructor(private http: HttpClient,
     private toastrService: NbToastrService,
+    private issueService: IssueService,
+    private assignService: AssginService,
+
+
   ) { }
 
   IssueID: string = '';
-  template: string = `
-  <p>Hello! this is demo table, let's try it</p> 
-  <table style="height: 98px; width: 791px;"> <tbody> <tr> <td style="width: 71.2px;">#</td> <td style="width: 116.8px;">ID</td> <td style="width: 190.4px;">Name</td> <td style="width: 190.4px;">Email</td> <td style="width: 190.4px;">Department</td> </tr> <tr> <td style="width: 71.2px;">1</td> <td style="width: 116.8px;">V1536123</td> <td style="width: 190.4px;">Hoang Ngo Van</td> <td style="width: 190.4px;">hoangnv@fih</td> <td style="width: 190.4px;">IT</td> </tr> <tr> <td style="width: 71.2px;">2</td> <td style="width: 116.8px;">V422564</td> <td style="width: 190.4px;">Ngo Van Hoang</td> <td style="width: 190.4px;">hoangng@gmail</td> <td style="width: 190.4px;">IT</td> </tr> </tbody> </table> 
-  `;
 
+  IssueData: IssueModel;
+  IssueDesc: string = '';
+  OBAData: OBAModel;
+  ProductData: ProductModel;
 
+  // Assign
+  TeamList: TeamFormationModel[] = []; // Team Formation
+  CacaList: AssignModel[] = []; // Containment Action
+  Caca1List: AssignModel[] = []; // Cause Analysis
+  CapaList: AssignModel[] = [];
+  CloseList: AssignModel[] = []; // Verify
 
-//   template: string = `<p>
-//   Hello world! <br>
-//   Lorem ipsum dolor sit amet consectetur adipisicing elit. Aut officia error laudantium deserunt commodi perspiciatis,
-//   ea quaerat quo reprehenderit voluptatibus, facere pariatur velit amet debitis. Ipsa modi cupiditate molestias
-//   soluta. <br>
-//   </p>
-//   <table style="width:100%" class="table table-striped table-sm table-bordered">
-//   <thead>
-//     <tr>
-//       <th>Area</th>
-//       <th>PON</th>
-//       <th>Line</th>
-//     </tr>
-//   </thead>
-//  <tbody>
-//     <tr>
-//       <td>1</td>
-//       <td>2</td>
-//       <td>3</td>
-//     </tr>
-//     <tr>
-//       <td>1</td>
-//       <td>2</td>
-//       <td>3</td>
-//     </tr>
-//     <tr>
-//       <td>1</td>
-//       <td>2</td>
-//       <td>3</td>
-//     </tr>
-//  </tbody>
-// </table>
-
-
-
-//   `;
 
   ngOnInit(): void {
-    this.IssueID = "4843726B-B336-4635-82F6-E68D3AC044B0";
+    this.IssueID = "7b92522f-ca9b-4f06-b8c0-9d11469fd264";
+    this.GetAll();
   }
 
+  async GetAll() {
+    // Issue Information
+    this.IssueData = await this.issueService.getIssueById(this.IssueID).toPromise();
+    this.IssueDesc = $(this.IssueData.failureDesc).text();
+    this.OBAData = await this.issueService.getOBAById(this.IssueID).toPromise();
+    this.ProductData = await this.issueService.getProductById(this.IssueID).toPromise();
+
+
+    // Assgin Information
+    this.assignService.getListAssign(this.IssueID).subscribe(result => {
+      result.forEach((item) => {
+        let teamFormation: TeamFormationModel = {
+          name: item.name,
+          empId: item.ownerId,
+          email: item.email,
+          team: item.team,
+          position: '',
+        }
+        if (item.currentStep === 'caca') {
+          teamFormation.position = "Containment Action";
+          this.CacaList.push(item)
+        }
+        else if (item.currentStep === 'caca1') {
+          teamFormation.position = "Cause Analysis";
+          this.Caca1List.push(item);
+        }
+        else if (item.currentStep === 'capa') {
+          teamFormation.position = "Corrective & Preventive Action";
+          this.CapaList.push(item)
+        }
+        else if (item.currentStep === 'close') {
+          teamFormation.position = "Verify";
+          this.CloseList.push(item)
+        }
+        // add team formation
+        if (!this.TeamList.find(x => x.empId == teamFormation.empId && x.position == teamFormation.position))
+        {
+          this.TeamList.push(teamFormation);
+        }
+      });
+      console.log(this.TeamList);
+    });
+  }
 
 }
 

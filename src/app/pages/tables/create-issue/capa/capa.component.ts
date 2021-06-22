@@ -26,6 +26,12 @@ export class CapaComponent implements OnInit {
   alert = new ToastrComponent(this.toastrService);
 
 
+
+  @Input() Hearder: any;
+  @Input() CurrentStep: any;
+  @Input() Next: any;
+  @Input() Back: any;
+
   @Input() IssueID: any;
   @Input() IssueTitle: any;
   @Input() IssueCreator: any;
@@ -39,10 +45,10 @@ export class CapaComponent implements OnInit {
   inputOwner = '';
   // IssueID = '2D864EC3-3DBC-4C06-BC12-31E50D880B16';
 
-  
+
   // list item
-  @ViewChildren('item') item : QueryList<any>;
-  
+  @ViewChildren('item') item: QueryList<any>;
+
   constructor(
     private formBuilder: FormBuilder,
     private adwebService: AdwebService,
@@ -56,7 +62,7 @@ export class CapaComponent implements OnInit {
     private ref: ChangeDetectorRef,
   ) { }
 
-  
+
   ngOnInit(): void {
     this.showListAssign();
   }
@@ -66,9 +72,9 @@ export class CapaComponent implements OnInit {
       this.item.forEach(element => {
         element.toggle();
       });
-    },10);
+    }, 1);
   }
-  
+
 
   //#region CHECK PERMISSON
   checkPermissionShow(ownerId: string) {
@@ -89,7 +95,7 @@ export class CapaComponent implements OnInit {
     let userId = this.userService.userId();
     if (this.userService.listRole().indexOf("Hanoi_NBB_PIZZA_ADMIN") !== -1)
       return true;
-      if (actionRole == 'Initiator' && userId.toUpperCase() == (this.IssueCreator && this.IssueCreator.toUpperCase()))
+    if (actionRole == 'Initiator' && userId.toUpperCase() == (this.IssueCreator && this.IssueCreator.toUpperCase()))
       return true;
     else if (actionRole == 'Owner' && (ownerId && userId.toUpperCase() == ownerId.toUpperCase()))
       return true;
@@ -113,7 +119,7 @@ export class CapaComponent implements OnInit {
     this.listAssign().clear();
     this.assignService.getListAssign(this.IssueID).subscribe(result => {
       result.forEach((item) => {
-        if (item.currentStep === 'capa')
+        if (item.currentStep === this.CurrentStep)
           this.listAssign().push(this.initAssign(item))
       });
     });
@@ -226,7 +232,7 @@ export class CapaComponent implements OnInit {
               "Dear Mr/Ms. " + assign.name + ",</br></br>" +
               "You have received a Cancel Assignment Notification in Pizza system.</br>" +
               "you would not need to fulfill data for this request anymore</br>" +
-              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=capa" + "'>Pizza - Open Issue</a></br></br>" +
+              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step="+this.CurrentStep+"'>Pizza - Open Issue</a></br></br>" +
               "Best regards," +
               "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
           }
@@ -271,7 +277,7 @@ export class CapaComponent implements OnInit {
     const assignNew: AssignModel = {
       'id': this.guidService.getGuid(),
       'issueNo': this.IssueID,
-      'currentStep': 'capa',
+      'currentStep': this.CurrentStep,
       'team': assignForm.team,
       'ownerId': assignForm.ownerId,
       'name': assignForm.name,
@@ -306,9 +312,9 @@ export class CapaComponent implements OnInit {
               "Dear Mr/Ms. " + assignForm.name + ",</br></br>" +
               "You have received a request to fill again in from " + this.userService.userName() + " in Pizza system.</br>" +
               "Deadline: " + format(deadLine, 'yyyy/MM/dd HH:mm') + "</br>" +
-              "Current step: Corrective & Preventive Actions</br>" +
+              "Current step: " + this.Hearder + "</br>" +
               "Request Content: " + assignForm.requestContent + "</br>" +
-              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=capa" + "'>Pizza - Open Issue</a></br></br>" +
+              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=" + this.CurrentStep+ "'>Pizza - Open Issue</a></br></br>" +
               "Best regards," +
               "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
           }
@@ -333,7 +339,7 @@ export class CapaComponent implements OnInit {
     const assignNew: AssignModel = {
       'id': assignForm.id ? assignForm.id : this.guidService.getGuid(),
       'issueNo': this.IssueID,
-      'currentStep': 'capa',
+      'currentStep': this.CurrentStep,
       'team': assignForm.team,
       'ownerId': assignForm.ownerId,
       'name': assignForm.name,
@@ -369,7 +375,7 @@ export class CapaComponent implements OnInit {
     const assignNew: AssignModel = {
       'id': assignForm.id ? assignForm.id : this.guidService.getGuid(),
       'issueNo': this.IssueID,
-      'currentStep': 'capa',
+      'currentStep': this.CurrentStep,
       'team': assignForm.team,
       'ownerId': assignForm.ownerId,
       'name': assignForm.name,
@@ -403,9 +409,9 @@ export class CapaComponent implements OnInit {
               "Dear Mr/Ms. " + assignForm.name + ",</br></br>" +
               "You have received a request to fill in from " + this.userService.userName() + " in Pizza system.</br>" +
               "Deadline: " + format(deadLine, 'yyyy/MM/dd HH:mm') + "</br>" +
-              "Current step: Corrective & Preventive Actions</br>" +
+              "Current step: " + this.Hearder + "</br>" +
               "Request Content: " + assignForm.requestContent + "</br>" +
-              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=capa" + "'>Pizza - Open Issue</a></br></br>" +
+              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=" + this.CurrentStep+ "'>Pizza - Open Issue</a></br></br>" +
               "Best regards," +
               "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
           }
@@ -423,9 +429,9 @@ export class CapaComponent implements OnInit {
             content:
               "Dear Mr/Ms. " + initiatorMail['ad_user_displayName'] + ",</br></br>" +
               "You have received a Submission Notification from " + this.userService.userName() + " in Pizza system.</br>" +
-              "Current step : Corrective & Preventive Actions</br>" +
+              "Current step : " + this.Hearder + "</br>" +
               "Action Content: " + assignForm.actionContent + "</br>" +
-              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=capa" + "'>Pizza - Open Issue</a></br></br>" +
+              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=" + this.CurrentStep+ "'>Pizza - Open Issue</a></br></br>" +
               "Best regards," +
               "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
           }
@@ -443,7 +449,8 @@ export class CapaComponent implements OnInit {
     // Update Issue Step
     if (type == 'submit') {
       this.issueService.getIssueById(this.IssueID).subscribe(result => {
-        result.currentStep = (result.currentStep == 'Caca') ? 'Capa' : result.currentStep;
+        result.issueStatus = 'On-going',
+        result.currentStep = (result.currentStep.toLocaleLowerCase() == this.Back) ? this.CurrentStep : result.currentStep;
         this.issueService.createIssue(result).subscribe(resultCreate => {
           if (resultCreate == true) {
             this.alert.showToast('success', 'Success', 'Create/Update assign successfully!');
@@ -513,7 +520,7 @@ export class CapaComponent implements OnInit {
           "Current deadline : " + format(this.listDeadline.slice(-1)[0].currentDeadLine, "yyyy/MM/dd HH:mm") + "</br>" +
           "Request deadline : " + format(this.listDeadline.slice(-1)[0].requestDeadLine, "yyyy/MM/dd HH:mm") + "</br>" +
           "Reason: " + this.listDeadline.slice(-1)[0].reason + "</br>" +
-          "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=capa" + "'>Pizza - Open Issue</a></br></br>" +
+          "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=" + this.CurrentStep+ "'>Pizza - Open Issue</a></br></br>" +
           "Best regards," +
           "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
       }
@@ -543,7 +550,7 @@ export class CapaComponent implements OnInit {
             "You have received a New Deadline Notification from " + this.userService.userName() + " in Pizza system.</br>" +
             "Result : Approved</br>" +
             "Remark: " + content + "</br>" +
-            "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=capa" + "'>Pizza - Open Issue</a></br></br>" +
+            "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=" + this.CurrentStep+ "'>Pizza - Open Issue</a></br></br>" +
             "Best regards," +
             "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
         }
@@ -581,7 +588,7 @@ export class CapaComponent implements OnInit {
               "You have received a New Deadline Notification from " + this.userService.userName() + " in Pizza system.</br>" +
               "Result : Rejected</br>" +
               "Reason: " + content + "</br>" +
-              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=capa" + "'>Pizza - Open Issue</a></br></br>" +
+              "Please follow below link to view : <a href='" + environment.clientUrl + "/pages/tables/create-issue;issueId=" + this.IssueID + ";type=open;step=" + this.CurrentStep+ "'>Pizza - Open Issue</a></br></br>" +
               "Best regards," +
               "</br><a href='" + environment.clientUrl + "'>Pizza System</a></br>"
           }
@@ -598,10 +605,10 @@ export class CapaComponent implements OnInit {
 
 
   NextStep() {
-    this.nextStatus.emit('close');
+    this.nextStatus.emit(this.Next);
   }
   BackStep() {
-    this.backStatus.emit('caca');
+    this.backStatus.emit(this.Back);
   }
 
 }
