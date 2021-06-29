@@ -5,7 +5,7 @@ import { NbDialogService, NbToastrService } from '@nebular/theme';
 import { FileModel } from 'app/@core/models/file-attach';
 import { IssueModel } from 'app/@core/models/issue';
 import { DropListModel } from 'app/@core/models/issue-config';
-import { MailModel, OBAModel, ProcessModel, ProductModel } from 'app/@core/models/issue-type';
+import { MailModel, OBAIssueModel, OBAModel, ProcessModel, ProductModel } from 'app/@core/models/issue-type';
 import { Mail } from 'app/@core/models/mail';
 import { AdwebService } from 'app/@core/service/adweb.service';
 import { AuthenticationService } from 'app/@core/service/authentication.service';
@@ -78,22 +78,25 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
   nameNoti: string;
   idNoti: string;
 
+  obaIssue: OBAIssueModel;
+
   alert = new ToastrComponent(this.toastrService);
 
   ngOnInit() {
+    // Get value from route    
     this.route.params.subscribe(params => {
       console.log(params['step']);
       this.IssueID = params['issueId'] == undefined ? this.guidService.getGuid() : params['issueId'];
       this.IssueType = params['type'] == undefined ? 'new' : params['type'];
-      this.IssueStep = params['step'] == undefined ? 'openIssue' : params['step'];;
+      this.IssueStep = params['step'] == undefined ? 'openIssue' : params['step'];
+      this.obaIssue = history.state // get oba from oba issue list.
     });
     this.showIssueOpen();
 
-
+    // Get list dropdownlist config
     this.issueService.getListProcess().subscribe(
       result => { this.listProcess = result; }
     );
-    // Get list dropdownlist config
     this.configIssueService.getDropdown('Defect Part').subscribe(
       result => { this.listDefectPart = result; }
     );
@@ -108,6 +111,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
     );
   }
 
+  //#region CHANGE ISSUE SCREEN
 
   clickStep(step: string) {
     // check this step with current status
@@ -160,6 +164,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
     }
   }
 
+  //#endregion
 
   // Get information from server base on issueId
   async showIssueOpen() {
@@ -168,9 +173,8 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
     this.obaFormGroup.reset();
     this.productFormGroup.reset();
 
-
-    // this.IssueID = '2D864EC3-3DBC-4C06-BC12-31E50D880B16';
     let issueModel = await this.issueService.getIssueById(this.IssueID).toPromise();
+
     if (issueModel) {
       // Select process type
       this.currentProcess = await this.issueService.getProcessByName(issueModel.processType.toUpperCase()).toPromise();
@@ -196,7 +200,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
         createdBy: issueModel.createdBy,
         createByName: issueModel.createByName,
       })
-      // Show list notfication
+      // Show list notification
       let emailList = issueModel.notifiedList?.split(';');
       emailList.forEach(email => {
         this.emailNoti = email;
@@ -205,7 +209,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
 
       if (issueModel.processType === 'OBA') {
         // Select process type
-        this.issueService.getProcessByName(issueModel.processType).subscribe(result => {
+        this.issueService.getProcessByName('OBA').subscribe(result => {
           this.currentProcess = result;
           //console.log(this.currentProcess);
         })
@@ -224,6 +228,8 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
             howToDetect: result.howToDetect,
             failureValidate: result.failureValidate,
             auditor: result.auditor,
+            supervisor: result.supervisor,
+            updatedDate: result.updatedDate
           })
         })
         // Show Product
@@ -243,19 +249,106 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
           })
         }).then(() => {
           // this.IssueTitleIndex = issueModel.repeatedSymptom ? Number(issueModel.repeatedSymptom) : 0;
-
           // Load issue no and title after load full data
           this.updateIssueNo();
           this.updateIssueTitle();
         })
       }
-    } else {
+    } else if (this.obaIssue.pid?.length > 0) {
+      console.log(this.obaIssue);
+
+      this.currentProcess = await this.issueService.getProcessByName('OBA').toPromise();
+      // Update issue information
+      this.issueFormGroup.patchValue({
+        failureDesc: `<p>${this.obaIssue.faiL_DESC2}</p>`,
+        processType: 'OBA',
+        carNo: 'N/A',
+        severity: 'Major',
+        repeatedSymptom: 'TBD',
+        repeatedCause: 'TBD',
+        createdBy: this.userService.userId(),
+        createByName: this.userService.userName(),
+      })
+      // Shows OBA
+      // Check dropdownlist first
+      await this.checkDropListContain('Defect Part', this.obaIssue.failurE_COMPONENT_DESC).then(async () => {
+        await this.checkDropListContain('Defect Type', this.obaIssue.failurE_MODE_DESC);
+      }).then(() => {
+        this.obaFormGroup.patchValue({
+          issueId: this.IssueID,
+          detectingDate: null,
+          detectingTime: null,
+          defectPart: this.obaIssue.failurE_COMPONENT_DESC,
+          defectName: this.obaIssue.failurE_CLASSIFICATION_DESC,
+          defectType: this.obaIssue.failurE_MODE_DESC,
+          samplingQty: null,
+          ngphoneOrdinal: '',
+          detectBy: '',
+          howToDetect: '',
+          failureValidate: '',
+          auditor: this.obaIssue.auditor,
+          supervisor: this.obaIssue.supervisor,
+          updatedDate: this.obaIssue.updateD_DATE,
+        })
+      })
+
+      // Show Product
+      this.productFormGroup.patchValue({
+        issueId: this.IssueID,
+        imei: this.obaIssue.pid,
+        customer: '',
+        product: this.obaIssue.family,
+        psn: this.obaIssue.pid,
+        ponno: '',
+        ponsize: '',
+        spcode: '',
+        line: this.obaIssue.line,
+        pattern: '',
+        shift: '',
+      })
+
+      // this.IssueTitleIndex = issueModel.repeatedSymptom ? Number(issueModel.repeatedSymptom) : 0;
+      // Load issue no and title after load full data
+      this.updateIssueNo();
+      this.updateIssueTitle();
+
+    }
+    else {
       this.issueFormGroup.patchValue({
         failureDesc: '<p></p>',
         createdBy: this.userService.userId(),
         createByName: this.userService.userName(),
       })
     }
+  }
+
+  async checkDropListContain(name: string, value: string) {
+    let listConfig = await this.configIssueService.getDropdown(name).toPromise();
+    if (!listConfig.find(x => x.value == value)) {
+      const newId = this.guidService.getGuid();
+      const config = {
+        'id': newId,
+        'name': name,
+        'value': value,
+        'updatedBy': this.userService.userName(),
+        'updatedDate': new Date(),
+        'dropListRemark': 'Auto inserted',
+      };
+      this.configIssueService.createOrUpdateConfig(config).toPromise();
+    }
+  }
+
+  checkPermissionShow() {
+    let userId = this.userService.userId();
+    if (
+      // initiator role
+      userId.toUpperCase() == (this.issueFormGroup.value?.createdBy && this.issueFormGroup.value?.createdBy.toUpperCase())
+      // admin role
+      || this.userService.listRole().indexOf("Hanoi_NBB_PIZZA_ADMIN") !== -1
+      || this.userService.listRole().indexOf("Hanoi_NBB_PIZZA_CONTROLLER") !== -1
+    )
+      return true;
+    return false;
   }
 
   updateRickText(value: string) {
@@ -287,7 +380,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
     })
   }
 
-  //#region Mail notification
+  //#region MAIL NOTIFICATION
   async checkMailInformation() {
     let newMail: MailModel;
     newMail = {
@@ -396,7 +489,6 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
     issueTitle += this.productFormGroup.value?.product ? (this.productFormGroup.value?.product + '-') : '';
     issueTitle += this.currentProcess.processName ? this.currentProcess.processName : '';
     issueTitle += this.obaFormGroup.value?.defectPart ? '-' + this.obaFormGroup.value.defectPart : '';
-    issueTitle += this.obaFormGroup.value?.defectName ? '-' + this.obaFormGroup.value.defectName : '';
     issueTitle += this.obaFormGroup.value?.defectType ? '-' + this.obaFormGroup.value.defectType : '';
     issueTitle += '-' + (this.createdDate ? format(new Date(this.createdDate), "yyyyMMdd").toString() : format(new Date(), "yyyyMMdd").toString());
     issueTitle += '-' + this.IssueTitleIndex;
@@ -519,6 +611,8 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
                 'howToDetect': this.obaFormGroup.value?.howToDetect,
                 'failureValidate': this.obaFormGroup.value?.failureValidate,
                 'auditor': this.obaFormGroup.value?.auditor,
+                'supervisor': this.obaFormGroup.value?.supervisor,
+                'updatedDate': this.obaFormGroup.value?.updatedDate,
               };
               finalResult = await this.issueService.createOBA(obaNew).toPromise();
               const productNew: ProductModel = {
@@ -581,6 +675,8 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
     howToDetect: '',
     failureValidate: '',
     auditor: '',
+    supervisor: '',
+    updatedDate: null,
   });
 
   // Product table

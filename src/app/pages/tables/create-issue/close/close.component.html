@@ -51,9 +51,9 @@
                 status="primary">
                 Approval
             </button>
-            <button class="ml-2" nbButton status="success">
+            <a [routerLink]="['/pages/tables/report', IssueID]" class="ml-2" nbButton status="success">
                 Report<nb-icon icon="file-text-outline"></nb-icon>
-            </button>
+            </a>
         </div>
     </nb-card-footer>
 </nb-card>

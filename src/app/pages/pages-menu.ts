@@ -12,10 +12,15 @@ export const MENU_ITEMS: NbMenuItem[] = [
     link: '/pages/tables/create-issue',
   },
   {
-    title: 'Report Issue',
-    icon: 'activity-outline',
-    link: '/pages/tables/report',
+    title: 'OBA Issue',
+    icon: 'radio-button-off-outline',
+    link: '/pages/tables/oba',
   },
+  // {
+  //   title: 'Report Issue',
+  //   icon: 'activity-outline',
+  //   link: '/pages/tables/report',
+  // },
   {
     title: 'SETTINGS',
     group: true,

@@ -22,4 +22,7 @@ export class ConfigService extends ConfigData {
   deleteConfig(id: string): Observable<any> {
     return this.http.delete<any>(this.configURL + '/' + id);
   }
+  getListConfigByName(name: string): Observable<ConfigModel[]> {
+    return this.http.get<ConfigModel[]>(this.configURL + '/list-dropdown/' + name);
+  }
 }

@@ -50,6 +50,7 @@ export class AuthenticationService {
     logout() {
         localStorage.removeItem('user');
         localStorage.removeItem('role');
+        localStorage.removeItem('obaIssueFilter');
         this.userSubject.next(null);
         // redirect logout session adweb
         window.location.href = this.logout_uri;
@@ -58,6 +59,7 @@ export class AuthenticationService {
     reLogin() {
         localStorage.removeItem('user');
         localStorage.removeItem('role');
+        localStorage.removeItem('obaIssueFilter');
         this.userSubject.next(null);
         // redirect re login session adweb
         window.location.href = this.login_uri;

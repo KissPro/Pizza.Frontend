@@ -9,6 +9,7 @@ import { NbDialogService, NbToastrService } from '@nebular/theme';
 import { ToastrComponent } from 'app/pages/modal-overlays/toastr/toastr.component';
 import { DialogConfirmComponent } from 'app/pages/modal-overlays/dialog/dialog-confirm/dialog-confirm.component';
 import { ConfigService } from 'app/@core/service/config.service';
+import { ConfigIssueService } from 'app/@core/service/issue-config.service';
 
 @Component({
   selector: 'ngx-config',
@@ -73,7 +74,7 @@ export class ConfigComponent {
   };
 
   constructor(
-    private serviceConfig: ConfigService,
+    private serviceConfig: ConfigIssueService,
     private authen: AuthenticationService,
     private guidService: GuidService,
     private dialogService: NbDialogService,

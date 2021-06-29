@@ -67,10 +67,6 @@ export class IssueComponent implements OnInit {
       'start' : this.dateFrom,
       'end' : this.dateTo,
     }
-
-    this.obaService.getListOBA().subscribe(res => {
-      console.log(res);
-    })
   }
 
   searchByDateRange(date: any) {
@@ -94,7 +90,7 @@ export class IssueComponent implements OnInit {
       processing: true,
       scrollX: true, // header scroll
       scrollY: '56vh', // hight data
-      order: [7, 'desc'],
+      order: [6, 'desc'],
 
       ajax: (dataTablesParameters: any, callback) => {
         dataTablesParameters.from = this.dateFrom;
@@ -118,7 +114,7 @@ export class IssueComponent implements OnInit {
       columns: [
         // tslint:disable-next-line: max-line-length
         { data: 'index' }, { data: 'issueNo' }, { data: 'title' },
-        { data: 'failureDesc' }, { data: 'processType' }, { data: 'currentStep' }, 
+        { data: 'failureDesc' }, { data: 'processType' },
         { data: 'createdByName' }, { data: 'createdDate' },{ data: 'issueStatus' },
         { data: 'open' },
       ],
@@ -143,6 +139,10 @@ export class IssueComponent implements OnInit {
   toggleSidebar() {
     this.sidebarService.compact('menu-sidebar');
     this.layoutService.changeLayoutSize();
+  }
+
+  getPlainText(rickText: string) {
+    return $(rickText).text();
   }
 
   // Thao tác với table
@@ -192,7 +192,6 @@ export class IssueComponent implements OnInit {
       return 'success';
     }
   }
-
 
   // Action
   openIssue(issueId: string) {

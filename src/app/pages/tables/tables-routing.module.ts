@@ -11,8 +11,7 @@ import { UploadFileComponent } from './common/upload-file/upload-file.component'
 import { CapaComponent } from './create-issue/capa/capa.component';
 import { CloseComponent } from './create-issue/close/close.component';
 import { ReportComponent } from './report/report.component';
-import { UploadFileShowComponent } from './common/upload-file-show/upload-file-show.component';
-// import { OBAComponent } from './report copy/oba.component';
+import { OBAComponent } from './oba/oba.component';
 
 const routes: Routes = [{
   path: '',
@@ -34,11 +33,14 @@ const routes: Routes = [{
       path: 'report',
       component: ReportComponent,
     },
-    // {
-    //   path: 'oba',
-    //   component: OBAComponent,
-    // },
-    // create issue route
+    {
+      path: 'report/:issueId',
+      component: ReportComponent,
+    },
+    {
+      path: 'oba',
+      component: OBAComponent,
+    },
     {
       path: 'create-issue',
       component: CreateIssueComponent,
@@ -61,12 +63,12 @@ export const routedComponents = [
   DataTablesComponent,
   ConfigComponent,
   IssueComponent,
-  // OBAComponent,
+  OBAComponent,
   ReportComponent,
+  OBAComponent,
   CreateIssueComponent,
   CacaComponent,
   CapaComponent,
   CloseComponent,
   UploadFileComponent,
-  UploadFileShowComponent
 ];

@@ -7,6 +7,7 @@ import { IssueModel } from 'app/@core/models/issue';
 import { OBAModel, ProductModel, TeamFormationModel } from 'app/@core/models/issue-type';
 import { AssignModel } from 'app/@core/models/assign';
 import { V } from '@angular/cdk/keycodes';
+import { Router, ActivatedRoute } from '@angular/router';
 
 @Component({
   selector: 'ngx-report',
@@ -19,10 +20,10 @@ export class ReportComponent implements OnInit {
     private toastrService: NbToastrService,
     private issueService: IssueService,
     private assignService: AssginService,
-
+    public router: Router,
+    public route: ActivatedRoute
 
   ) { }
-
   IssueID: string = '';
 
   IssueData: IssueModel;
@@ -39,8 +40,11 @@ export class ReportComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.IssueID = "7b92522f-ca9b-4f06-b8c0-9d11469fd264";
-    this.GetAll();
+    // Get value from route    
+    this.route.params.subscribe(params => {
+      this.IssueID = params['issueId'] == undefined ? '7b92522f-ca9b-4f06-b8c0-9d11469fd264' : params['issueId'];
+      this.GetAll();
+    });
   }
 
   async GetAll() {
@@ -78,12 +82,10 @@ export class ReportComponent implements OnInit {
           this.CloseList.push(item)
         }
         // add team formation
-        if (!this.TeamList.find(x => x.empId == teamFormation.empId && x.position == teamFormation.position))
-        {
+        if (!this.TeamList.find(x => x.empId == teamFormation.empId && x.position == teamFormation.position)) {
           this.TeamList.push(teamFormation);
         }
       });
-      console.log(this.TeamList);
     });
   }
 

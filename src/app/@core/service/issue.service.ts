@@ -25,8 +25,6 @@ export class IssueService extends IssueData {
   getListIssueByIssueTitle(issueTitle: string): Observable<IssueModel[]> {
     return this.http.get<IssueModel[]>(this.url + 'list-issue-issueTitle/' + issueTitle);
   }
-
-
   getListProcess() {
     return this.http.get<ProcessModel[]>(this.url + 'list-process');
   }
@@ -51,6 +49,9 @@ export class IssueService extends IssueData {
 
   download() {
     return this.http.get(this.url + 'download', { responseType: 'blob' });
+  }
+  getProductByPSN(psn: string) : Observable<ProductModel> {
+    return this.http.get<ProductModel>(this.url + 'product-psn/' + psn);
   }
 
   // Create Information

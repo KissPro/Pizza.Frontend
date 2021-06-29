@@ -1,0 +1,114 @@
+<nb-card accent='info'>
+  <nb-card-header>
+    OBA Issue Table
+
+    <!-- <button (click)="testAdweb()" class="float-right" nbButton outline status="danger">
+      <nb-icon icon="close-outline"></nb-icon>
+    </button> -->
+    <!-- <button class="float-right mr-2" nbButton outline status="success" (click)="downloadIssue()">
+      <nb-icon icon="download-outline"></nb-icon>
+    </button> -->
+    <!-- <button (click)="newIssue()" class="float-right mr-2" nbButton outline status="primary">New Issue
+      <nb-icon icon="plus-outline"></nb-icon>
+    </button> -->
+  </nb-card-header>
+  <nb-card-body>
+    <div class="row">
+      <div class="col-sm-2 offset-sm-2">
+        <div class="form-group">
+          <label class="label">Factory</label>
+          <nb-select fullWidth [(selected)]="selectedFactory" id="selectFactory">
+            <nb-option *ngFor="let drop of listFactory" [value]="drop.value">{{drop.value}}
+            </nb-option>
+          </nb-select>
+        </div>
+      </div>
+      <div class="col-sm-2">
+        <div class="form-group">
+          <label class="label">NPI</label>
+          <nb-select fullWidth [(selected)]="selectedNPI" id="selectNPI">
+            <nb-option *ngFor="let drop of listNPI" [value]="drop.value">{{drop.value}}
+            </nb-option>
+          </nb-select>
+        </div>
+      </div>
+      <div class="col-sm-2">
+        <label class="label">Date</label>
+        <nb-form-field>
+          <input #dateInput [nbDatepicker]="inputDate" [(ngModel)]="dateSelected" nbInput fullWidth id="inputDate">
+          <nb-icon nbSuffix icon="calendar-outline" style="color: #5d5d5d;" pack="eva" (click)="dateInput.click()">
+          </nb-icon>
+          <nb-datepicker #inputDate></nb-datepicker>
+        </nb-form-field>
+      </div>
+      <div class="col-sm-1">
+        <div class="form-group">
+          <label class="label">&nbsp;</label>
+          <button (click)="getListOBAIssue()" fullWidth nbButton outline status="info">
+            <nb-icon icon="search-outline"></nb-icon>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <br>
+    <table class="table table-striped table-bordered">
+      <thead>
+        <tr>
+          <th style="width: 1.5rem;">#</th>
+          <th style="width: 3rem;">LINE</th>
+          <th style="width: 6rem;">PSN</th>
+          <th style="width: 4rem;">FAMILY</th>
+          <th>ITEM</th>
+          <th style="width: 6rem;">MODE</th>
+          <th style="width: 6.5rem;">COMPONENT</th>
+          <th>CLASSIFICATION</th>
+          <th>DESC</th>
+          <th>SUPERVISOR</th>
+          <th>AUDITOR</th>
+          <th>UPDATED_DATE</th>
+          <th>UPDATE</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let oba of obaIssueList;index as i">
+          <td>{{i + 1}}</td>
+          <td>{{ oba.line}}</td>
+          <td>{{ oba.pid }}</td>
+          <td>{{ oba.family }}</td>
+          <td>{{ oba.flag }}</td>
+          <td>{{ oba.failurE_MODE_DESC }}</td>
+          <td>{{ oba.failurE_COMPONENT_DESC }}</td>
+          <td>{{ oba.failurE_CLASSIFICATION_DESC }}</td>
+          <td>{{ oba.faiL_DESC2 }}</td>
+          <td>{{ oba.supervisor }}</td>
+          <td>{{ oba.auditor }}</td>
+          <td>{{ oba.updateD_DATE | date:'dd/MM/yyyy HH:mm'}}</td>
+          <td>
+            <div class="row d-flex justify-content-center">
+              <a size="small" *ngIf="oba.status != 'Updated'" class="float-right"
+                [routerLink]="['/pages/tables/create-issue']" [state]="oba" 
+                nbButton outline status="danger">
+                <nb-icon icon="edit-2-outline"></nb-icon>
+              </a>
+              <button size="small" *ngIf="oba.status == 'Updated'" class="float-right"
+                (click)="openIssueDetail(oba.url)" nbButton outline status="primary">
+                <nb-icon icon="book-open-outline"></nb-icon>
+              </button>
+              <button size="small" *ngIf="oba.status == 'Updated'" class="float-right ml-1"
+                (click)="openReport(oba.url)" nbButton outline status="success">
+                <nb-icon icon="file-text-outline"></nb-icon>
+              </button>
+
+
+              <!-- <a size="small" [routerLink]="['/pages/tables/report', issue.id]" class="float-right ml-1 mr-1" nbButton
+                outline status="success">
+                <nb-icon icon="file-text-outline"></nb-icon>
+              </a> -->
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </nb-card-body>
+</nb-card>

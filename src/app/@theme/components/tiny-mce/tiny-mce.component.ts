@@ -52,7 +52,7 @@ export class TinyMCEComponent implements OnDestroy, AfterViewInit {
       // inline: true,
       // menubar: false,
       // toolbar: false,
-      
+
       setup: editor => {
         this.editor = editor;
 
@@ -87,6 +87,26 @@ export class TinyMCEComponent implements OnDestroy, AfterViewInit {
             input.click();
           }
         });
+
+        // Check image paste
+        editor.on('paste', (e) => {
+          var imageBlob = this.onPaste(e);
+          if (!imageBlob) {
+            return;
+          }
+          e.preventDefault();
+          // upload
+          const formData = new FormData();
+          formData.append("file", imageBlob);
+          this.uploadService.UploadImage(formData)
+            .subscribe(result => {
+              console.log(result);
+              if (result['body'] !== undefined)
+                tinymce.activeEditor.insertContent('<img src="' + environment.APIPortalURL + result['body'] + '"/>');
+            });
+        });
+
+
       },
       height: '250',
     });
@@ -94,5 +114,16 @@ export class TinyMCEComponent implements OnDestroy, AfterViewInit {
 
   ngOnDestroy() {
     tinymce.remove(this.editor);
+  }
+
+  onPaste(e: any) {
+    const items = (e.clipboardData || e.originalEvent.clipboardData).items;
+    let blob = null;
+    for (const item of items) {
+      if (item.type.indexOf('image') === 0) {
+        blob = item.getAsFile();
+        return blob;
+      }
+    }
   }
 }

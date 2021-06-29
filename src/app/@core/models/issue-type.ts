@@ -5,7 +5,7 @@ export interface OBAModel {
 	defectPart: string;
 	defectName: string;
 	defectType: string;
-	samplingQty?: number; 
+	samplingQty?: number;
 	ngphoneOrdinal: string; // failure quantity
 	supervisor?: string;
 	auditor?: string;
@@ -29,6 +29,37 @@ export interface IMEIModel {
 	shift: string;
 }
 
+export interface OBAIssueModel {
+	auditor?: any,
+	createD_DATE?: any,
+	faiL_DESC?: any,
+	faiL_DESC2?: any,
+	failurE_CLASSIFICATION_CODE?: any,
+	failurE_CLASSIFICATION_DESC?: any,
+	failurE_COMPONENT_CODE?: any,
+	failurE_COMPONENT_DESC?: any,
+	failurE_MODE_CODE?: any,
+	failurE_MODE_DESC?: any,
+	family?: any,
+	fileName?: any,
+	flaG9?: any,
+	flag?: any,
+	id?: any,
+	line?: any,
+	pid?: any,
+	pointS_ID?: any,
+	status?: any,
+	supervisor?: any,
+	unlocker?: any,
+	updateD_DATE?: any,
+	url?: any,
+}
+
+export interface OBAIssueFilterModel {
+	factory?: any;
+	npi?: any;
+	date?: Date;
+}
 
 export interface ITModel {
 	id: string;
