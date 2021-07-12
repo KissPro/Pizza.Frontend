@@ -104,7 +104,7 @@
                             <br>
                             <div class="d-flex float-right">
                                 <div
-                                    *ngIf="userService.userId() != IssueCreator && assignList.value.status != 'Reassigned'">
+                                    *ngIf="!(userService.userId() == IssueCreator &&  userService.userId() == assignList.value.ownerId) && assignList.value.status != 'Reassigned'">
                                     <!-- Save for assign -->
                                     <button *ngIf="assignList.value.status == 'Draft'"
                                         (click)="assignSubmit(assignList.value,'draft')" class="mr-2" nbButton outline
@@ -137,7 +137,7 @@
                                     </button>
                                 </div>
                                 <!-- For seft submit -->
-                                <div *ngIf="userService.userId() == IssueCreator">
+                                <div *ngIf="userService.userId() == IssueCreator && userService.userId() == assignList.value.ownerId">
                                     <button (click)="seftSubmit(assignList.value,'submit-draft')" class="ml-2" nbButton
                                         outline status="info">
                                         Save

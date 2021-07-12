@@ -464,8 +464,8 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
             shift: (new Date(result[0].shift).getHours() >= 8 && new Date(result[0].shift).getHours() < 20) ? 'Day' : 'Night',
           })
         } else {
-          this.alert.showToast('danger', 'Error', 'IMEI not contain in the system!');
-          this.productFormGroup.reset();
+          this.alert.showToast('danger', 'Error', 'IMEI or PSN not contain in the system!');
+          // this.productFormGroup.reset();
         }
         this.loading = false;
         this.updateIssueNo();

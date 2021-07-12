@@ -51,15 +51,13 @@ export class TinyMCEComponent implements OnDestroy, AfterViewInit {
       paste_data_images: true,
       // inline: true,
       // menubar: false,
-      // toolbar: false,
-
+      // toolbar: false
       setup: editor => {
         this.editor = editor;
 
         // set content
         editor.on('init', () => {
           editor.setContent(this.rickText ? this.rickText : '<p></p>');
-
         });
         // get context
         editor.on('change', () => {
@@ -105,8 +103,6 @@ export class TinyMCEComponent implements OnDestroy, AfterViewInit {
                 tinymce.activeEditor.insertContent('<img src="' + environment.APIPortalURL + result['body'] + '"/>');
             });
         });
-
-
       },
       height: '250',
     });

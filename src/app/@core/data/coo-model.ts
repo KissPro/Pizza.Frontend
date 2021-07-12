@@ -26,3 +26,4 @@ export interface DataTablesResponse {
 export abstract class COOData {
 abstract postDatatables(dtParameter: any): Observable<any>;
 }
+
