@@ -283,7 +283,7 @@ export class CloseComponent implements OnInit {
             ///         IT  - 1 level
             if (this.approvalLv1.work_email == this.userService.email() 
                  && resultApproval.status == 1
-                 && this.IssueProcess == 'OBA') {
+                 && (this.IssueProcess === 'OBA' || this.IssueProcess === 'CAPA')) {
               this.sendMailApproval(this.approvalLv2);
             }
 

@@ -207,7 +207,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
         this.checkMailInformation();
       });
 
-      if (issueModel.processType === 'OBA') {
+      if (issueModel.processType === 'OBA' || issueModel.processType === 'CAPA') {
         // Select process type
         this.issueService.getProcessByName('OBA').subscribe(result => {
           this.currentProcess = result;
@@ -261,7 +261,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
       // Update issue information
       this.issueFormGroup.patchValue({
         failureDesc: `<p>${this.obaIssue.faiL_DESC2}</p>`,
-        processType: 'OBA',
+        processType: issueModel.processType,
         carNo: 'N/A',
         severity: 'Major',
         repeatedSymptom: 'TBD',
@@ -563,7 +563,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
     else if (this.issueFormGroup.invalid) {
       errorMessage = 'Kindly check issue information!';
     }
-    else if (this.currentProcess.processName == 'OBA'
+    else if ((this.currentProcess.processName === 'OBA' || this.currentProcess.processName === 'CAPA')
       && (this.obaFormGroup.invalid || this.productFormGroup.invalid)) {
       errorMessage = 'Kindly check required field!';
     }
@@ -597,7 +597,7 @@ export class CreateIssueComponent implements OnInit, AfterViewInit {
           if (result == true) {
             // Check process type.
             // Type : OBA -> Insert tblOBA, tblProduct
-            if (this.currentProcess.processName === 'OBA') {
+            if (this.currentProcess.processName === 'OBA' || this.currentProcess.processName === 'CAPA') {
               const obaNew: OBAModel = {
                 'id': this.obaFormGroup.value?.issueId ? this.obaFormGroup.value.issueId : this.guidService.getGuid(),
                 'issueId': this.IssueID,
